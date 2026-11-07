@@ -1,0 +1,18 @@
+SPDX-License-Identifier: LicenseRef-Microsoft-Azure-Architecture-Icons
+
+Microsoft Azure Architecture Icons
+
+These SVG files are Microsoft artwork. They are not under the MIT license
+that covers the infrasketch source code.
+
+Microsoft permits the use of these icons in architectural diagrams, training
+materials, or documentation. You may copy, distribute, and display the icons
+only for that permitted use, unless Microsoft grants explicit permission for
+something else. Microsoft reserves all other rights.
+
+Do not crop, flip, rotate, recolor, or change an icon's shape.
+Do not use these icons to represent your own product or service.
+Do not relicense these files.
+
+Source and terms: https://learn.microsoft.com/azure/architecture/icons/
+Icon package: Azure_Public_Service_Icons_V25 (November 2026).

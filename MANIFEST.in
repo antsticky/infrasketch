@@ -1,0 +1,4 @@
+recursive-include src/infrasketch/data *.svg *.json *.txt
+include src/infrasketch/py.typed
+include LICENSE
+include NOTICE

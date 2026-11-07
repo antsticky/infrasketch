@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Icons · infrasketch</title>
+  <meta name="description" content="Browse the Azure architecture icons included with infrasketch and copy the import line.">
+  <link rel="icon" href="assets/favicon.svg">
+  <link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="index.html">infrasketch<small>SVG architecture diagrams</small></a>
+    <nav class="nav" aria-label="Documentation">
+      <a href="index.html">Overview</a>
+      <a href="guide.html">Guide</a>
+      <a href="icons.html" aria-current="page">Icons</a>
+      <a href="license.html">License</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <div class="page-title">
+      <h1>Icons</h1>
+      <p class="lede">All 721 Azure Architecture Icons in this package. Search by service, class, or shortcut, then copy the import.</p>
+    </div>
+
+    <div class="toolbar">
+      <input id="search" type="search" placeholder="Search function, redis, private endpoint" aria-label="Search icons">
+    </div>
+
+    <div class="browser">
+      <nav id="cats" class="cats" aria-label="Icon categories"></nav>
+      <section class="results">
+        <p id="count" class="count" style="padding: 12px 12px 0">Loading icons…</p>
+        <div id="grid" class="grid" style="padding: 12px"></div>
+      </section>
+      <aside id="detail" class="detail" aria-live="polite">
+        <p class="muted">Choose an icon to see the class name and the import to paste into a diagram.</p>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer wrap">
+    Azure icons © Microsoft · shown unchanged, for architecture diagrams, training, and documentation.
+  </footer>
+  <script type="module" src="assets/icons.js"></script>
+</body>
+</html>

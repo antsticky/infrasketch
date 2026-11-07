@@ -1,0 +1,433 @@
+"""Diagram model and the connection operators.
+
+Create resources inside a ``Diagram``. ``>>`` draws a forward arrow,
+``<<`` draws one pointing back at the left side, and ``-`` draws a plain line.
+Lists work on either side because the right-hand object handles the operator.
+"""
+
+from __future__ import annotations
+
+import re
+from dataclasses import dataclass, field
+from typing import Iterator
+
+_stack: list[Scope] = []
+
+
+class DiagramError(RuntimeError):
+    """Raised when a diagram is built outside a valid context."""
+
+
+class Scope:
+    """A diagram or a boundary that can contain nodes and other boundaries."""
+
+    def __init__(self) -> None:
+        self.children: list[Endpoint] = []
+        self.parent: Scope | None = None
+        self.diagram: Diagram | None = None
+        self.x = 0.0
+        self.y = 0.0
+        self.w = 0.0
+        self.h = 0.0
+        self.abs_x = 0.0
+        self.abs_y = 0.0
+        self.content_w = 0.0
+        self.content_h = 0.0
+        self.content_x = 0.0
+        self.content_y = 0.0
+
+    def walk(self) -> Iterator[Endpoint]:
+        for child in self.children:
+            yield child
+            if isinstance(child, Scope):
+                yield from child.walk()
+
+
+class Endpoint(Scope):
+    """Something an arrow can connect to: a resource or a boundary."""
+
+    label = ""
+
+    def __repr__(self) -> str:
+        return f"{type(self).__name__}({self.label!r})"
+
+    def connect(self, other: Endpoint, edge: Edge) -> Endpoint:
+        if not isinstance(other, Endpoint):
+            raise DiagramError(f"{other!r} is not a resource or group")
+        diagram = self.diagram
+        if diagram is None or other.diagram is None:
+            raise DiagramError("Connect resources that belong to a diagram")
+        if diagram is not other.diagram:
+            raise DiagramError("Cannot connect resources from different diagrams")
+        if edge.forward and edge.reverse:
+            direction = "both"
+        elif edge.forward:
+            direction = "forward"
+        elif edge.reverse:
+            direction = "back"
+        else:
+            direction = "none"
+        diagram.edges.append(
+            Connection(
+                source=self,
+                target=other,
+                label=edge.label,
+                color=edge.color,
+                style=edge.style or "solid",
+                direction=direction,
+            )
+        )
+        return other
+
+    def __rshift__(self, other):
+        if isinstance(other, list):
+            for item in other:
+                self >> item
+            return other
+        if isinstance(other, Endpoint):
+            return self.connect(other, Edge(forward=True))
+        other.forward = True
+        other.node = self
+        return other
+
+    def __lshift__(self, other):
+        if isinstance(other, list):
+            for item in other:
+                self << item
+            return other
+        if isinstance(other, Endpoint):
+            return self.connect(other, Edge(reverse=True))
+        other.reverse = True
+        return other.connect(self)
+
+    def __sub__(self, other):
+        if isinstance(other, list):
+            for item in other:
+                self - item
+            return other
+        if isinstance(other, Endpoint):
+            return self.connect(other, Edge())
+        other.node = self
+        return other
+
+    def __rrshift__(self, other):
+        for item in other:
+            if isinstance(item, Edge):
+                item.forward = True
+                item.connect(self)
+            else:
+                item.connect(self, Edge(forward=True))
+        return self
+
+    def __rlshift__(self, other):
+        for item in other:
+            if isinstance(item, Edge):
+                item.reverse = True
+                item.connect(self)
+            else:
+                item.connect(self, Edge(reverse=True))
+        return self
+
+    def __rsub__(self, other):
+        for item in other:
+            if isinstance(item, Edge):
+                item.connect(self)
+            else:
+                item.connect(self, Edge())
+        return self
+
+
+@dataclass
+class Connection:
+    source: Endpoint
+    target: Endpoint
+    label: str = ""
+    color: str = ""
+    style: str = "solid"
+    direction: str = "forward"
+    points: list[tuple[float, float]] = field(default_factory=list)
+    lane: float = 0.0
+
+
+class Edge:
+    """A connector. Put it between resources: ``api >> Edge("SQL") >> db``."""
+
+    def __init__(
+        self,
+        label: str = "",
+        *,
+        color: str = "",
+        style: str = "solid",
+        forward: bool = False,
+        reverse: bool = False,
+        node: Endpoint | None = None,
+    ) -> None:
+        self.label = label or ""
+        self.color = color or ""
+        self.style = style or "solid"
+        self.forward = forward
+        self.reverse = reverse
+        self.node = node
+        _check_color(self.color)
+        if self.style not in {"solid", "dashed", "dotted"}:
+            raise DiagramError("Edge style must be solid, dashed, or dotted")
+
+    def __rshift__(self, other):
+        self.forward = True
+        return self.connect(other)
+
+    def __lshift__(self, other):
+        self.reverse = True
+        return self.connect(other)
+
+    def __sub__(self, other):
+        return self.connect(other)
+
+    def __rrshift__(self, other):
+        return self._from_list(other, forward=True)
+
+    def __rlshift__(self, other):
+        return self._from_list(other, reverse=True)
+
+    def __rsub__(self, other):
+        return self._from_list(other)
+
+    def _from_list(self, other, forward: bool = False, reverse: bool = False):
+        result = []
+        for item in other:
+            edge = Edge(
+                self.label,
+                color=self.color,
+                style=self.style,
+                forward=forward or self.forward,
+                reverse=reverse or self.reverse,
+                node=item if isinstance(item, Endpoint) else None,
+            )
+            if isinstance(item, Edge):
+                edge.label = item.label or edge.label
+                edge.color = item.color or edge.color
+                edge.style = item.style or edge.style
+            result.append(edge)
+        return result
+
+    def connect(self, other):
+        if isinstance(other, list):
+            for item in other:
+                self.connect(item)
+            return other
+        if isinstance(other, Edge):
+            if other.label:
+                self.label = other.label
+            if other.color:
+                self.color = other.color
+            if other.style:
+                self.style = other.style
+            return self
+        if self.node is not None:
+            return self.node.connect(other, self)
+        self.node = other
+        return self
+
+
+class Https(Edge):
+    """HTTPS connector in Azure blue."""
+
+    def __init__(self, label: str = "HTTPS", **kwargs) -> None:
+        kwargs.setdefault("color", "#0078D4")
+        super().__init__(label, **kwargs)
+
+
+class Async(Edge):
+    """Dashed connector for queues, events, and other asynchronous calls."""
+
+    def __init__(self, label: str = "", **kwargs) -> None:
+        kwargs.setdefault("color", "#7C3AED")
+        kwargs.setdefault("style", "dashed")
+        super().__init__(label, **kwargs)
+
+
+class Private(Edge):
+    """Dashed green connector for Private Link and private endpoints."""
+
+    def __init__(self, label: str = "", **kwargs) -> None:
+        kwargs.setdefault("color", "#107C41")
+        kwargs.setdefault("style", "dashed")
+        super().__init__(label, **kwargs)
+
+
+class Node(Endpoint):
+    """A single Azure resource. Subclasses set ``icon`` and ``service``."""
+
+    icon: str | None = None
+    service: str = "Resource"
+
+    def __init__(
+        self,
+        label: str | None = None,
+        *,
+        caption: str | bool | None = None,
+        icon: str | None = None,
+    ) -> None:
+        super().__init__()
+        parent = _current_parent()
+        service = self.service or type(self).__name__
+        if label:
+            self.label = label
+            if caption is False:
+                self.caption = ""
+            elif isinstance(caption, str):
+                self.caption = caption
+            else:
+                self.caption = "" if label == service else service
+        else:
+            self.label = service
+            self.caption = ""
+        self.icon = icon if icon is not None else self.__class__.icon
+        self.diagram = parent.diagram if not isinstance(parent, Diagram) else parent
+        self.parent = parent
+        parent.children.append(self)
+        self.label_lines: list[str] = []
+        self.caption_lines: list[str] = []
+        self.icon_box = (0.0, 0.0, 0.0, 0.0)
+
+    def __init_subclass__(cls, **kwargs) -> None:
+        super().__init_subclass__(**kwargs)
+        doc = getattr(cls, "__doc__", None)
+        if doc and cls.service == "Resource":
+            cls.service = doc.strip().splitlines()[0].strip(". ")
+
+
+class Group(Endpoint):
+    """A rounded boundary. Prefer ``ResourceGroup``, ``VNet``, or ``Subnet``."""
+
+    kind = "group"
+
+    def __init__(
+        self,
+        label: str,
+        *,
+        kind: str | None = None,
+        direction: str | None = None,
+        arrange: str | None = None,
+        columns: int | None = None,
+        align: str | None = None,
+    ) -> None:
+        super().__init__()
+        self.label = label
+        self.kind = kind or self.__class__.kind
+        self.direction = _check_direction(direction) if direction else None
+        self.arrange = arrange
+        self.columns = columns
+        self.align = align
+        self.header_h = 0.0
+        if self.arrange not in {None, "flow", "row", "column", "grid"}:
+            raise DiagramError("arrange must be flow, row, column, or grid")
+        if self.align not in {None, "top", "center"}:
+            raise DiagramError("align must be top or center")
+
+    def __enter__(self) -> Group:
+        parent = _current_parent()
+        self.parent = parent
+        self.diagram = parent if isinstance(parent, Diagram) else parent.diagram
+        parent.children.append(self)
+        _stack.append(self)
+        return self
+
+    def __exit__(self, exc_type, exc, tb) -> None:
+        if not _stack or _stack[-1] is not self:
+            raise DiagramError("Group context closed out of order")
+        _stack.pop()
+
+
+class Diagram(Scope):
+    """An architecture diagram. Use it as a context manager.
+
+    Resources created inside the ``with`` block are added to the diagram and,
+    unless ``autosave`` is false, the SVG is written when the block ends.
+    """
+
+    def __init__(
+        self,
+        title: str,
+        path: str | None = None,
+        *,
+        direction: str = "LR",
+        subtitle: str | None = None,
+        spacing: str = "regular",
+        align: str = "top",
+        autosave: bool = True,
+    ) -> None:
+        super().__init__()
+        self.title = title
+        self.subtitle = subtitle or ""
+        self.path = path or _slug(title) + ".svg"
+        self.direction = _check_direction(direction)
+        if spacing not in {"compact", "regular", "relaxed"}:
+            raise DiagramError("spacing must be compact, regular, or relaxed")
+        if align not in {"top", "center"}:
+            raise DiagramError("align must be top or center")
+        self.spacing = spacing
+        self.align = align
+        self.arrange = "flow"
+        self.columns = None
+        self.autosave = autosave
+        self.edges: list[Connection] = []
+        self.diagram = self
+        self.label = title
+
+    def __enter__(self) -> Diagram:
+        if _stack:
+            raise DiagramError("Start a diagram on its own, not inside another diagram or group")
+        _stack.append(self)
+        return self
+
+    def __exit__(self, exc_type, exc, tb) -> None:
+        if not _stack or _stack[-1] is not self:
+            raise DiagramError("Diagram context closed out of order")
+        _stack.pop()
+        if exc_type is None and self.autosave:
+            self.save()
+
+    def svg(self) -> str:
+        from infrasketch.render import render_svg
+
+        return render_svg(self)
+
+    def save(self, path: str | None = None) -> str:
+        from pathlib import Path
+
+        destination = Path(path or self.path)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_text(self.svg(), encoding="utf-8")
+        self.path = str(destination)
+        return self.path
+
+
+def _current_parent() -> Scope:
+    if not _stack:
+        raise DiagramError(
+            "Create resources inside a diagram:\n\n"
+            "    with Diagram('Orders') as diagram:\n"
+            "        api = FunctionApp('API')\n"
+        )
+    return _stack[-1]
+
+
+def _check_direction(direction: str) -> str:
+    value = direction.upper()
+    if value not in {"LR", "TB"}:
+        raise DiagramError("direction must be LR (left to right) or TB (top to bottom)")
+    return value
+
+
+def _check_color(color: str) -> None:
+    if not color:
+        return
+    if re.fullmatch(r"#[0-9A-Fa-f]{3,8}", color) or re.fullmatch(r"[A-Za-z]{1,32}", color):
+        return
+    raise DiagramError(f"Unsupported edge color {color!r}. Use a hex color such as #0078D4.")
+
+
+def _slug(title: str) -> str:
+    slug = re.sub(r"[^a-zA-Z0-9]+", "-", title.strip().lower()).strip("-")
+    return slug or "diagram"

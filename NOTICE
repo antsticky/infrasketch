@@ -1,0 +1,27 @@
+Third-party artwork
+
+The SVG files in src/infrasketch/data/icons/ are the Microsoft Azure Architecture
+Icons (package Azure_Public_Service_Icons_V25, published November 2026). They
+are not covered by the MIT license that applies to the infrasketch source code.
+A copy of these terms is kept beside the files in
+src/infrasketch/data/icons/LICENSE.txt.
+
+Microsoft permits the use of these icons in architectural diagrams, training
+materials, or documentation. You may copy, distribute, and display the icons
+only for that permitted use, unless Microsoft grants explicit permission for
+something else. Microsoft reserves all other rights.
+
+Permitted:
+
+- Use an icon to show how Azure products work together.
+- Keep the product name near the icon in a diagram.
+- Show the icon as it appears in Azure.
+
+Not permitted:
+
+- Do not crop, flip, rotate, recolor, or otherwise change an icon's shape.
+- Do not use a Microsoft product icon to represent your own product or service.
+- Do not present the icons as MIT, Apache, public-domain, or infrasketch artwork.
+- Do not imply that Microsoft made, sponsors, or endorses this package.
+
+Source and terms: https://learn.microsoft.com/azure/architecture/icons/
