@@ -20,29 +20,14 @@ caption under it is the service name.
 
 ## Install
 
-From this folder:
-
 ```bash
-pip install -e .
-```
-
-The examples also run without installing:
-
-```bash
-python examples/web_api_redis.py
-python examples/render_all.py
+pip install infrasketch
 ```
 
 ## Documentation
 
-The guide and the icon browser are a static site. Build it, then open the local copy:
-
-```bash
-python tools/build_site.py
-python -m http.server -d site 8765
-```
-
-That serves the overview, the guide, and a searchable page of every Azure icon with its import line. GitHub Pages publishes the same build from `.github/workflows/pages.yml` on each push to `main`.
+The guide and the searchable icon browser are published at
+[antsticky.github.io/infrasketch](https://antsticky.github.io/infrasketch/).
 
 ## Draw a diagram
 
@@ -162,12 +147,6 @@ to use your own artwork. Azure icons are never recoloured or stretched.
 | `examples/functions_events.py` | API Management, functions, Service Bus, Cosmos DB, storage |
 | `examples/aks_platform.py` | AKS, ACR, firewall, PostgreSQL, managed Redis |
 
-```bash
-python examples/render_all.py
-```
-
-The SVGs land in `examples/out/`.
-
 ![Web, API, and Redis](examples/out/web-api-redis.svg)
 
 ![Container Apps](examples/out/container-apps.svg)
@@ -186,9 +165,3 @@ training materials, and documentation only. Do not crop, flip, rotate, recolor,
 or reshape them, and do not use them as a logo or to represent your own
 product. The terms travel with the files in `NOTICE` and
 `src/infrasketch/data/icons/LICENSE.txt`.
-
-Refresh the set, after downloading a newer zip to `.icons.zip`, with:
-
-```bash
-python tools/import_icons.py
-```
