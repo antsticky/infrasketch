@@ -27,14 +27,31 @@
 
     <h2>Install</h2>
     <pre><code>pip install infrasketch</code></pre>
-    <p>From a checkout of this repository, <code>pip install -e .</code> installs the same package. The examples also run without installing, because each script adds <code>src</code> to its path:</p>
-    <pre><code>python examples/web_api_redis.py
-python examples/render_all.py</code></pre>
+
+    <h2>AWS</h2>
+    <p>AWS resources live in <code>infrasketch.aws</code>, so they do not replace the Azure names. <code>VPC</code>, <code>PublicSubnet</code>, and <code>PrivateSubnet</code> are boundaries, the same way a resource group and a virtual network are.</p>
+    <pre><code>from infrasketch import Diagram
+from infrasketch.aws import (
+    APIGateway, CloudFront, DynamoDB, Lambda, PrivateSubnet, PublicSubnet, S3, Users, VPC,
+)
+
+with Diagram("Orders", "orders.svg"):
+    customers = Users("Customers")
+    edge = CloudFront("Entry")
+    with VPC("vpc-orders"):
+        with PublicSubnet("public"):
+            api = APIGateway("Orders")
+        with PrivateSubnet("data"):
+            checkout = Lambda("Checkout")
+            orders = DynamoDB("Orders")
+            images = S3("Images")
+    customers &gt;&gt; edge &gt;&gt; api &gt;&gt; checkout
+    checkout &gt;&gt; [orders, images]</code></pre>
 
     <h2>Draw a diagram</h2>
     <p>Groups are context managers too, so the indentation is the architecture. The icon says which Azure service it is. The label is your name for that piece of the system, and the caption under it is the service name.</p>
-    <pre><code>from infrasketch import (
-    Diagram, Https, Private,
+    <pre><code>from infrasketch import Diagram, Https, Private
+from infrasketch.azure import (
     ResourceGroup, VNet, Subnet, PrivateNetwork,
     Users, FrontDoor, StaticWebApp, AppService, Redis, SQLDatabase, KeyVault,
 )
@@ -84,20 +101,23 @@ diagram.save("orders.svg")</code></pre>
     <table>
       <thead><tr><th>Group</th><th>Use it for</th></tr></thead>
       <tbody>
-        <tr><td><code>Subscription("sub")</code></td><td>A subscription</td></tr>
-        <tr><td><code>ResourceGroup("rg-app")</code></td><td>A resource group</td></tr>
-        <tr><td><code>Region("West Europe")</code></td><td>A region</td></tr>
-        <tr><td><code>VNet("vnet-app")</code></td><td>A virtual network</td></tr>
-        <tr><td><code>Subnet("snet-api")</code></td><td>A subnet</td></tr>
+        <tr><td><code>Subscription("sub")</code></td><td>An Azure subscription</td></tr>
+        <tr><td><code>ResourceGroup("rg-app")</code></td><td>An Azure resource group</td></tr>
+        <tr><td><code>Region("West Europe")</code></td><td>An Azure region. AWS has its own <code>Region</code> in <code>infrasketch.aws</code></td></tr>
+        <tr><td><code>VNet("vnet-app")</code></td><td>An Azure virtual network</td></tr>
+        <tr><td><code>Subnet("snet-api")</code></td><td>An Azure subnet</td></tr>
         <tr><td><code>PrivateNetwork("data")</code></td><td>Private endpoints or Private Link</td></tr>
+        <tr><td><code>VPC("vpc-app")</code></td><td>An AWS virtual private cloud</td></tr>
+        <tr><td><code>PublicSubnet("public")</code></td><td>An AWS public subnet</td></tr>
+        <tr><td><code>PrivateSubnet("private")</code></td><td>An AWS private subnet</td></tr>
         <tr><td><code>Group("Workers")</code></td><td>Anything else</td></tr>
       </tbody>
     </table>
     <p>Inside a boundary, connected resources flow in the diagram direction. Resources at the same step stack. <code>arrange="row"</code> forces a single row, <code>arrange="column"</code> a single column, and <code>arrange="grid"</code> with <code>columns=3</code> a grid.</p>
 
     <h2>Names</h2>
-    <p>Common resources have short names: <code>FunctionApp</code>, <code>ContainerApp</code>, <code>ACR</code>, <code>AKS</code>, <code>Redis</code>, <code>ManagedRedis</code>, <code>SQLDatabase</code>, <code>CosmosDB</code>, <code>PostgreSQL</code>, <code>StorageAccount</code>, <code>KeyVault</code>, <code>FrontDoor</code>, <code>ApplicationGateway</code>, <code>ServiceBus</code>, <code>StaticWebApp</code>.</p>
-    <p>Every icon in the Azure set is included. The <a href="icons.html">icon browser</a> shows the import line. From a terminal:</p>
+    <p>Common Azure names come from <code>infrasketch.azure</code>: <code>FunctionApp</code>, <code>ContainerApp</code>, <code>ACR</code>, <code>AKS</code>, <code>Redis</code>, <code>SQLDatabase</code>, <code>KeyVault</code>, <code>FrontDoor</code>. Common AWS names come from <code>infrasketch.aws</code>: <code>Lambda</code>, <code>S3</code>, <code>DynamoDB</code>, <code>APIGateway</code>.</p>
+    <p>Every icon in both sets is included. The <a href="icons.html">icon browser</a> shows the import line. From a terminal:</p>
     <pre><code>python -m infrasketch search private endpoint
 python -m infrasketch categories</code></pre>
     <pre><code>from infrasketch import search
@@ -105,11 +125,11 @@ python -m infrasketch categories</code></pre>
 for hit in search("cosmos"):
     print(hit.import_line)</code></pre>
     <p><code>FunctionApp("Orders")</code> labels the box "Orders" and captions it "Function App". <code>FunctionApp()</code> uses the service name as the only label. <code>caption=False</code> hides the caption.</p>
-    <p>A resource with no icon draws a neutral placeholder. Pass <code>icon="path/to.svg"</code> to use your own artwork. Azure icons stay at their original colors and proportions.</p>
+    <p>A resource with no icon draws a neutral placeholder. Pass <code>icon="path/to.svg"</code> to use your own artwork. Azure and AWS icons stay at their original colors and proportions.</p>
   </main>
 
   <footer class="site-footer wrap">
-    Azure icons © Microsoft · for architecture diagrams, training, and documentation.
+    Azure icons © Microsoft · AWS icons © Amazon Web Services · for architecture diagrams, training, and documentation.
   </footer>
 </body>
 </html>

@@ -25,3 +25,19 @@ Not permitted:
 - Do not imply that Microsoft made, sponsors, or endorses this package.
 
 Source and terms: https://learn.microsoft.com/azure/architecture/icons/
+
+AWS Architecture Icons
+
+The SVG files in src/infrasketch/data/icons/aws/ are the AWS Architecture Icons
+(package Icon-package_07312026). They are not covered by the MIT license that
+applies to the infrasketch source code. A copy of these terms is kept beside
+the files in src/infrasketch/data/icons/aws/LICENSE.txt.
+
+AWS allows customers and partners to use these icons to create architecture
+diagrams. The same icons may also appear in whitepapers, presentations, data
+sheets, and posters. AWS reserves all other rights.
+
+Do not present the icons as MIT or as infrasketch artwork, and do not imply
+that Amazon Web Services made, sponsors, or endorses this package.
+
+Source: https://aws.amazon.com/architecture/icons/

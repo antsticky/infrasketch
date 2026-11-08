@@ -1,10 +1,11 @@
 # infrasketch
 
-Draw Azure architecture diagrams as SVG. The package uses the official Azure
+Draw Azure and AWS architecture diagrams as SVG. The package uses the official
 resource icons and lays the diagram out itself, so Graphviz is not required.
 
 ```python
-from infrasketch import Diagram, FrontDoor, FunctionApp, Redis, ResourceGroup
+from infrasketch import Diagram
+from infrasketch.azure import FrontDoor, FunctionApp, Redis, ResourceGroup
 
 with Diagram("Orders", "orders.svg"):
     with ResourceGroup("rg-app"):
@@ -14,9 +15,25 @@ with Diagram("Orders", "orders.svg"):
     web >> api >> cache
 ```
 
-That writes `orders.svg` when the block ends. The icon says which Azure
-service it is. The label is your name for that piece of the system, and the
-caption under it is the service name.
+That writes `orders.svg` when the block ends. The icon says which service it
+is. The label is your name for that piece of the system, and the caption under
+it is the service name.
+
+Azure resources come from `infrasketch.azure`. AWS resources come from `infrasketch.aws`:
+
+```python
+from infrasketch import Diagram
+from infrasketch.aws import APIGateway, CloudFront, DynamoDB, Lambda, S3, Users, VPC
+
+with Diagram("Orders", "orders.svg"):
+    with VPC("vpc-orders"):
+        api = APIGateway("Orders")
+        checkout = Lambda("Checkout")
+        orders = DynamoDB("Orders")
+        images = S3("Images")
+    Users("Customers") >> CloudFront("Entry") >> api >> checkout
+    checkout >> [orders, images]
+```
 
 ## Install
 
@@ -35,8 +52,8 @@ Resources only exist inside a diagram. Groups are context managers too, so the
 indentation is the architecture:
 
 ```python
-from infrasketch import (
-    Diagram, Edge, Https, Private,
+from infrasketch import Diagram, Https, Private
+from infrasketch.azure import (
     ResourceGroup, VNet, Subnet, PrivateNetwork,
     Users, FrontDoor, StaticWebApp, AppService, Redis, SQLDatabase, KeyVault,
 )
@@ -107,12 +124,15 @@ single column, and `arrange="grid"` with `columns=3` a grid.
 
 ## Finding an icon
 
-Common resources have short names: `FunctionApp`, `ContainerApp`, `ACR`,
-`AKS`, `Redis`, `ManagedRedis`, `SQLDatabase`, `CosmosDB`, `PostgreSQL`,
-`StorageAccount`, `KeyVault`, `FrontDoor`, `ApplicationGateway`,
-`ServiceBus`, `StaticWebApp`.
+Common Azure names, imported from `infrasketch.azure`: `FunctionApp`,
+`ContainerApp`, `ACR`, `AKS`, `Redis`, `ManagedRedis`, `SQLDatabase`,
+`CosmosDB`, `PostgreSQL`, `StorageAccount`, `KeyVault`, `FrontDoor`,
+`ApplicationGateway`, `ServiceBus`, `StaticWebApp`.
 
-Everything in the Azure icon set is included. Search when you need the rest:
+Common AWS names, imported from `infrasketch.aws`: `Lambda`, `EC2`, `S3`,
+`DynamoDB`, `APIGateway`, `CloudFront`, `SQS`, `EKS`.
+
+Search when you need the rest:
 
 ```bash
 python -m infrasketch search private endpoint
@@ -128,7 +148,8 @@ for hit in search("cosmos"):
 ```
 
 ```python
-from infrasketch.networking import Bastions
+from infrasketch.azure.networking import Bastions
+from infrasketch.aws.compute import AWSLambda
 ```
 
 `FunctionApp("Orders")` labels the box "Orders" and captions it "Function App".
@@ -142,26 +163,33 @@ to use your own artwork. Azure icons are never recoloured or stretched.
 
 | Script | What it shows |
 | --- | --- |
-| `examples/web_api_redis.py` | Front Door, static web app, API, Redis, SQL, Key Vault |
-| `examples/container_apps.py` | ACR, Container Apps, private endpoints |
-| `examples/functions_events.py` | API Management, functions, Service Bus, Cosmos DB, storage |
-| `examples/aks_platform.py` | AKS, ACR, firewall, PostgreSQL, managed Redis |
+| `examples/azure_web_api.py` | Front Door, static web app, API, Redis, SQL, Key Vault |
+| `examples/azure_container_apps.py` | ACR, Container Apps, private endpoints |
+| `examples/azure_functions.py` | API Management, functions, Service Bus, Cosmos DB, storage |
+| `examples/azure_aks.py` | AKS, ACR, PostgreSQL, managed Redis |
+| `examples/azure_ai.py` | Static web app, Azure OpenAI, AI Search, storage |
+| `examples/azure_data.py` | Event Hubs, Logic Apps, Data Factory, SQL |
+| `examples/azure_network.py` | Firewall, Application Gateway, Bastion, a jump host |
+| `examples/aws_orders.py` | CloudFront, API Gateway, Lambda, DynamoDB, and S3 in a VPC |
 
-![Web, API, and Redis](examples/out/web-api-redis.svg)
+![Web, API, and Redis](examples/out/azure-web-api.svg)
 
-![Container Apps](examples/out/container-apps.svg)
+![Container Apps](examples/out/azure-container-apps.svg)
 
 ## License
 
 The package license expression is
-`MIT AND LicenseRef-Microsoft-Azure-Architecture-Icons`.
+`MIT AND LicenseRef-Microsoft-Azure-Architecture-Icons AND LicenseRef-AWS-Architecture-Icons`.
 
 The Python code is MIT. See `LICENSE`.
 
-The SVG files in `src/infrasketch/data/icons` are Microsoft Azure Architecture
-Icons (V25). They are not MIT. Their identifier is
-`LicenseRef-Microsoft-Azure-Architecture-Icons`. Microsoft allows them in architecture diagrams,
-training materials, and documentation only. Do not crop, flip, rotate, recolor,
-or reshape them, and do not use them as a logo or to represent your own
-product. The terms travel with the files in `NOTICE` and
-`src/infrasketch/data/icons/LICENSE.txt`.
+The SVG files in `src/infrasketch/data/icons` are official cloud artwork. They
+are not MIT. Azure icons are `LicenseRef-Microsoft-Azure-Architecture-Icons`.
+AWS icons, under `src/infrasketch/data/icons/aws`, are
+`LicenseRef-AWS-Architecture-Icons`. Microsoft allows the Azure icons in
+architecture diagrams, training materials, and documentation. AWS allows
+customers and partners to use the AWS icons in architecture diagrams, and in
+whitepapers, presentations, datasheets, and posters. Do not use either set as
+a logo or to represent your own product. The terms travel with the files in
+`NOTICE`, `src/infrasketch/data/icons/LICENSE.txt`, and
+`src/infrasketch/data/icons/aws/LICENSE.txt`.

@@ -1,0 +1,16 @@
+SPDX-License-Identifier: LicenseRef-AWS-Architecture-Icons
+
+AWS Architecture Icons
+
+These SVG files are Amazon Web Services artwork. They are not under the MIT
+license that covers the infrasketch source code.
+
+AWS allows customers and partners to use these icons to create architecture
+diagrams. The same icons may also appear in whitepapers, presentations, data
+sheets, and posters. AWS reserves all other rights.
+
+Do not relicense these files.
+Do not use these icons to represent your own product or service.
+
+Source: https://aws.amazon.com/architecture/icons/
+Icon package: Icon-package_07312026.

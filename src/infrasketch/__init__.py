@@ -1,9 +1,10 @@
-"""Draw Azure architecture diagrams as SVG, with the official resource icons.
+"""Draw Azure and AWS architecture diagrams as SVG, with the official resource icons.
 
 Graphviz is not required. A diagram is a ``with`` block, resources are
 constructed inside it, and ``>>`` draws the arrow::
 
-    from infrasketch import Diagram, FrontDoor, FunctionApp, Redis, ResourceGroup
+    from infrasketch import Diagram
+    from infrasketch.azure import FrontDoor, FunctionApp, Redis, ResourceGroup
 
     with Diagram("Orders", "orders.svg"):
         with ResourceGroup("rg-app"):
@@ -13,26 +14,17 @@ constructed inside it, and ``>>`` draws the arrow::
         web >> api >> cache
 
 The file is written when the block ends. ``python -m infrasketch search redis``
-finds the class for any other resource.
+finds the class for any other resource. AWS resources are in ``infrasketch.aws``.
 
-The source code is MIT. The Azure icons are Microsoft artwork and are not
-covered by that license. See ``NOTICE``.
+The source code is MIT. The Azure icons are Microsoft artwork and the AWS
+icons are Amazon Web Services artwork. Neither set is covered by that license.
+See ``NOTICE``.
 """
 
-from infrasketch.groups import (
-    Cluster,
-    Group,
-    PrivateNetwork,
-    Region,
-    ResourceGroup,
-    Subnet,
-    Subscription,
-    VNet,
-)
-from infrasketch.model import Async, Diagram, Edge, Https, Node, Private
+from infrasketch.model import Async, Diagram, Edge, Group, Https, Node, Private
 from infrasketch.search import categories, search
-from infrasketch.shortcuts import *  # noqa: F403
-from infrasketch.shortcuts import __all__ as _resources
+
+Cluster = Group
 
 __all__ = [
     "Async",
@@ -43,13 +35,6 @@ __all__ = [
     "Https",
     "Node",
     "Private",
-    "PrivateNetwork",
-    "Region",
-    "ResourceGroup",
-    "Subnet",
-    "Subscription",
-    "VNet",
     "categories",
     "search",
-    *_resources,
 ]

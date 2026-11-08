@@ -4,17 +4,18 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "infrasketch"
-version = "0.1.0"
-description = "Draw Azure architecture diagrams as SVG with official resource icons. No Graphviz."
+version = "1.0.0"
+description = "Draw Azure and AWS architecture diagrams as SVG with official resource icons. No Graphviz."
 readme = "README.md"
 requires-python = ">=3.10"
-license = "MIT AND LicenseRef-Microsoft-Azure-Architecture-Icons"
+license = "MIT AND LicenseRef-Microsoft-Azure-Architecture-Icons AND LicenseRef-AWS-Architecture-Icons"
 license-files = [
     "LICENSE",
     "NOTICE",
     "src/infrasketch/data/icons/LICENSE.txt",
+    "src/infrasketch/data/icons/aws/LICENSE.txt",
 ]
-keywords = ["azure", "architecture", "diagram", "svg", "icons"]
+keywords = ["azure", "aws", "architecture", "diagram", "svg", "icons"]
 authors = [{ name = "infrasketch" }]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -30,6 +31,9 @@ where = ["src"]
 infrasketch = [
     "py.typed",
     "data/catalog.json",
+    "data/aws-catalog.json",
     "data/icons/LICENSE.txt",
+    "data/icons/aws/LICENSE.txt",
     "data/icons/*/*.svg",
+    "data/icons/*/*/*.svg",
 ]

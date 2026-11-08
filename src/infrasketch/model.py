@@ -256,7 +256,7 @@ class Private(Edge):
 
 
 class Node(Endpoint):
-    """A single Azure resource. Subclasses set ``icon`` and ``service``."""
+    """A single cloud resource. Subclasses set ``icon`` and ``service``."""
 
     icon: str | None = None
     service: str = "Resource"

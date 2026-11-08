@@ -11,7 +11,7 @@ from infrasketch.search import categories, search
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="infrasketch",
-        description="Find Azure resource classes and draw architecture diagrams.",
+        description="Find Azure and AWS resource classes and draw architecture diagrams.",
     )
     sub = parser.add_subparsers(dest="command")
 

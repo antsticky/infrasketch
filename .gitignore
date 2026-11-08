@@ -7,4 +7,6 @@ dist/
 build/
 .icons.zip
 .icon_src/
+.aws-icons.zip
+.aws-icons.html
 site/

@@ -23,7 +23,7 @@ def read_icon(spec: str) -> str:
         return resource.read_text(encoding="utf-8")
     except FileNotFoundError as exc:
         raise FileNotFoundError(
-            f"No Azure icon at {spec}. Find one with: python -m infrasketch search <name>"
+            f"No icon at {spec}. Find one with: python -m infrasketch search <name>"
         ) from exc
 
 

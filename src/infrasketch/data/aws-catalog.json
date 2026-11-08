@@ -1,0 +1,2172 @@
+[
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AWSAppStudio",
+    "service": "AWS App Studio",
+    "icon": "aws/ai/AWSAppStudio.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AWSDeepLearningAMIs",
+    "service": "AWS Deep Learning AMIs",
+    "icon": "aws/ai/AWSDeepLearningAMIs.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AWSDeepLearningContainers",
+    "service": "AWS Deep Learning Containers",
+    "icon": "aws/ai/AWSDeepLearningContainers.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AWSDeepRacer",
+    "service": "AWS DeepRacer",
+    "icon": "aws/ai/AWSDeepRacer.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AWSElementalInference",
+    "service": "AWS Elemental Inference",
+    "icon": "aws/ai/AWSElementalInference.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AWSHealthImaging",
+    "service": "AWS HealthImaging",
+    "icon": "aws/ai/AWSHealthImaging.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AWSHealthLake",
+    "service": "AWS HealthLake",
+    "icon": "aws/ai/AWSHealthLake.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AWSHealthOmics",
+    "service": "AWS HealthOmics",
+    "icon": "aws/ai/AWSHealthOmics.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AWSHealthScribe",
+    "service": "AWS HealthScribe",
+    "icon": "aws/ai/AWSHealthScribe.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AWSNeuron",
+    "service": "AWS Neuron",
+    "icon": "aws/ai/AWSNeuron.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AWSPanorama",
+    "service": "AWS Panorama",
+    "icon": "aws/ai/AWSPanorama.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonAugmentedAIA2I",
+    "service": "Amazon Augmented AI A2I",
+    "icon": "aws/ai/AmazonAugmentedAIA2I.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonBedrock",
+    "service": "Amazon Bedrock",
+    "icon": "aws/ai/AmazonBedrock.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonBedrockAgentCore",
+    "service": "Amazon Bedrock AgentCore",
+    "icon": "aws/ai/AmazonBedrockAgentCore.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonCodeGuru",
+    "service": "Amazon CodeGuru",
+    "icon": "aws/ai/AmazonCodeGuru.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonCodeWhisperer",
+    "service": "Amazon CodeWhisperer",
+    "icon": "aws/ai/AmazonCodeWhisperer.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonComprehend",
+    "service": "Amazon Comprehend",
+    "icon": "aws/ai/AmazonComprehend.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonComprehendMedical",
+    "service": "Amazon Comprehend Medical",
+    "icon": "aws/ai/AmazonComprehendMedical.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonDevOpsGuru",
+    "service": "Amazon DevOps Guru",
+    "icon": "aws/ai/AmazonDevOpsGuru.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonElasticInference",
+    "service": "Amazon Elastic Inference",
+    "icon": "aws/ai/AmazonElasticInference.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonForecast",
+    "service": "Amazon Forecast",
+    "icon": "aws/ai/AmazonForecast.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonFraudDetector",
+    "service": "Amazon Fraud Detector",
+    "icon": "aws/ai/AmazonFraudDetector.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonKendra",
+    "service": "Amazon Kendra",
+    "icon": "aws/ai/AmazonKendra.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonLex",
+    "service": "Amazon Lex",
+    "icon": "aws/ai/AmazonLex.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonLookoutForEquipment",
+    "service": "Amazon Lookout For Equipment",
+    "icon": "aws/ai/AmazonLookoutForEquipment.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonLookoutForVision",
+    "service": "Amazon Lookout For Vision",
+    "icon": "aws/ai/AmazonLookoutForVision.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonMonitron",
+    "service": "Amazon Monitron",
+    "icon": "aws/ai/AmazonMonitron.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonNova",
+    "service": "Amazon Nova",
+    "icon": "aws/ai/AmazonNova.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonPersonalize",
+    "service": "Amazon Personalize",
+    "icon": "aws/ai/AmazonPersonalize.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonPolly",
+    "service": "Amazon Polly",
+    "icon": "aws/ai/AmazonPolly.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonQ",
+    "service": "Amazon Q",
+    "icon": "aws/ai/AmazonQ.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonRekognition",
+    "service": "Amazon Rekognition",
+    "icon": "aws/ai/AmazonRekognition.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonSageMakerAI",
+    "service": "Amazon SageMaker AI",
+    "icon": "aws/ai/AmazonSageMakerAI.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonSageMakerGroundTruth",
+    "service": "Amazon SageMaker Ground Truth",
+    "icon": "aws/ai/AmazonSageMakerGroundTruth.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonSageMakerStudioLab",
+    "service": "Amazon SageMaker Studio Lab",
+    "icon": "aws/ai/AmazonSageMakerStudioLab.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonTextract",
+    "service": "Amazon Textract",
+    "icon": "aws/ai/AmazonTextract.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonTranscribe",
+    "service": "Amazon Transcribe",
+    "icon": "aws/ai/AmazonTranscribe.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "AmazonTranslate",
+    "service": "Amazon Translate",
+    "icon": "aws/ai/AmazonTranslate.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "ApacheMXNetOnAWS",
+    "service": "Apache MXNet On AWS",
+    "icon": "aws/ai/ApacheMXNetOnAWS.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "PyTorchOnAWS",
+    "service": "PyTorch On AWS",
+    "icon": "aws/ai/PyTorchOnAWS.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "ai",
+    "name": "TensorFlowOnAWS",
+    "service": "TensorFlow On AWS",
+    "icon": "aws/ai/TensorFlowOnAWS.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "analytics",
+    "name": "AWSCleanRooms",
+    "service": "AWS Clean Rooms",
+    "icon": "aws/analytics/AWSCleanRooms.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "analytics",
+    "name": "AWSDataExchange",
+    "service": "AWS Data Exchange",
+    "icon": "aws/analytics/AWSDataExchange.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "analytics",
+    "name": "AWSEntityResolution",
+    "service": "AWS Entity Resolution",
+    "icon": "aws/analytics/AWSEntityResolution.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "analytics",
+    "name": "AWSGlue",
+    "service": "AWS Glue",
+    "icon": "aws/analytics/AWSGlue.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "analytics",
+    "name": "AWSGlueDataBrew",
+    "service": "AWS Glue DataBrew",
+    "icon": "aws/analytics/AWSGlueDataBrew.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "analytics",
+    "name": "AWSLakeFormation",
+    "service": "AWS Lake Formation",
+    "icon": "aws/analytics/AWSLakeFormation.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "analytics",
+    "name": "AmazonAthena",
+    "service": "Amazon Athena",
+    "icon": "aws/analytics/AmazonAthena.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "analytics",
+    "name": "AmazonCloudSearch",
+    "service": "Amazon CloudSearch",
+    "icon": "aws/analytics/AmazonCloudSearch.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "analytics",
+    "name": "AmazonDataFirehose",
+    "service": "Amazon Data Firehose",
+    "icon": "aws/analytics/AmazonDataFirehose.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "analytics",
+    "name": "AmazonDataZone",
+    "service": "Amazon DataZone",
+    "icon": "aws/analytics/AmazonDataZone.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "analytics",
+    "name": "AmazonEMR",
+    "service": "Amazon EMR",
+    "icon": "aws/analytics/AmazonEMR.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "analytics",
+    "name": "AmazonFinSpace",
+    "service": "Amazon FinSpace",
+    "icon": "aws/analytics/AmazonFinSpace.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "analytics",
+    "name": "AmazonKinesis",
+    "service": "Amazon Kinesis",
+    "icon": "aws/analytics/AmazonKinesis.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "analytics",
+    "name": "AmazonKinesisDataStreams",
+    "service": "Amazon Kinesis Data Streams",
+    "icon": "aws/analytics/AmazonKinesisDataStreams.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "analytics",
+    "name": "AmazonKinesisVideoStreamsAnalytics",
+    "service": "Amazon Kinesis Video Streams",
+    "icon": "aws/analytics/AmazonKinesisVideoStreamsAnalytics.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "analytics",
+    "name": "AmazonManagedServiceForApacheFlink",
+    "service": "Amazon Managed Service For Apache Flink",
+    "icon": "aws/analytics/AmazonManagedServiceForApacheFlink.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "analytics",
+    "name": "AmazonManagedStreamingForApacheKafka",
+    "service": "Amazon Managed Streaming For Apache Kafka",
+    "icon": "aws/analytics/AmazonManagedStreamingForApacheKafka.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "analytics",
+    "name": "AmazonOpenSearchService",
+    "service": "Amazon OpenSearch Service",
+    "icon": "aws/analytics/AmazonOpenSearchService.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "analytics",
+    "name": "AmazonRedshift",
+    "service": "Amazon Redshift",
+    "icon": "aws/analytics/AmazonRedshift.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "analytics",
+    "name": "AmazonSageMaker",
+    "service": "Amazon SageMaker",
+    "icon": "aws/analytics/AmazonSageMaker.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "blockchain",
+    "name": "AmazonManagedBlockchain",
+    "service": "Amazon Managed Blockchain",
+    "icon": "aws/blockchain/AmazonManagedBlockchain.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "business",
+    "name": "AWSAppFabric",
+    "service": "AWS AppFabric",
+    "icon": "aws/business/AWSAppFabric.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "business",
+    "name": "AWSEndUserMessaging",
+    "service": "AWS End User Messaging",
+    "icon": "aws/business/AWSEndUserMessaging.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "business",
+    "name": "AWSSupplyChain",
+    "service": "AWS Supply Chain",
+    "icon": "aws/business/AWSSupplyChain.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "business",
+    "name": "AWSWickr",
+    "service": "AWS Wickr",
+    "icon": "aws/business/AWSWickr.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "business",
+    "name": "AmazonChime",
+    "service": "Amazon Chime",
+    "icon": "aws/business/AmazonChime.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "business",
+    "name": "AmazonChimeSDK",
+    "service": "Amazon Chime SDK",
+    "icon": "aws/business/AmazonChimeSDK.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "business",
+    "name": "AmazonConnect",
+    "service": "Amazon Connect",
+    "icon": "aws/business/AmazonConnect.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "business",
+    "name": "AmazonPinpoint",
+    "service": "Amazon Pinpoint",
+    "icon": "aws/business/AmazonPinpoint.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "business",
+    "name": "AmazonPinpointAPIs",
+    "service": "Amazon Pinpoint APIs",
+    "icon": "aws/business/AmazonPinpointAPIs.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "business",
+    "name": "AmazonQuick",
+    "service": "Amazon Quick",
+    "icon": "aws/business/AmazonQuick.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "business",
+    "name": "AmazonSimpleEmailService",
+    "service": "Amazon Simple Email Service",
+    "icon": "aws/business/AmazonSimpleEmailService.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "business",
+    "name": "AmazonWorkDocs",
+    "service": "Amazon WorkDocs",
+    "icon": "aws/business/AmazonWorkDocs.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "business",
+    "name": "AmazonWorkDocsSDK",
+    "service": "Amazon WorkDocs SDK",
+    "icon": "aws/business/AmazonWorkDocsSDK.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "business",
+    "name": "AmazonWorkMail",
+    "service": "Amazon WorkMail",
+    "icon": "aws/business/AmazonWorkMail.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "compute",
+    "name": "AWSAppRunner",
+    "service": "AWS App Runner",
+    "icon": "aws/compute/AWSAppRunner.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "compute",
+    "name": "AWSBatch",
+    "service": "AWS Batch",
+    "icon": "aws/compute/AWSBatch.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "compute",
+    "name": "AWSComputeOptimizer",
+    "service": "AWS Compute Optimizer",
+    "icon": "aws/compute/AWSComputeOptimizer.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "compute",
+    "name": "AWSElasticBeanstalk",
+    "service": "AWS Elastic Beanstalk",
+    "icon": "aws/compute/AWSElasticBeanstalk.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "compute",
+    "name": "AWSLambda",
+    "service": "AWS Lambda",
+    "icon": "aws/compute/AWSLambda.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "compute",
+    "name": "AWSLocalZones",
+    "service": "AWS Local Zones",
+    "icon": "aws/compute/AWSLocalZones.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "compute",
+    "name": "AWSNitroEnclaves",
+    "service": "AWS Nitro Enclaves",
+    "icon": "aws/compute/AWSNitroEnclaves.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "compute",
+    "name": "AWSOutpostsFamily",
+    "service": "AWS Outposts Family",
+    "icon": "aws/compute/AWSOutpostsFamily.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "compute",
+    "name": "AWSOutpostsRack",
+    "service": "AWS Outposts Rack",
+    "icon": "aws/compute/AWSOutpostsRack.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "compute",
+    "name": "AWSOutpostsServers",
+    "service": "AWS Outposts Servers",
+    "icon": "aws/compute/AWSOutpostsServers.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "compute",
+    "name": "AWSParallelCluster",
+    "service": "AWS Parallel Cluster",
+    "icon": "aws/compute/AWSParallelCluster.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "compute",
+    "name": "AWSParallelComputingService",
+    "service": "AWS Parallel Computing Service",
+    "icon": "aws/compute/AWSParallelComputingService.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "compute",
+    "name": "AWSServerlessApplicationRepository",
+    "service": "AWS Serverless Application Repository",
+    "icon": "aws/compute/AWSServerlessApplicationRepository.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "compute",
+    "name": "AWSSimSpaceWeaver",
+    "service": "AWS SimSpace Weaver",
+    "icon": "aws/compute/AWSSimSpaceWeaver.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "compute",
+    "name": "AWSWavelength",
+    "service": "AWS Wavelength",
+    "icon": "aws/compute/AWSWavelength.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "compute",
+    "name": "AmazonDCV",
+    "service": "Amazon DCV",
+    "icon": "aws/compute/AmazonDCV.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "compute",
+    "name": "AmazonEC2",
+    "service": "Amazon EC2",
+    "icon": "aws/compute/AmazonEC2.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "compute",
+    "name": "AmazonEC2AutoScaling",
+    "service": "Amazon EC2 Auto Scaling",
+    "icon": "aws/compute/AmazonEC2AutoScaling.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "compute",
+    "name": "AmazonEC2ImageBuilder",
+    "service": "Amazon EC2 Image Builder",
+    "icon": "aws/compute/AmazonEC2ImageBuilder.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "compute",
+    "name": "AmazonElasticVMwareService",
+    "service": "Amazon Elastic VMware Service",
+    "icon": "aws/compute/AmazonElasticVMwareService.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "compute",
+    "name": "AmazonLightsail",
+    "service": "Amazon Lightsail",
+    "icon": "aws/compute/AmazonLightsail.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "compute",
+    "name": "AmazonLightsailForResearch",
+    "service": "Amazon Lightsail For Research",
+    "icon": "aws/compute/AmazonLightsailForResearch.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "compute",
+    "name": "Bottlerocket",
+    "service": "Bottlerocket",
+    "icon": "aws/compute/Bottlerocket.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "compute",
+    "name": "ElasticFabricAdapter",
+    "service": "Elastic Fabric Adapter",
+    "icon": "aws/compute/ElasticFabricAdapter.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "containers",
+    "name": "AWSFargate",
+    "service": "AWS Fargate",
+    "icon": "aws/containers/AWSFargate.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "containers",
+    "name": "AmazonECSAnywhere",
+    "service": "Amazon ECS Anywhere",
+    "icon": "aws/containers/AmazonECSAnywhere.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "containers",
+    "name": "AmazonEKSAnywhere",
+    "service": "Amazon EKS Anywhere",
+    "icon": "aws/containers/AmazonEKSAnywhere.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "containers",
+    "name": "AmazonEKSDistro",
+    "service": "Amazon EKS Distro",
+    "icon": "aws/containers/AmazonEKSDistro.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "containers",
+    "name": "AmazonElasticContainerRegistry",
+    "service": "Amazon Elastic Container Registry",
+    "icon": "aws/containers/AmazonElasticContainerRegistry.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "containers",
+    "name": "AmazonElasticContainerService",
+    "service": "Amazon Elastic Container Service",
+    "icon": "aws/containers/AmazonElasticContainerService.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "containers",
+    "name": "AmazonElasticKubernetesService",
+    "service": "Amazon Elastic Kubernetes Service",
+    "icon": "aws/containers/AmazonElasticKubernetesService.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "containers",
+    "name": "RedHatOpenShiftServiceOnAWS",
+    "service": "Red Hat OpenShift Service On AWS",
+    "icon": "aws/containers/RedHatOpenShiftServiceOnAWS.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "cost",
+    "name": "AWSBillingConductor",
+    "service": "AWS Billing Conductor",
+    "icon": "aws/cost/AWSBillingConductor.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "cost",
+    "name": "AWSBudgets",
+    "service": "AWS Budgets",
+    "icon": "aws/cost/AWSBudgets.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "cost",
+    "name": "AWSCostAndUsageReport",
+    "service": "AWS Cost And Usage Report",
+    "icon": "aws/cost/AWSCostAndUsageReport.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "cost",
+    "name": "AWSCostExplorer",
+    "service": "AWS Cost Explorer",
+    "icon": "aws/cost/AWSCostExplorer.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "cost",
+    "name": "AWSFinOpsAgent",
+    "service": "AWS FinOps Agent",
+    "icon": "aws/cost/AWSFinOpsAgent.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "cost",
+    "name": "ReservedInstanceReporting",
+    "service": "Reserved Instance Reporting",
+    "icon": "aws/cost/ReservedInstanceReporting.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "cost",
+    "name": "SavingsPlans",
+    "service": "Savings Plans",
+    "icon": "aws/cost/SavingsPlans.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "databases",
+    "name": "AWSDatabaseMigrationService",
+    "service": "AWS Database Migration Service",
+    "icon": "aws/databases/AWSDatabaseMigrationService.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "databases",
+    "name": "AmazonAurora",
+    "service": "Amazon Aurora",
+    "icon": "aws/databases/AmazonAurora.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "databases",
+    "name": "AmazonDocumentDB",
+    "service": "Amazon DocumentDB",
+    "icon": "aws/databases/AmazonDocumentDB.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "databases",
+    "name": "AmazonDynamoDB",
+    "service": "Amazon DynamoDB",
+    "icon": "aws/databases/AmazonDynamoDB.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "databases",
+    "name": "AmazonElastiCache",
+    "service": "Amazon ElastiCache",
+    "icon": "aws/databases/AmazonElastiCache.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "databases",
+    "name": "AmazonKeyspaces",
+    "service": "Amazon Keyspaces",
+    "icon": "aws/databases/AmazonKeyspaces.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "databases",
+    "name": "AmazonMemoryDB",
+    "service": "Amazon MemoryDB",
+    "icon": "aws/databases/AmazonMemoryDB.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "databases",
+    "name": "AmazonNeptune",
+    "service": "Amazon Neptune",
+    "icon": "aws/databases/AmazonNeptune.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "databases",
+    "name": "AmazonRDS",
+    "service": "Amazon RDS",
+    "icon": "aws/databases/AmazonRDS.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "databases",
+    "name": "AmazonTimestream",
+    "service": "Amazon Timestream",
+    "icon": "aws/databases/AmazonTimestream.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "databases",
+    "name": "OracleDatabaseAtAWS",
+    "service": "Oracle Database At AWS",
+    "icon": "aws/databases/OracleDatabaseAtAWS.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "developer_tools",
+    "name": "AWSCloudControlAPI",
+    "service": "AWS Cloud Control API",
+    "icon": "aws/developer_tools/AWSCloudControlAPI.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "developer_tools",
+    "name": "AWSCloudDevelopmentKit",
+    "service": "AWS Cloud Development Kit",
+    "icon": "aws/developer_tools/AWSCloudDevelopmentKit.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "developer_tools",
+    "name": "AWSCloud9",
+    "service": "AWS Cloud9",
+    "icon": "aws/developer_tools/AWSCloud9.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "developer_tools",
+    "name": "AWSCloudShell",
+    "service": "AWS CloudShell",
+    "icon": "aws/developer_tools/AWSCloudShell.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "developer_tools",
+    "name": "AWSCodeArtifact",
+    "service": "AWS CodeArtifact",
+    "icon": "aws/developer_tools/AWSCodeArtifact.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "developer_tools",
+    "name": "AWSCodeBuild",
+    "service": "AWS CodeBuild",
+    "icon": "aws/developer_tools/AWSCodeBuild.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "developer_tools",
+    "name": "AWSCodeCommit",
+    "service": "AWS CodeCommit",
+    "icon": "aws/developer_tools/AWSCodeCommit.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "developer_tools",
+    "name": "AWSCodeDeploy",
+    "service": "AWS CodeDeploy",
+    "icon": "aws/developer_tools/AWSCodeDeploy.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "developer_tools",
+    "name": "AWSCodePipeline",
+    "service": "AWS CodePipeline",
+    "icon": "aws/developer_tools/AWSCodePipeline.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "developer_tools",
+    "name": "AWSCommandLineInterface",
+    "service": "AWS Command Line Interface",
+    "icon": "aws/developer_tools/AWSCommandLineInterface.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "developer_tools",
+    "name": "AWSFaultInjectionService",
+    "service": "AWS Fault Injection Service",
+    "icon": "aws/developer_tools/AWSFaultInjectionService.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "developer_tools",
+    "name": "AWSInfrastructureComposer",
+    "service": "AWS Infrastructure Composer",
+    "icon": "aws/developer_tools/AWSInfrastructureComposer.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "developer_tools",
+    "name": "AWSToolsAndSDKs",
+    "service": "AWS Tools And SDKs",
+    "icon": "aws/developer_tools/AWSToolsAndSDKs.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "developer_tools",
+    "name": "AWSXRay",
+    "service": "AWS X Ray",
+    "icon": "aws/developer_tools/AWSXRay.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "developer_tools",
+    "name": "AmazonCodeCatalyst",
+    "service": "Amazon CodeCatalyst",
+    "icon": "aws/developer_tools/AmazonCodeCatalyst.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "developer_tools",
+    "name": "AmazonCorretto",
+    "service": "Amazon Corretto",
+    "icon": "aws/developer_tools/AmazonCorretto.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "end_user",
+    "name": "AmazonWorkSpaces",
+    "service": "Amazon WorkSpaces",
+    "icon": "aws/end_user/AmazonWorkSpaces.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "games",
+    "name": "AmazonGameLiftServers",
+    "service": "Amazon GameLift Servers",
+    "icon": "aws/games/AmazonGameLiftServers.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "games",
+    "name": "AmazonGameLiftStreams",
+    "service": "Amazon GameLift Streams",
+    "icon": "aws/games/AmazonGameLiftStreams.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "games",
+    "name": "Open3DEngine",
+    "service": "Open 3D Engine",
+    "icon": "aws/games/Open3DEngine.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "general",
+    "name": "AWSMarketplace",
+    "service": "AWS Marketplace",
+    "icon": "aws/general/AWSMarketplace.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "general",
+    "name": "Client",
+    "service": "Client",
+    "icon": "aws/general/Client.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "general",
+    "name": "Internet",
+    "service": "Internet",
+    "icon": "aws/general/Internet.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "general",
+    "name": "MobileClient",
+    "service": "Mobile Client",
+    "icon": "aws/general/MobileClient.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "general",
+    "name": "User",
+    "service": "User",
+    "icon": "aws/general/User.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "general",
+    "name": "Users",
+    "service": "Users",
+    "icon": "aws/general/Users.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "integration",
+    "name": "AWSAppSync",
+    "service": "AWS AppSync",
+    "icon": "aws/integration/AWSAppSync.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "integration",
+    "name": "AWSB2BDataInterchange",
+    "service": "AWS B2B Data Interchange",
+    "icon": "aws/integration/AWSB2BDataInterchange.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "integration",
+    "name": "AWSExpressWorkflows",
+    "service": "AWS Express Workflows",
+    "icon": "aws/integration/AWSExpressWorkflows.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "integration",
+    "name": "AWSStepFunctions",
+    "service": "AWS Step Functions",
+    "icon": "aws/integration/AWSStepFunctions.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "integration",
+    "name": "AmazonAppFlow",
+    "service": "Amazon AppFlow",
+    "icon": "aws/integration/AmazonAppFlow.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "integration",
+    "name": "AmazonEventBridge",
+    "service": "Amazon EventBridge",
+    "icon": "aws/integration/AmazonEventBridge.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "integration",
+    "name": "AmazonMQ",
+    "service": "Amazon MQ",
+    "icon": "aws/integration/AmazonMQ.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "integration",
+    "name": "AmazonManagedWorkflowsForApacheAirflow",
+    "service": "Amazon Managed Workflows For Apache Airflow",
+    "icon": "aws/integration/AmazonManagedWorkflowsForApacheAirflow.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "integration",
+    "name": "AmazonSimpleNotificationService",
+    "service": "Amazon Simple Notification Service",
+    "icon": "aws/integration/AmazonSimpleNotificationService.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "integration",
+    "name": "AmazonSimpleQueueService",
+    "service": "Amazon Simple Queue Service",
+    "icon": "aws/integration/AmazonSimpleQueueService.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "iot",
+    "name": "AWSIOTCore",
+    "service": "AWS IOT Core",
+    "icon": "aws/iot/AWSIOTCore.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "iot",
+    "name": "AWSIOTDeviceDefender",
+    "service": "AWS IOT Device Defender",
+    "icon": "aws/iot/AWSIOTDeviceDefender.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "iot",
+    "name": "AWSIOTDeviceManagement",
+    "service": "AWS IOT Device Management",
+    "icon": "aws/iot/AWSIOTDeviceManagement.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "iot",
+    "name": "AWSIOTEvents",
+    "service": "AWS IOT Events",
+    "icon": "aws/iot/AWSIOTEvents.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "iot",
+    "name": "AWSIOTExpressLink",
+    "service": "AWS IOT ExpressLink",
+    "icon": "aws/iot/AWSIOTExpressLink.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "iot",
+    "name": "AWSIOTFleetWise",
+    "service": "AWS IOT FleetWise",
+    "icon": "aws/iot/AWSIOTFleetWise.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "iot",
+    "name": "AWSIOTGreengrass",
+    "service": "AWS IOT Greengrass",
+    "icon": "aws/iot/AWSIOTGreengrass.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "iot",
+    "name": "AWSIOTSiteWise",
+    "service": "AWS IOT SiteWise",
+    "icon": "aws/iot/AWSIOTSiteWise.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "iot",
+    "name": "AWSIOTTwinMaker",
+    "service": "AWS IOT TwinMaker",
+    "icon": "aws/iot/AWSIOTTwinMaker.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "iot",
+    "name": "FreeRTOS",
+    "service": "FreeRTOS",
+    "icon": "aws/iot/FreeRTOS.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSAppConfig",
+    "service": "AWS AppConfig",
+    "icon": "aws/management/AWSAppConfig.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSApplicationAutoScaling",
+    "service": "AWS Application Auto Scaling",
+    "icon": "aws/management/AWSApplicationAutoScaling.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSAutoScaling",
+    "service": "AWS Auto Scaling",
+    "icon": "aws/management/AWSAutoScaling.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSBackintAgent",
+    "service": "AWS Backint Agent",
+    "icon": "aws/management/AWSBackintAgent.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSChatbot",
+    "service": "AWS Chatbot",
+    "icon": "aws/management/AWSChatbot.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSCloudFormation",
+    "service": "AWS CloudFormation",
+    "icon": "aws/management/AWSCloudFormation.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSCloudTrail",
+    "service": "AWS CloudTrail",
+    "icon": "aws/management/AWSCloudTrail.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSComputeOptimizerManagement",
+    "service": "AWS Compute Optimizer",
+    "icon": "aws/management/AWSComputeOptimizerManagement.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSConfig",
+    "service": "AWS Config",
+    "icon": "aws/management/AWSConfig.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSConsoleMobileApplication",
+    "service": "AWS Console Mobile Application",
+    "icon": "aws/management/AWSConsoleMobileApplication.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSControlTower",
+    "service": "AWS Control Tower",
+    "icon": "aws/management/AWSControlTower.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSDevOpsAgent",
+    "service": "AWS DevOps Agent",
+    "icon": "aws/management/AWSDevOpsAgent.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSDistroForOpenTelemetry",
+    "service": "AWS Distro For OpenTelemetry",
+    "icon": "aws/management/AWSDistroForOpenTelemetry.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSHealthDashboard",
+    "service": "AWS Health Dashboard",
+    "icon": "aws/management/AWSHealthDashboard.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSLaunchWizard",
+    "service": "AWS Launch Wizard",
+    "icon": "aws/management/AWSLaunchWizard.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSLicenseManager",
+    "service": "AWS License Manager",
+    "icon": "aws/management/AWSLicenseManager.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSManagementConsole",
+    "service": "AWS Management Console",
+    "icon": "aws/management/AWSManagementConsole.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSOrganizations",
+    "service": "AWS Organizations",
+    "icon": "aws/management/AWSOrganizations.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSPartnerCentral",
+    "service": "AWS Partner Central",
+    "icon": "aws/management/AWSPartnerCentral.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSProton",
+    "service": "AWS Proton",
+    "icon": "aws/management/AWSProton.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSResilienceHub",
+    "service": "AWS Resilience Hub",
+    "icon": "aws/management/AWSResilienceHub.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSResourceExplorer",
+    "service": "AWS Resource Explorer",
+    "icon": "aws/management/AWSResourceExplorer.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSServiceCatalog",
+    "service": "AWS Service Catalog",
+    "icon": "aws/management/AWSServiceCatalog.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSServiceManagementConnector",
+    "service": "AWS Service Management Connector",
+    "icon": "aws/management/AWSServiceManagementConnector.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSSustainability",
+    "service": "AWS Sustainability",
+    "icon": "aws/management/AWSSustainability.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSSystemsManager",
+    "service": "AWS Systems Manager",
+    "icon": "aws/management/AWSSystemsManager.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSTelcoNetworkBuilder",
+    "service": "AWS Telco Network Builder",
+    "icon": "aws/management/AWSTelcoNetworkBuilder.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSTrustedAdvisor",
+    "service": "AWS Trusted Advisor",
+    "icon": "aws/management/AWSTrustedAdvisor.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSUserNotifications",
+    "service": "AWS User Notifications",
+    "icon": "aws/management/AWSUserNotifications.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AWSWellArchitectedTool",
+    "service": "AWS Well Architected Tool",
+    "icon": "aws/management/AWSWellArchitectedTool.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AmazonCloudWatch",
+    "service": "Amazon CloudWatch",
+    "icon": "aws/management/AmazonCloudWatch.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AmazonManagedGrafana",
+    "service": "Amazon Managed Grafana",
+    "icon": "aws/management/AmazonManagedGrafana.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "management",
+    "name": "AmazonManagedServiceForPrometheus",
+    "service": "Amazon Managed Service For Prometheus",
+    "icon": "aws/management/AmazonManagedServiceForPrometheus.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "media",
+    "name": "AWSDeadlineCloud",
+    "service": "AWS Deadline Cloud",
+    "icon": "aws/media/AWSDeadlineCloud.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "media",
+    "name": "AWSElementalAppliancesAndSoftware",
+    "service": "AWS Elemental Appliances & Software",
+    "icon": "aws/media/AWSElementalAppliancesAndSoftware.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "media",
+    "name": "AWSElementalConductor",
+    "service": "AWS Elemental Conductor",
+    "icon": "aws/media/AWSElementalConductor.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "media",
+    "name": "AWSElementalDelta",
+    "service": "AWS Elemental Delta",
+    "icon": "aws/media/AWSElementalDelta.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "media",
+    "name": "AWSElementalLink",
+    "service": "AWS Elemental Link",
+    "icon": "aws/media/AWSElementalLink.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "media",
+    "name": "AWSElementalLive",
+    "service": "AWS Elemental Live",
+    "icon": "aws/media/AWSElementalLive.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "media",
+    "name": "AWSElementalMediaConnect",
+    "service": "AWS Elemental MediaConnect",
+    "icon": "aws/media/AWSElementalMediaConnect.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "media",
+    "name": "AWSElementalMediaConvert",
+    "service": "AWS Elemental MediaConvert",
+    "icon": "aws/media/AWSElementalMediaConvert.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "media",
+    "name": "AWSElementalMediaLive",
+    "service": "AWS Elemental MediaLive",
+    "icon": "aws/media/AWSElementalMediaLive.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "media",
+    "name": "AWSElementalMediaPackage",
+    "service": "AWS Elemental MediaPackage",
+    "icon": "aws/media/AWSElementalMediaPackage.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "media",
+    "name": "AWSElementalMediaStore",
+    "service": "AWS Elemental MediaStore",
+    "icon": "aws/media/AWSElementalMediaStore.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "media",
+    "name": "AWSElementalMediaTailor",
+    "service": "AWS Elemental MediaTailor",
+    "icon": "aws/media/AWSElementalMediaTailor.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "media",
+    "name": "AWSElementalServer",
+    "service": "AWS Elemental Server",
+    "icon": "aws/media/AWSElementalServer.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "media",
+    "name": "AWSThinkboxDeadline",
+    "service": "AWS Thinkbox Deadline",
+    "icon": "aws/media/AWSThinkboxDeadline.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "media",
+    "name": "AWSThinkboxFrost",
+    "service": "AWS Thinkbox Frost",
+    "icon": "aws/media/AWSThinkboxFrost.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "media",
+    "name": "AWSThinkboxKrakatoa",
+    "service": "AWS Thinkbox Krakatoa",
+    "icon": "aws/media/AWSThinkboxKrakatoa.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "media",
+    "name": "AWSThinkboxStoke",
+    "service": "AWS Thinkbox Stoke",
+    "icon": "aws/media/AWSThinkboxStoke.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "media",
+    "name": "AWSThinkboxXMesh",
+    "service": "AWS Thinkbox XMesh",
+    "icon": "aws/media/AWSThinkboxXMesh.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "media",
+    "name": "AmazonInteractiveVideoService",
+    "service": "Amazon Interactive Video Service",
+    "icon": "aws/media/AmazonInteractiveVideoService.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "media",
+    "name": "AmazonKinesisVideoStreams",
+    "service": "Amazon Kinesis Video Streams",
+    "icon": "aws/media/AmazonKinesisVideoStreams.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "migration",
+    "name": "AWSApplicationDiscoveryService",
+    "service": "AWS Application Discovery Service",
+    "icon": "aws/migration/AWSApplicationDiscoveryService.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "migration",
+    "name": "AWSApplicationMigrationService",
+    "service": "AWS Application Migration Service",
+    "icon": "aws/migration/AWSApplicationMigrationService.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "migration",
+    "name": "AWSDataTransferTerminal",
+    "service": "AWS Data Transfer Terminal",
+    "icon": "aws/migration/AWSDataTransferTerminal.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "migration",
+    "name": "AWSDataSync",
+    "service": "AWS DataSync",
+    "icon": "aws/migration/AWSDataSync.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "migration",
+    "name": "AWSMainframeModernization",
+    "service": "AWS Mainframe Modernization",
+    "icon": "aws/migration/AWSMainframeModernization.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "migration",
+    "name": "AWSMigrationEvaluator",
+    "service": "AWS Migration Evaluator",
+    "icon": "aws/migration/AWSMigrationEvaluator.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "migration",
+    "name": "AWSTransferFamily",
+    "service": "AWS Transfer Family",
+    "icon": "aws/migration/AWSTransferFamily.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "migration",
+    "name": "AWSTransform",
+    "service": "AWS Transform",
+    "icon": "aws/migration/AWSTransform.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "networking",
+    "name": "AWSAppMesh",
+    "service": "AWS App Mesh",
+    "icon": "aws/networking/AWSAppMesh.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "networking",
+    "name": "AWSClientVPN",
+    "service": "AWS Client VPN",
+    "icon": "aws/networking/AWSClientVPN.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "networking",
+    "name": "AWSCloudMap",
+    "service": "AWS Cloud Map",
+    "icon": "aws/networking/AWSCloudMap.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "networking",
+    "name": "AWSCloudWAN",
+    "service": "AWS Cloud WAN",
+    "icon": "aws/networking/AWSCloudWAN.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "networking",
+    "name": "AWSDirectConnect",
+    "service": "AWS Direct Connect",
+    "icon": "aws/networking/AWSDirectConnect.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "networking",
+    "name": "AWSGlobalAccelerator",
+    "service": "AWS Global Accelerator",
+    "icon": "aws/networking/AWSGlobalAccelerator.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "networking",
+    "name": "AWSInterconnect",
+    "service": "AWS Interconnect",
+    "icon": "aws/networking/AWSInterconnect.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "networking",
+    "name": "AWSPrivateLink",
+    "service": "AWS PrivateLink",
+    "icon": "aws/networking/AWSPrivateLink.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "networking",
+    "name": "AWSRTBFabric",
+    "service": "AWS RTB Fabric",
+    "icon": "aws/networking/AWSRTBFabric.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "networking",
+    "name": "AWSSiteToSiteVPN",
+    "service": "AWS Site To Site VPN",
+    "icon": "aws/networking/AWSSiteToSiteVPN.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "networking",
+    "name": "AWSTransitGateway",
+    "service": "AWS Transit Gateway",
+    "icon": "aws/networking/AWSTransitGateway.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "networking",
+    "name": "AWSVerifiedAccess",
+    "service": "AWS Verified Access",
+    "icon": "aws/networking/AWSVerifiedAccess.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "networking",
+    "name": "AmazonAPIGateway",
+    "service": "Amazon API Gateway",
+    "icon": "aws/networking/AmazonAPIGateway.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "networking",
+    "name": "AmazonApplicationRecoveryController",
+    "service": "Amazon Application Recovery Controller",
+    "icon": "aws/networking/AmazonApplicationRecoveryController.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "networking",
+    "name": "AmazonCloudFront",
+    "service": "Amazon CloudFront",
+    "icon": "aws/networking/AmazonCloudFront.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "networking",
+    "name": "AmazonRoute53",
+    "service": "Amazon Route 53",
+    "icon": "aws/networking/AmazonRoute53.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "networking",
+    "name": "AmazonVPCInternetGateway",
+    "service": "Amazon VPC Internet Gateway",
+    "icon": "aws/networking/AmazonVPCInternetGateway.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "networking",
+    "name": "AmazonVPCLattice",
+    "service": "Amazon VPC Lattice",
+    "icon": "aws/networking/AmazonVPCLattice.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "networking",
+    "name": "AmazonVirtualPrivateCloud",
+    "service": "Amazon Virtual Private Cloud",
+    "icon": "aws/networking/AmazonVirtualPrivateCloud.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "networking",
+    "name": "ElasticLoadBalancing",
+    "service": "Elastic Load Balancing",
+    "icon": "aws/networking/ElasticLoadBalancing.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "quantum",
+    "name": "AmazonBraket",
+    "service": "Amazon Braket",
+    "icon": "aws/quantum/AmazonBraket.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "satellite",
+    "name": "AWSGroundStation",
+    "service": "AWS Ground Station",
+    "icon": "aws/satellite/AWSGroundStation.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AWSArtifact",
+    "service": "AWS Artifact",
+    "icon": "aws/security/AWSArtifact.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AWSAuditManager",
+    "service": "AWS Audit Manager",
+    "icon": "aws/security/AWSAuditManager.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AWSCertificateManager",
+    "service": "AWS Certificate Manager",
+    "icon": "aws/security/AWSCertificateManager.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AWSCloudHSM",
+    "service": "AWS CloudHSM",
+    "icon": "aws/security/AWSCloudHSM.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AWSDirectoryService",
+    "service": "AWS Directory Service",
+    "icon": "aws/security/AWSDirectoryService.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AWSFirewallManager",
+    "service": "AWS Firewall Manager",
+    "icon": "aws/security/AWSFirewallManager.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AWSIAMIdentityCenter",
+    "service": "AWS IAM Identity Center",
+    "icon": "aws/security/AWSIAMIdentityCenter.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AWSIdentityAndAccessManagement",
+    "service": "AWS Identity And Access Management",
+    "icon": "aws/security/AWSIdentityAndAccessManagement.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AWSKeyManagementService",
+    "service": "AWS Key Management Service",
+    "icon": "aws/security/AWSKeyManagementService.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AWSNetworkFirewall",
+    "service": "AWS Network Firewall",
+    "icon": "aws/security/AWSNetworkFirewall.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AWSPaymentCryptography",
+    "service": "AWS Payment Cryptography",
+    "icon": "aws/security/AWSPaymentCryptography.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AWSPrivateCertificateAuthority",
+    "service": "AWS Private Certificate Authority",
+    "icon": "aws/security/AWSPrivateCertificateAuthority.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AWSResourceAccessManager",
+    "service": "AWS Resource Access Manager",
+    "icon": "aws/security/AWSResourceAccessManager.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AWSSecretsManager",
+    "service": "AWS Secrets Manager",
+    "icon": "aws/security/AWSSecretsManager.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AWSSecurityAgent",
+    "service": "AWS Security Agent",
+    "icon": "aws/security/AWSSecurityAgent.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AWSSecurityHub",
+    "service": "AWS Security Hub",
+    "icon": "aws/security/AWSSecurityHub.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AWSSecurityIncidentResponse",
+    "service": "AWS Security Incident Response",
+    "icon": "aws/security/AWSSecurityIncidentResponse.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AWSShield",
+    "service": "AWS Shield",
+    "icon": "aws/security/AWSShield.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AWSSigner",
+    "service": "AWS Signer",
+    "icon": "aws/security/AWSSigner.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AWSWAF",
+    "service": "AWS WAF",
+    "icon": "aws/security/AWSWAF.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AmazonCloudDirectory",
+    "service": "Amazon Cloud Directory",
+    "icon": "aws/security/AmazonCloudDirectory.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AmazonCognito",
+    "service": "Amazon Cognito",
+    "icon": "aws/security/AmazonCognito.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AmazonDetective",
+    "service": "Amazon Detective",
+    "icon": "aws/security/AmazonDetective.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AmazonGuardDuty",
+    "service": "Amazon GuardDuty",
+    "icon": "aws/security/AmazonGuardDuty.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AmazonInspector",
+    "service": "Amazon Inspector",
+    "icon": "aws/security/AmazonInspector.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AmazonMacie",
+    "service": "Amazon Macie",
+    "icon": "aws/security/AmazonMacie.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AmazonSecurityLake",
+    "service": "Amazon Security Lake",
+    "icon": "aws/security/AmazonSecurityLake.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "security",
+    "name": "AmazonVerifiedPermissions",
+    "service": "Amazon Verified Permissions",
+    "icon": "aws/security/AmazonVerifiedPermissions.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "storage",
+    "name": "AWSBackup",
+    "service": "AWS Backup",
+    "icon": "aws/storage/AWSBackup.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "storage",
+    "name": "AWSElasticDisasterRecovery",
+    "service": "AWS Elastic Disaster Recovery",
+    "icon": "aws/storage/AWSElasticDisasterRecovery.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "storage",
+    "name": "AWSSnowball",
+    "service": "AWS Snowball",
+    "icon": "aws/storage/AWSSnowball.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "storage",
+    "name": "AWSSnowballEdge",
+    "service": "AWS Snowball Edge",
+    "icon": "aws/storage/AWSSnowballEdge.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "storage",
+    "name": "AWSStorageGateway",
+    "service": "AWS Storage Gateway",
+    "icon": "aws/storage/AWSStorageGateway.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "storage",
+    "name": "AmazonEFS",
+    "service": "Amazon EFS",
+    "icon": "aws/storage/AmazonEFS.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "storage",
+    "name": "AmazonElasticBlockStore",
+    "service": "Amazon Elastic Block Store",
+    "icon": "aws/storage/AmazonElasticBlockStore.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "storage",
+    "name": "AmazonFSx",
+    "service": "Amazon FSx",
+    "icon": "aws/storage/AmazonFSx.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "storage",
+    "name": "AmazonFSxForLustre",
+    "service": "Amazon FSx For Lustre",
+    "icon": "aws/storage/AmazonFSxForLustre.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "storage",
+    "name": "AmazonFSxForNetAppONTAP",
+    "service": "Amazon FSx For NetApp ONTAP",
+    "icon": "aws/storage/AmazonFSxForNetAppONTAP.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "storage",
+    "name": "AmazonFSxForOpenZFS",
+    "service": "Amazon FSx For OpenZFS",
+    "icon": "aws/storage/AmazonFSxForOpenZFS.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "storage",
+    "name": "AmazonFSxForWFS",
+    "service": "Amazon FSx For WFS",
+    "icon": "aws/storage/AmazonFSxForWFS.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "storage",
+    "name": "AmazonFileCache",
+    "service": "Amazon File Cache",
+    "icon": "aws/storage/AmazonFileCache.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "storage",
+    "name": "AmazonS3OnOutposts",
+    "service": "Amazon S3 On Outposts",
+    "icon": "aws/storage/AmazonS3OnOutposts.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "storage",
+    "name": "AmazonSimpleStorageService",
+    "service": "Amazon Simple Storage Service",
+    "icon": "aws/storage/AmazonSimpleStorageService.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "storage",
+    "name": "AmazonSimpleStorageServiceGlacier",
+    "service": "Amazon Simple Storage Service Glacier",
+    "icon": "aws/storage/AmazonSimpleStorageServiceGlacier.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "support",
+    "name": "AWSActivate",
+    "service": "AWS Activate",
+    "icon": "aws/support/AWSActivate.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "support",
+    "name": "AWSIQ",
+    "service": "AWS IQ",
+    "icon": "aws/support/AWSIQ.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "support",
+    "name": "AWSManagedServices",
+    "service": "AWS Managed Services",
+    "icon": "aws/support/AWSManagedServices.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "support",
+    "name": "AWSProfessionalServices",
+    "service": "AWS Professional Services",
+    "icon": "aws/support/AWSProfessionalServices.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "support",
+    "name": "AWSRePost",
+    "service": "AWS RePost",
+    "icon": "aws/support/AWSRePost.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "support",
+    "name": "AWSRePostPrivate",
+    "service": "AWS RePost Private",
+    "icon": "aws/support/AWSRePostPrivate.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "support",
+    "name": "AWSSupport",
+    "service": "AWS Support",
+    "icon": "aws/support/AWSSupport.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "support",
+    "name": "AWSTrainingCertification",
+    "service": "AWS Training Certification",
+    "icon": "aws/support/AWSTrainingCertification.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "web",
+    "name": "AWSAmplify",
+    "service": "AWS Amplify",
+    "icon": "aws/web/AWSAmplify.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "web",
+    "name": "AWSDeviceFarm",
+    "service": "AWS Device Farm",
+    "icon": "aws/web/AWSDeviceFarm.svg"
+  },
+  {
+    "provider": "aws",
+    "module": "web",
+    "name": "AmazonLocationService",
+    "service": "Amazon Location Service",
+    "icon": "aws/web/AmazonLocationService.svg"
+  }
+]

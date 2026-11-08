@@ -13,26 +13,35 @@ const detail = document.querySelector("#detail");
 
 const WORDS = { ai: "AI", iot: "IoT", devops: "DevOps" };
 
-function categoryLabel(name) {
-  return name.split("_").map((part) => WORDS[part] || part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
+function categoryKey(item) {
+  return `${item.provider || "azure"}/${item.module}`;
+}
+
+function categoryLabel(key) {
+  const [provider, module] = key.split("/");
+  const name = module.split("_").map((part) => WORDS[part] || part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
+  return provider === "aws" ? `AWS · ${name}` : name;
 }
 
 function haystack(item) {
-  return [item.module, item.name, item.service, ...(item.aliases || [])].join(" ").toLowerCase();
+  return [item.provider, item.module, item.name, item.service, ...(item.aliases || [])].join(" ").toLowerCase();
 }
 
 function visible() {
   const words = state.query.toLowerCase().split(/\s+/).filter(Boolean);
   return state.items.filter((item) => {
-    if (state.category !== "all" && item.module !== state.category) return false;
+    if (state.category !== "all" && categoryKey(item) !== state.category) return false;
     return words.every((word) => haystack(item).includes(word));
   });
 }
 
 function renderCategories() {
   const counts = new Map();
-  for (const item of state.items) counts.set(item.module, (counts.get(item.module) || 0) + 1);
-  const names = [...counts.keys()].sort((a, b) => categoryLabel(a).localeCompare(categoryLabel(b)));
+  for (const item of state.items) counts.set(categoryKey(item), (counts.get(categoryKey(item)) || 0) + 1);
+  const names = [...counts.keys()].sort((a, b) => {
+    const provider = Number(a.startsWith("aws/")) - Number(b.startsWith("aws/"));
+    return provider || categoryLabel(a).localeCompare(categoryLabel(b));
+  });
   const entries = [["all", "All", state.items.length], ...names.map((name) => [name, categoryLabel(name), counts.get(name)])];
   cats.replaceChildren(...entries.map(([id, label, total]) => {
     const button = document.createElement("button");
@@ -114,7 +123,7 @@ function renderDetail() {
   title.textContent = item.service;
   const meta = document.createElement("p");
   meta.className = "muted";
-  meta.textContent = `${item.module}.${item.name}`;
+  meta.textContent = `${item.provider || "azure"} · ${item.module}.${item.name}`;
   detail.append(preview, title, meta);
 
   if (item.aliases?.length) {

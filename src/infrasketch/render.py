@@ -10,13 +10,30 @@ from infrasketch.model import Connection, Diagram, Group, Node
 from infrasketch.route import route_diagram
 from infrasketch.theme import BOUNDARIES, CANVAS, EDGE, FONT_ATTR, FOOTER, INK, LINE, MUTED, PAGE_X
 
-FOOTNOTE = "Azure icons © Microsoft · for architecture diagrams"
+def footnote(diagram: Diagram) -> str:
+    """Credit the icon sets that actually appear on this diagram."""
+    paths: list[str] = []
+    for element in diagram.walk():
+        icon = getattr(element, "icon", None)
+        if isinstance(element, Group):
+            icon = BOUNDARIES.get(element.kind, {}).get("icon") or icon
+        if icon:
+            paths.append(icon)
+    notes = []
+    if any(path.startswith("azure/") for path in paths):
+        notes.append("Azure icons © Microsoft")
+    if any(path.startswith("aws/") for path in paths):
+        notes.append("AWS icons © Amazon Web Services")
+    if not notes:
+        return "Architecture diagram"
+    return " · ".join(notes) + " · for architecture diagrams"
 
 
 def render_svg(diagram: Diagram) -> str:
     layout_diagram(diagram)
     route_diagram(diagram)
-    width, height = _canvas_size(diagram)
+    note = footnote(diagram)
+    width, height = _canvas_size(diagram, note)
     ids = _Ids()
     parts = [
         '<?xml version="1.0" encoding="UTF-8"?>',
@@ -25,7 +42,7 @@ def render_svg(diagram: Diagram) -> str:
             f'viewBox="0 0 {width:.1f} {height:.1f}" role="img" text-rendering="optimizeLegibility">'
         ),
         f"<title>{escape(diagram.title)}</title>",
-        f"<desc>{escape(diagram.subtitle or diagram.title)}. {escape(FOOTNOTE)}</desc>",
+        f"<desc>{escape(diagram.subtitle or diagram.title)}. {escape(note)}</desc>",
         f'<rect width="100%" height="100%" fill="{CANVAS}"/>',
         "<defs>",
     ]
@@ -50,7 +67,7 @@ def render_svg(diagram: Diagram) -> str:
         parts.append(_node(node, ids))
     parts.append(_edge_labels(diagram))
     parts.append(_title(diagram))
-    parts.append(_footer(diagram, width, height))
+    parts.append(_footer(diagram, width, height, note))
     parts.append("</svg>")
     return "\n".join(part for part in parts if part)
 
@@ -64,10 +81,10 @@ class _Ids:
         return f"{prefix}{self.number}"
 
 
-def _canvas_size(diagram: Diagram) -> tuple[float, float]:
+def _canvas_size(diagram: Diagram, note: str) -> tuple[float, float]:
     title_w = text_width(diagram.title, 22) + PAGE_X * 2
     sub_w = text_width(diagram.subtitle, 13) + PAGE_X * 2 if diagram.subtitle else 0
-    note_w = text_width(FOOTNOTE, 11) + PAGE_X * 2
+    note_w = text_width(note, 11) + PAGE_X * 2
     content_right = diagram.origin[0] + diagram.content_w
     content_bottom = diagram.origin[1] + diagram.content_h
     width = max(content_right + PAGE_X, title_w, sub_w, note_w, 320)
@@ -238,10 +255,10 @@ def _title(diagram: Diagram) -> str:
     )
 
 
-def _footer(diagram: Diagram, width: float, height: float) -> str:
+def _footer(diagram: Diagram, width: float, height: float, note: str) -> str:
     return (
         f'<text x="{PAGE_X}" y="{height - 12:.1f}" fill="#94A3B8" font-family="{FONT_ATTR}" font-size="11">'
-        f"{escape(FOOTNOTE)}</text>"
+        f"{escape(note)}</text>"
     )
 
 

@@ -2,11 +2,11 @@ MIT License
 
 This license applies to the infrasketch source code only.
 
-It does not apply to the Microsoft Azure Architecture Icons under
-src/infrasketch/data/icons/. Those files remain Microsoft artwork. They may be
-copied, distributed, and displayed only for architecture diagrams, training
-materials, and documentation. Their terms are in NOTICE and in
-src/infrasketch/data/icons/LICENSE.txt.
+It does not apply to the icon artwork under src/infrasketch/data/icons/.
+The Azure files remain Microsoft artwork. The files under
+src/infrasketch/data/icons/aws/ remain Amazon Web Services artwork.
+Their terms are in NOTICE, src/infrasketch/data/icons/LICENSE.txt, and
+src/infrasketch/data/icons/aws/LICENSE.txt.
 
 Copyright (c) 2026 the infrasketch authors
 
