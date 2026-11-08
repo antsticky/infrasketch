@@ -6,7 +6,7 @@
   <title>infrasketch</title>
   <meta name="description" content="Draw Azure and AWS architecture diagrams as SVG with official resource icons. No Graphviz.">
   <link rel="icon" href="assets/favicon.svg">
-  <link rel="stylesheet" href="assets/site.css">
+  <link rel="stylesheet" href="assets/site.css?v=3">
 </head>
 <body>
   <header class="top">
@@ -24,12 +24,19 @@
       <h1>Draw the architecture as SVG.</h1>
       <p class="lede">infrasketch places official Azure and AWS icons on a white canvas and routes the connectors itself. Graphviz is not required.</p>
       <div class="actions">
-        <a class="button" href="icons.html">Browse the icons</a>
+        <a class="button" href="icons.html" data-icons>Browse the icons</a>
         <a class="button secondary" href="guide.html">Read the guide</a>
       </div>
     </section>
 
-    <h2>Azure</h2>
+    <div class="cloud-switch">
+      <div class="providers" role="group" aria-label="Cloud">
+        <button type="button" class="provider" data-provider="azure" aria-pressed="true">Azure</button>
+        <button type="button" class="provider" data-provider="aws" aria-pressed="false">AWS</button>
+      </div>
+    </div>
+
+    <section class="cloud" data-cloud="azure">
     <pre><code>from infrasketch import Diagram
 from infrasketch.azure import FrontDoor, FunctionApp, Redis, ResourceGroup
 
@@ -53,8 +60,9 @@ with Diagram("Orders", "orders.svg"):
         <figcaption>AKS, a registry, and private data.</figcaption>
       </figure>
     </div>
+    </section>
 
-    <h2>AWS</h2>
+    <section class="cloud" data-cloud="aws" hidden>
     <pre><code>from infrasketch import Diagram
 from infrasketch.aws import APIGateway, CloudFront, DynamoDB, Lambda, S3, Users
 
@@ -79,7 +87,30 @@ with Diagram("Orders", "orders.svg"):
         <figcaption>Lambda, a queue, and the data behind it.</figcaption>
       </figure>
     </div>
+    </section>
   </main>
+  <script>
+    const sections = document.querySelectorAll(".cloud");
+    const buttons = document.querySelectorAll(".cloud-switch .provider");
+    const icons = document.querySelector("[data-icons]");
+
+    function show(provider) {
+      for (const section of sections) section.hidden = section.dataset.cloud !== provider;
+      for (const button of buttons) {
+        button.setAttribute("aria-pressed", String(button.dataset.provider === provider));
+      }
+      icons.href = provider === "aws" ? "icons.html?provider=aws" : "icons.html";
+      const params = new URLSearchParams();
+      if (provider !== "azure") params.set("provider", provider);
+      const next = params.toString();
+      history.replaceState(null, "", next ? `?${next}` : location.pathname);
+    }
+
+    for (const button of buttons) {
+      button.addEventListener("click", () => show(button.dataset.provider));
+    }
+    show(new URLSearchParams(location.search).get("provider") === "aws" ? "aws" : "azure");
+  </script>
 
   <footer class="site-footer wrap">
     Azure icons © Microsoft · AWS icons © Amazon Web Services · for architecture diagrams, training, and documentation.
