@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Icons · infrasketch</title>
-  <meta name="description" content="Browse the Azure architecture icons included with infrasketch and copy the import line.">
+  <meta name="description" content="Browse the Azure and AWS architecture icons included with infrasketch and copy the import line.">
   <link rel="icon" href="assets/favicon.svg">
   <link rel="stylesheet" href="assets/site.css">
 </head>
@@ -26,6 +26,10 @@
     </div>
 
     <div class="toolbar">
+      <div class="providers" role="group" aria-label="Icon set">
+        <button type="button" class="provider" data-provider="azure" aria-pressed="true">Azure</button>
+        <button type="button" class="provider" data-provider="aws" aria-pressed="false">AWS</button>
+      </div>
       <input id="search" type="search" placeholder="Search lambda, redis, s3" aria-label="Search icons">
     </div>
 

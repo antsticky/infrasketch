@@ -5,6 +5,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
+from aws_eks import main as aws_eks  # noqa: E402
+from aws_events import main as aws_events  # noqa: E402
 from aws_orders import main as aws_orders  # noqa: E402
 from azure_ai import main as azure_ai  # noqa: E402
 from azure_aks import main as azure_aks  # noqa: E402
@@ -25,6 +27,8 @@ def main() -> None:
         azure_data,
         azure_network,
         aws_orders,
+        aws_eks,
+        aws_events,
     ):
         print(render())
 

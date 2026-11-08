@@ -171,10 +171,12 @@ to use your own artwork. Azure icons are never recoloured or stretched.
 | `examples/azure_data.py` | Event Hubs, Logic Apps, Data Factory, SQL |
 | `examples/azure_network.py` | Firewall, Application Gateway, Bastion, a jump host |
 | `examples/aws_orders.py` | CloudFront, API Gateway, Lambda, DynamoDB, and S3 in a VPC |
+| `examples/aws_eks.py` | EKS, a registry, ElastiCache, and RDS |
+| `examples/aws_events.py` | API Gateway, Lambda, SQS, DynamoDB, and S3 |
 
 ![Web, API, and Redis](examples/out/azure-web-api.svg)
 
-![Container Apps](examples/out/azure-container-apps.svg)
+![Orders on AWS](examples/out/aws-orders.svg)
 
 ## License
 

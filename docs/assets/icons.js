@@ -1,6 +1,7 @@
 const state = {
   items: [],
   query: "",
+  provider: "azure",
   category: "all",
   selected: null,
 };
@@ -10,39 +11,43 @@ const cats = document.querySelector("#cats");
 const search = document.querySelector("#search");
 const count = document.querySelector("#count");
 const detail = document.querySelector("#detail");
+const providers = document.querySelectorAll(".provider");
 
 const WORDS = { ai: "AI", iot: "IoT", devops: "DevOps" };
 
-function categoryKey(item) {
-  return `${item.provider || "azure"}/${item.module}`;
+function providerOf(item) {
+  return item.provider || "azure";
 }
 
-function categoryLabel(key) {
-  const [provider, module] = key.split("/");
-  const name = module.split("_").map((part) => WORDS[part] || part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
-  return provider === "aws" ? `AWS · ${name}` : name;
+function categoryLabel(module) {
+  return module.split("_").map((part) => WORDS[part] || part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
 }
 
 function haystack(item) {
   return [item.provider, item.module, item.name, item.service, ...(item.aliases || [])].join(" ").toLowerCase();
 }
 
+function inProvider(item) {
+  return providerOf(item) === state.provider;
+}
+
 function visible() {
   const words = state.query.toLowerCase().split(/\s+/).filter(Boolean);
   return state.items.filter((item) => {
-    if (state.category !== "all" && categoryKey(item) !== state.category) return false;
+    if (!inProvider(item)) return false;
+    if (state.category !== "all" && item.module !== state.category) return false;
     return words.every((word) => haystack(item).includes(word));
   });
 }
 
 function renderCategories() {
   const counts = new Map();
-  for (const item of state.items) counts.set(categoryKey(item), (counts.get(categoryKey(item)) || 0) + 1);
-  const names = [...counts.keys()].sort((a, b) => {
-    const provider = Number(a.startsWith("aws/")) - Number(b.startsWith("aws/"));
-    return provider || categoryLabel(a).localeCompare(categoryLabel(b));
-  });
-  const entries = [["all", "All", state.items.length], ...names.map((name) => [name, categoryLabel(name), counts.get(name)])];
+  for (const item of state.items) {
+    if (inProvider(item)) counts.set(item.module, (counts.get(item.module) || 0) + 1);
+  }
+  const names = [...counts.keys()].sort((a, b) => categoryLabel(a).localeCompare(categoryLabel(b)));
+  const total = [...counts.values()].reduce((sum, value) => sum + value, 0);
+  const entries = [["all", "All", total], ...names.map((name) => [name, categoryLabel(name), counts.get(name)])];
   cats.replaceChildren(...entries.map(([id, label, total]) => {
     const button = document.createElement("button");
     button.type = "button";
@@ -123,7 +128,7 @@ function renderDetail() {
   title.textContent = item.service;
   const meta = document.createElement("p");
   meta.className = "muted";
-  meta.textContent = `${item.provider || "azure"} · ${item.module}.${item.name}`;
+  meta.textContent = `${providerOf(item)} · ${item.module}.${item.name}`;
   detail.append(preview, title, meta);
 
   if (item.aliases?.length) {
@@ -150,7 +155,11 @@ function renderDetail() {
 
 function render() {
   const items = visible();
-  count.textContent = `${items.length} icon${items.length === 1 ? "" : "s"}`;
+  const cloud = state.provider === "aws" ? "AWS" : "Azure";
+  count.textContent = `${items.length} ${cloud} icon${items.length === 1 ? "" : "s"}`;
+  for (const button of providers) {
+    button.setAttribute("aria-pressed", String(button.dataset.provider === state.provider));
+  }
   for (const button of cats.querySelectorAll(".cat")) {
     button.setAttribute("aria-pressed", String(button.dataset.category === state.category));
   }
@@ -168,10 +177,22 @@ function render() {
 
 function syncQuery() {
   const params = new URLSearchParams();
+  if (state.provider !== "azure") params.set("provider", state.provider);
   if (state.query) params.set("q", state.query);
   if (state.category !== "all") params.set("category", state.category);
   const next = params.toString();
   history.replaceState(null, "", next ? `?${next}` : location.pathname);
+}
+
+for (const button of providers) {
+  button.addEventListener("click", () => {
+    state.provider = button.dataset.provider;
+    state.category = "all";
+    state.selected = null;
+    syncQuery();
+    renderCategories();
+    render();
+  });
 }
 
 search.addEventListener("input", () => {
@@ -182,7 +203,8 @@ search.addEventListener("input", () => {
 
 const params = new URLSearchParams(location.search);
 state.query = params.get("q") || "";
-state.category = params.get("category") || "all";
+state.provider = params.get("provider") === "aws" ? "aws" : "azure";
+state.category = (params.get("category") || "all").split("/").pop();
 search.value = state.query;
 
 const response = await fetch("catalog.json");
