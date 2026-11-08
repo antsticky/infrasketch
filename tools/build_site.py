@@ -6,6 +6,7 @@ so the browser can show each one at its original proportions.
 
 from __future__ import annotations
 
+import json
 import shutil
 import sys
 from pathlib import Path
