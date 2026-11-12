@@ -61,9 +61,9 @@ def route_diagram(diagram: Diagram) -> None:
     for edge in diagram.edges:
         source, target = _shown(edge.source), _shown(edge.target)
         if source is target:
-            edge.points = [] if source is not edge.source else _loop(source)
+            edge.points = [] if source is not edge.source else _orthogonal(_loop(source))
             continue
-        edge.points = _route(edge, obstacles, source, target)
+        edge.points = _orthogonal(_route(edge, obstacles, source, target))
 
 
 def _shown(element: Endpoint) -> Endpoint:
@@ -259,7 +259,7 @@ def _detour_horizontal(start, end, leave, arrive, lane, obstacles: list[Rect]):
                 and _clear(arrive[0], y, arrive[0], arrive[1], obstacles)
             ):
                 return _clean([start, leave, (leave[0], y), (arrive[0], y), arrive, end])
-    return _clean([start, end])
+    return _elbow(start, end, horizontal=True)
 
 
 def _detour_vertical(start, end, leave, arrive, lane, obstacles: list[Rect]):
@@ -274,7 +274,7 @@ def _detour_vertical(start, end, leave, arrive, lane, obstacles: list[Rect]):
                 and _clear(x, arrive[1], arrive[0], arrive[1], obstacles)
             ):
                 return _clean([start, leave, (x, leave[1]), (x, arrive[1]), arrive, end])
-    return _clean([start, end])
+    return _elbow(start, end, horizontal=False)
 
 
 def _bridge(leave, arrive, obstacles: list[Rect], *, horizontal: bool, lane: float = 0.0):
@@ -362,6 +362,38 @@ def _hits(x1: float, y1: float, x2: float, y2: float, rect: Rect) -> bool:
         top, bottom = sorted((y1, y2))
         return rect.left <= x <= rect.right and top < rect.bottom and bottom > rect.top
     return False
+
+
+def _elbow(start, end, *, horizontal: bool) -> list[tuple[float, float]]:
+    """A right-angle connector. The last segment meets the target port straight on."""
+    x1, y1 = start
+    x2, y2 = end
+    if abs(x1 - x2) <= 0.8 or abs(y1 - y2) <= 0.8:
+        return _clean([start, end])
+    if horizontal:
+        mid = (x1 + x2) / 2.0
+        return _clean([start, (mid, y1), (mid, y2), end])
+    mid = (y1 + y2) / 2.0
+    return _clean([start, (x1, mid), (x2, mid), end])
+
+
+def _orthogonal(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
+    """Replace any slanted segment with a horizontal run and a vertical run."""
+    if len(points) < 2:
+        return points
+    out = [points[0]]
+    for nxt in points[1:]:
+        x1, y1 = out[-1]
+        x2, y2 = nxt
+        if abs(x1 - x2) <= 0.8 or abs(y1 - y2) <= 0.8:
+            out.append((x2, y2))
+            continue
+        if len(out) >= 2 and abs(out[-2][1] - y1) <= 0.8:
+            out.append((x2, y1))
+        else:
+            out.append((x1, y2))
+        out.append((x2, y2))
+    return _clean(out)
 
 
 def _clean(points: list[tuple[float, float]]) -> list[tuple[float, float]]:

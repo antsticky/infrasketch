@@ -7,13 +7,13 @@
 <marker id="arrow-5C6B7C" viewBox="0 0 10 10" refX="8.6" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M0.8 1.15 L8.6 5 L0.8 8.85 Z" fill="#5C6B7C"/></marker>
 <marker id="arrow-7C3AED" viewBox="0 0 10 10" refX="8.6" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M0.8 1.15 L8.6 5 L0.8 8.85 Z" fill="#7C3AED"/></marker>
 </defs>
-<path d="M 95.9 114.0 L 212.3 114.0" fill="none" stroke="#5C6B7C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-5C6B7C)"/>
-<path d="M 260.3 114.0 L 382.8 114.0" fill="none" stroke="#5C6B7C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-5C6B7C)"/>
-<path d="M 430.8 114.0 L 554.2 114.0" fill="none" stroke="#7C3AED" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#arrow-7C3AED)"/>
-<path d="M 602.2 114.0 L 726.4 114.0" fill="none" stroke="#5C6B7C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-5C6B7C)"/>
-<path d="M 774.4 114.0 L 904.7 114.0" fill="none" stroke="#5C6B7C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-5C6B7C)"/>
-<path d="M 430.8 114.0 L 474.5 114.0 Q 483.5 114.0 483.5 123.0 L 483.5 230.0 Q 483.5 239.0 492.5 239.0 L 554.2 239.0" fill="none" stroke="#5C6B7C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-5C6B7C)"/>
-<path d="M 774.4 114.0 L 839.5 114.0 Q 848.5 114.0 848.5 123.0 L 848.5 230.0 Q 848.5 239.0 857.5 239.0 L 904.7 239.0" fill="none" stroke="#5C6B7C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-5C6B7C)"/>
+<path d="M 95.9 114.0 L 212.3 114.0" fill="none" stroke="#5C6B7C" stroke-width="1.6" stroke-linecap="butt" stroke-linejoin="miter" marker-end="url(#arrow-5C6B7C)"/>
+<path d="M 260.3 114.0 L 382.8 114.0" fill="none" stroke="#5C6B7C" stroke-width="1.6" stroke-linecap="butt" stroke-linejoin="miter" marker-end="url(#arrow-5C6B7C)"/>
+<path d="M 430.8 114.0 L 554.2 114.0" fill="none" stroke="#7C3AED" stroke-width="1.6" stroke-linecap="butt" stroke-linejoin="miter" stroke-dasharray="6 4" marker-end="url(#arrow-7C3AED)"/>
+<path d="M 602.2 114.0 L 726.4 114.0" fill="none" stroke="#5C6B7C" stroke-width="1.6" stroke-linecap="butt" stroke-linejoin="miter" marker-end="url(#arrow-5C6B7C)"/>
+<path d="M 774.4 114.0 L 904.7 114.0" fill="none" stroke="#5C6B7C" stroke-width="1.6" stroke-linecap="butt" stroke-linejoin="miter" marker-end="url(#arrow-5C6B7C)"/>
+<path d="M 430.8 114.0 L 446.8 114.0 L 483.5 114.0 L 483.5 239.0 L 538.2 239.0 L 554.2 239.0" fill="none" stroke="#5C6B7C" stroke-width="1.6" stroke-linecap="butt" stroke-linejoin="miter" marker-end="url(#arrow-5C6B7C)"/>
+<path d="M 774.4 114.0 L 790.4 114.0 L 848.5 114.0 L 848.5 239.0 L 888.7 239.0 L 904.7 239.0" fill="none" stroke="#5C6B7C" stroke-width="1.6" stroke-linecap="butt" stroke-linejoin="miter" marker-end="url(#arrow-5C6B7C)"/>
 <svg x="47.9" y="90.0" width="48.0" height="48.0" viewBox="0 0 48 48" preserveAspectRatio="xMidYMid meet" overflow="visible" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>Icon-Resource/General-Resource/Res_Users_48_Light</title>
     <g id="n1Icon-Resource_General-Resource_Res_Users_48" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">

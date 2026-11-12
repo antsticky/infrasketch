@@ -276,8 +276,8 @@ def _edge_path(edge: Connection) -> str:
     end = ' marker-end="url(#{0})"'.format(marker) if edge.direction in {"forward", "both"} else ""
     dash = {"dashed": ' stroke-dasharray="6 4"', "dotted": ' stroke-dasharray="1.4 4"'}.get(edge.style, "")
     return (
-        f'<path d="{_rounded(edge.points)}" fill="none" stroke="{color}" stroke-width="1.6" '
-        f'stroke-linecap="round" stroke-linejoin="round"{dash}{start}{end}/>'
+        f'<path d="{_polyline(edge.points)}" fill="none" stroke="{color}" stroke-width="1.6" '
+        f'stroke-linecap="butt" stroke-linejoin="miter"{dash}{start}{end}/>'
     )
 
 
@@ -391,38 +391,15 @@ def _footer(diagram: Diagram, width: float, height: float, note: str) -> str:
     )
 
 
-def _rounded(points: list[tuple[float, float]], radius: float = 9) -> str:
+def _polyline(points: list[tuple[float, float]]) -> str:
+    """Straight horizontal and vertical runs. Corners stay at 90 degrees."""
     pts = [points[0]]
     for point in points[1:]:
         if abs(point[0] - pts[-1][0]) >= 0.6 or abs(point[1] - pts[-1][1]) >= 0.6:
             pts.append(point)
-    simplified = [pts[0]]
-    for index in range(1, len(pts) - 1):
-        ax, ay = simplified[-1]
-        bx, by = pts[index]
-        cx, cy = pts[index + 1]
-        cross = (bx - ax) * (cy - by) - (by - ay) * (cx - bx)
-        if abs(cross) > 0.8:
-            simplified.append(pts[index])
-    simplified.append(pts[-1])
-    if len(simplified) == 2:
-        return f"M {simplified[0][0]:.1f} {simplified[0][1]:.1f} L {simplified[1][0]:.1f} {simplified[1][1]:.1f}"
-    commands = [f"M {simplified[0][0]:.1f} {simplified[0][1]:.1f}"]
-    for index in range(1, len(simplified) - 1):
-        prev, cur, nxt = simplified[index - 1], simplified[index], simplified[index + 1]
-        v1 = (cur[0] - prev[0], cur[1] - prev[1])
-        v2 = (nxt[0] - cur[0], nxt[1] - cur[1])
-        len1 = (v1[0] ** 2 + v1[1] ** 2) ** 0.5
-        len2 = (v2[0] ** 2 + v2[1] ** 2) ** 0.5
-        curve = min(radius, len1 / 2, len2 / 2)
-        if len1 < 1 or len2 < 1 or curve < 1.2:
-            commands.append(f"L {cur[0]:.1f} {cur[1]:.1f}")
-            continue
-        enter = (cur[0] - v1[0] / len1 * curve, cur[1] - v1[1] / len1 * curve)
-        leave = (cur[0] + v2[0] / len2 * curve, cur[1] + v2[1] / len2 * curve)
-        commands.append(f"L {enter[0]:.1f} {enter[1]:.1f}")
-        commands.append(f"Q {cur[0]:.1f} {cur[1]:.1f} {leave[0]:.1f} {leave[1]:.1f}")
-    commands.append(f"L {simplified[-1][0]:.1f} {simplified[-1][1]:.1f}")
+    commands = [f"M {pts[0][0]:.1f} {pts[0][1]:.1f}"]
+    for x, y in pts[1:]:
+        commands.append(f"L {x:.1f} {y:.1f}")
     return " ".join(commands)
 
 
