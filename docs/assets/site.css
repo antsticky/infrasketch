@@ -200,11 +200,11 @@ th { color: var(--muted); font-size: 12px; font-weight: 650; letter-spacing: 0.0
   line-height: 1.5;
 }
 
-.back .py-keyword, .code-pop .py-keyword, .guide pre .py-keyword { color: #6d28d9; }
-.back .py-string, .code-pop .py-string, .guide pre .py-string { color: #107c41; }
-.back .py-comment, .code-pop .py-comment, .guide pre .py-comment { color: #64748b; }
-.back .py-number, .code-pop .py-number, .guide pre .py-number { color: #c2410c; }
-.back .py-call, .code-pop .py-call, .guide pre .py-call { color: #0078d4; }
+.back .py-keyword, .code-pop .py-keyword, .guide .py-keyword { color: #6d28d9; }
+.back .py-string, .code-pop .py-string, .guide .py-string { color: #107c41; }
+.back .py-comment, .code-pop .py-comment, .guide .py-comment { color: #64748b; }
+.back .py-number, .code-pop .py-number, .guide .py-number { color: #c2410c; }
+.back .py-call, .code-pop .py-call, .guide .py-call { color: #0078d4; }
 
 .code-copy {
   position: absolute;
