@@ -20,6 +20,8 @@ class IconInfo:
 
     @property
     def import_line(self) -> str:
+        if self.provider == "external":
+            return f"from infrasketch.external import {self.name}"
         return f"from infrasketch.{self.provider}.{self.module} import {self.name}"
 
     def __str__(self) -> str:
@@ -30,7 +32,7 @@ class IconInfo:
 def catalog() -> tuple[IconInfo, ...]:
     root = files("infrasketch").joinpath("data")
     rows = []
-    for name in ("catalog.json", "aws-catalog.json"):
+    for name in ("catalog.json", "aws-catalog.json", "external-catalog.json"):
         path = root.joinpath(name)
         if not path.is_file():
             continue

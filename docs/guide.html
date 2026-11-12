@@ -24,6 +24,7 @@
       <button class="cat" type="button" data-section="install">Install</button>
       <button class="cat" type="button" data-section="azure">Azure</button>
       <button class="cat" type="button" data-section="aws">AWS</button>
+      <button class="cat" type="button" data-section="external">External</button>
       <button class="cat" type="button" data-section="diagram">Draw a diagram</button>
       <button class="cat" type="button" data-section="connectors">Connectors</button>
       <button class="cat" type="button" data-section="decisions">Decisions</button>
@@ -89,6 +90,26 @@ with Diagram("Orders", "orders.svg", subtitle="Production · eu-west-1"):
             images = S3("Images")
     customers &gt;&gt; edge &gt;&gt; api &gt;&gt; checkout
     checkout &gt;&gt; [orders, images]</code></pre>
+      </section>
+
+      <section class="panel" id="external" hidden>
+        <h2>External</h2>
+        <p>Services outside Azure and AWS live in <code>infrasketch.external</code>. Each one is a node. The icon is the service, and the label is your name for that piece of the system. The set is <code>GitHub</code>, <code>Cloudflare</code>, and <code>Akamai</code>.</p>
+        <pre><code>from infrasketch import Diagram, Https
+from infrasketch.azure import AppService, ResourceGroup
+from infrasketch.external import Akamai, Cloudflare, GitHub
+
+with Diagram("Edge and source", "edge.svg"):
+    repo = GitHub("Orders")
+    primary = Cloudflare("Primary")
+    failover = Akamai("Failover")
+    with ResourceGroup("rg-app"):
+        api = AppService("Orders API")
+
+    primary &gt;&gt; Https() &gt;&gt; api
+    failover &gt;&gt; Https() &gt;&gt; api
+    repo &gt;&gt; api</code></pre>
+        <p>See <code>examples/external_edge.py</code> and <code>examples/external_github.py</code>. The <a href="icons.html?provider=external">icon browser</a> lists the import for each mark. A diagram credits only the marks it actually draws.</p>
       </section>
 
       <section class="panel" id="diagram" hidden>
@@ -212,7 +233,8 @@ api &gt;&gt; Private("The API reports failures", 4) &gt;&gt; alerts</code></pre>
         <h2>Names</h2>
         <p>Common Azure names come from <code>infrasketch.azure</code>: <code>FunctionApp</code>, <code>ContainerApp</code>, <code>ACR</code>, <code>AKS</code>, <code>Redis</code>, <code>SQLDatabase</code>, <code>KeyVault</code>, <code>FrontDoor</code>.</p>
         <p>Common AWS names come from <code>infrasketch.aws</code>: <code>Lambda</code>, <code>EC2</code>, <code>S3</code>, <code>DynamoDB</code>, <code>RDS</code>, <code>APIGateway</code>, <code>CloudFront</code>, <code>EKS</code>.</p>
-        <p>Every icon in both sets is included. The <a href="icons.html">icon browser</a> shows the import line. From a terminal:</p>
+        <p>External names come from <code>infrasketch.external</code>: <code>GitHub</code>, <code>Cloudflare</code>, and <code>Akamai</code>.</p>
+        <p>Every icon in these sets is included. The <a href="icons.html">icon browser</a> shows the import line. From a terminal:</p>
         <pre><code>python -m infrasketch search private endpoint
 python -m infrasketch categories</code></pre>
         <pre><code>from infrasketch import search
@@ -226,7 +248,7 @@ for hit in search("cosmos"):
   </main>
 
   <footer class="site-footer wrap">
-    Azure icons © Microsoft · AWS icons © Amazon Web Services · for architecture diagrams, training, and documentation.
+    Azure icons © Microsoft · AWS icons © Amazon Web Services · External marks © their owners.
   </footer>
   <script>
     const buttons = [...document.querySelectorAll("#guide-nav .cat")];

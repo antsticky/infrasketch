@@ -28,6 +28,8 @@ EXAMPLES = (
     "aws-events.svg",
     "azure-decisions.svg",
     "aws-decisions.svg",
+    "external-github.svg",
+    "external-edge.svg",
 )
 
 
@@ -35,9 +37,10 @@ def aliases() -> dict[tuple[str, str, str], list[str]]:
     sys.path.insert(0, str(ROOT / "src"))
     import infrasketch.aws as aws
     import infrasketch.azure as azure
+    import infrasketch.external as external
 
     found: dict[tuple[str, str, str], list[str]] = {}
-    for provider, module in (("azure", azure), ("aws", aws)):
+    for provider, module in (("azure", azure), ("aws", aws), ("external", external)):
         for public in module.__all__:
             obj = getattr(module, public)
             if not hasattr(obj, "icon"):

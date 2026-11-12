@@ -41,3 +41,13 @@ Do not present the icons as MIT or as infrasketch artwork, and do not imply
 that Amazon Web Services made, sponsors, or endorses this package.
 
 Source: https://aws.amazon.com/architecture/icons/
+
+External service marks
+
+The icons in src/infrasketch/data/icons/external/ are the GitHub, Cloudflare,
+and Akamai marks from Simple Icons, dedicated to the public domain under
+CC0 1.0. GitHub, Cloudflare, and Akamai, and their logos, are trademarks of
+their owners. Each icon identifies that service in a diagram. They are not
+MIT, and they are not infrasketch artwork. Do not imply that the owner made,
+sponsors, or endorses this package. The terms are kept beside the files in
+src/infrasketch/data/icons/external/LICENSE.txt.

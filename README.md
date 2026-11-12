@@ -152,6 +152,16 @@ Common Azure names, imported from `infrasketch.azure`: `FunctionApp`,
 Common AWS names, imported from `infrasketch.aws`: `Lambda`, `EC2`, `S3`,
 `DynamoDB`, `APIGateway`, `CloudFront`, `SQS`, `EKS`.
 
+Services outside both clouds are in `infrasketch.external`. `GitHub`,
+`Cloudflare`, and `Akamai` are nodes like any other resource:
+
+```python
+from infrasketch.external import Akamai, Cloudflare, GitHub
+
+repo = GitHub("Orders")
+edge = Cloudflare("Primary")
+```
+
 Search when you need the rest:
 
 ```bash
@@ -195,6 +205,8 @@ to use your own artwork. Azure icons are never recoloured or stretched.
 | `examples/aws_events.py` | API Gateway, Lambda, SQS, DynamoDB, and S3 |
 | `examples/azure_decisions.py` | SKU, exposure, notes, numbered steps, and links |
 | `examples/aws_decisions.py` | The same decisions on an AWS drawing |
+| `examples/external_github.py` | A GitHub repository deploying an App Service |
+| `examples/external_edge.py` | Cloudflare and Akamai in front of an App Service |
 
 ![Web, API, and Redis](examples/out/azure-web-api.svg)
 
@@ -217,3 +229,7 @@ whitepapers, presentations, datasheets, and posters. Do not use either set as
 a logo or to represent your own product. The terms travel with the files in
 `NOTICE`, `src/infrasketch/data/icons/LICENSE.txt`, and
 `src/infrasketch/data/icons/aws/LICENSE.txt`.
+
+`GitHub`, `Cloudflare`, and `Akamai` use the marks from Simple Icons (CC0 1.0).
+The names and logos remain trademarks of their owners. The terms are in
+`src/infrasketch/data/icons/external/LICENSE.txt`.

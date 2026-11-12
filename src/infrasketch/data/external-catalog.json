@@ -1,0 +1,23 @@
+[
+  {
+    "module": "external",
+    "name": "Akamai",
+    "service": "Akamai",
+    "icon": "external/akamai.svg",
+    "provider": "external"
+  },
+  {
+    "module": "external",
+    "name": "Cloudflare",
+    "service": "Cloudflare",
+    "icon": "external/cloudflare.svg",
+    "provider": "external"
+  },
+  {
+    "module": "external",
+    "name": "GitHub",
+    "service": "GitHub",
+    "icon": "external/github.svg",
+    "provider": "external"
+  }
+]

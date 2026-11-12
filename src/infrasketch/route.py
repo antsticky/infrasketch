@@ -172,12 +172,10 @@ def _route(
 
 def _route_horizontal(start, end, lane, obstacles: list[Rect]) -> list[tuple[float, float]]:
     forward = end[0] >= start[0]
-    distance = abs(end[0] - start[0])
-    stub = min(16.0, max(8.0, distance * 0.22))
     sign = 1.0 if forward else -1.0
-    leave = (start[0] + sign * stub, start[1])
-    arrive = (end[0] - sign * stub, end[1])
-    if abs(leave[1] - arrive[1]) < 1 and (arrive[0] - leave[0]) * sign > 0:
+    leave = _approach(start, sign, 0.0, obstacles)
+    arrive = _approach(end, -sign, 0.0, obstacles)
+    if abs(start[1] - end[1]) < 1 and (end[0] - start[0]) * sign > 0 and _clear(start[0], start[1], end[0], end[1], obstacles):
         return [start, end]
     low, high = sorted((leave[0], arrive[0]))
     center = (leave[0] + arrive[0]) / 2.0 + (lane if forward else -lane)
@@ -199,17 +197,15 @@ def _route_horizontal(start, end, lane, obstacles: list[Rect]) -> list[tuple[flo
             and _clear(candidate, arrive[1], arrive[0], arrive[1], obstacles)
         ):
             return _clean([start, leave, (candidate, leave[1]), (candidate, arrive[1]), arrive, end])
-    return _detour_horizontal(start, end, leave, arrive, obstacles)
+    return _detour_horizontal(start, end, leave, arrive, lane, obstacles)
 
 
 def _route_vertical(start, end, lane, obstacles: list[Rect]) -> list[tuple[float, float]]:
     forward = end[1] >= start[1]
-    distance = abs(end[1] - start[1])
-    stub = min(16.0, max(8.0, distance * 0.22))
     sign = 1.0 if forward else -1.0
-    leave = (start[0], start[1] + sign * stub)
-    arrive = (end[0], end[1] - sign * stub)
-    if abs(leave[0] - arrive[0]) < 1 and (arrive[1] - leave[1]) * sign > 0:
+    leave = _approach(start, 0.0, sign, obstacles)
+    arrive = _approach(end, 0.0, -sign, obstacles)
+    if abs(start[0] - end[0]) < 1 and (end[1] - start[1]) * sign > 0 and _clear(start[0], start[1], end[0], end[1], obstacles):
         return [start, end]
     low, high = sorted((leave[1], arrive[1]))
     center = (leave[1] + arrive[1]) / 2.0 + (lane if forward else -lane)
@@ -231,26 +227,57 @@ def _route_vertical(start, end, lane, obstacles: list[Rect]) -> list[tuple[float
             and _clear(arrive[0], candidate, arrive[0], arrive[1], obstacles)
         ):
             return _clean([start, leave, (leave[0], candidate), (arrive[0], candidate), arrive, end])
-    return _detour_vertical(start, end, leave, arrive, obstacles)
+    return _detour_vertical(start, end, leave, arrive, lane, obstacles)
 
 
-def _detour_horizontal(start, end, leave, arrive, obstacles: list[Rect]):
-    bridged = _bridge(leave, arrive, obstacles, horizontal=True)
+def _approach(port: tuple[float, float], dx: float, dy: float, obstacles: list[Rect]) -> tuple[float, float]:
+    """Step away from a port, stopping before a title band or another resource."""
+    length = (dx * dx + dy * dy) ** 0.5
+    if length < 1:
+        return port
+    ux, uy = dx / length, dy / length
+    best = port
+    dist = 4.0
+    while dist <= 16.1:
+        point = (port[0] + ux * dist, port[1] + uy * dist)
+        if not _clear(port[0], port[1], point[0], point[1], obstacles):
+            break
+        best = point
+        dist += 4.0
+    return best
+
+
+def _detour_horizontal(start, end, leave, arrive, lane, obstacles: list[Rect]):
+    bridged = _bridge(leave, arrive, obstacles, horizontal=True, lane=lane)
     if bridged is not None:
         return _clean([start, leave, *bridged, arrive, end])
-    channel = (leave[1] + arrive[1]) / 2.0
-    return _clean([start, leave, (leave[0], channel), (arrive[0], channel), arrive, end])
+    for pad in (36, 72, 120, 180, 260):
+        for y in (min(leave[1], arrive[1]) - pad, max(leave[1], arrive[1]) + pad):
+            if (
+                _clear(leave[0], leave[1], leave[0], y, obstacles)
+                and _clear(leave[0], y, arrive[0], y, obstacles)
+                and _clear(arrive[0], y, arrive[0], arrive[1], obstacles)
+            ):
+                return _clean([start, leave, (leave[0], y), (arrive[0], y), arrive, end])
+    return _clean([start, end])
 
 
-def _detour_vertical(start, end, leave, arrive, obstacles: list[Rect]):
-    bridged = _bridge(leave, arrive, obstacles, horizontal=False)
+def _detour_vertical(start, end, leave, arrive, lane, obstacles: list[Rect]):
+    bridged = _bridge(leave, arrive, obstacles, horizontal=False, lane=lane)
     if bridged is not None:
         return _clean([start, leave, *bridged, arrive, end])
-    channel = (leave[0] + arrive[0]) / 2.0
-    return _clean([start, leave, (channel, leave[1]), (channel, arrive[1]), arrive, end])
+    for pad in (36, 72, 120, 180, 260):
+        for x in (min(leave[0], arrive[0]) - pad, max(leave[0], arrive[0]) + pad):
+            if (
+                _clear(leave[0], leave[1], x, leave[1], obstacles)
+                and _clear(x, leave[1], x, arrive[1], obstacles)
+                and _clear(x, arrive[1], arrive[0], arrive[1], obstacles)
+            ):
+                return _clean([start, leave, (x, leave[1]), (x, arrive[1]), arrive, end])
+    return _clean([start, end])
 
 
-def _bridge(leave, arrive, obstacles: list[Rect], *, horizontal: bool):
+def _bridge(leave, arrive, obstacles: list[Rect], *, horizontal: bool, lane: float = 0.0):
     """One extra bend so a connector can use the gap above a row of resources."""
     x1, y1 = leave
     x2, y2 = arrive
@@ -294,6 +321,11 @@ def _bridge(leave, arrive, obstacles: list[Rect], *, horizontal: bool):
             # A clear lane above the icons beats a detour underneath the boxes.
             if horizontal and y > max(y1, y2) + 10:
                 cost += (y - max(y1, y2)) * 4
+            # Parallel connectors take neighbouring gaps when both are clear.
+            if horizontal:
+                cost += abs(y - (min(y1, y2) + lane)) * 0.35
+            else:
+                cost += abs(x - (min(x1, x2) + lane)) * 0.35
             if best is None or cost < best_cost:
                 best = (x, y)
                 best_cost = cost

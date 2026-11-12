@@ -17,6 +17,8 @@ from azure_decisions import main as azure_decisions  # noqa: E402
 from azure_functions import main as azure_functions  # noqa: E402
 from azure_network import main as azure_network  # noqa: E402
 from azure_web_api import main as azure_web_api  # noqa: E402
+from external_edge import main as external_edge  # noqa: E402
+from external_github import main as external_github  # noqa: E402
 
 
 def main() -> None:
@@ -33,6 +35,8 @@ def main() -> None:
         aws_eks,
         aws_events,
         aws_decisions,
+        external_github,
+        external_edge,
     ):
         print(render())
 

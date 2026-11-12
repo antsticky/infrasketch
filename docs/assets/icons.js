@@ -155,7 +155,8 @@ function renderDetail() {
 
 function render() {
   const items = visible();
-  const cloud = state.provider === "aws" ? "AWS" : "Azure";
+  const labels = { azure: "Azure", aws: "AWS", external: "External" };
+  const cloud = labels[state.provider] || state.provider;
   count.textContent = `${items.length} ${cloud} icon${items.length === 1 ? "" : "s"}`;
   for (const button of providers) {
     button.setAttribute("aria-pressed", String(button.dataset.provider === state.provider));
@@ -203,7 +204,7 @@ search.addEventListener("input", () => {
 
 const params = new URLSearchParams(location.search);
 state.query = params.get("q") || "";
-state.provider = params.get("provider") === "aws" ? "aws" : "azure";
+state.provider = ["aws", "external"].includes(params.get("provider")) ? params.get("provider") : "azure";
 state.category = (params.get("category") || "all").split("/").pop();
 search.value = state.query;
 

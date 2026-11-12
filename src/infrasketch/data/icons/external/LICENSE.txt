@@ -1,0 +1,12 @@
+External service marks
+
+The icons in this folder are the service marks from Simple Icons
+(https://simpleicons.org/), dedicated to the public domain under CC0 1.0.
+
+GitHub and the GitHub logo are trademarks of GitHub, Inc.
+Cloudflare and the Cloudflare logo are trademarks of Cloudflare, Inc.
+Akamai and the Akamai logo are trademarks of Akamai Technologies, Inc.
+
+Each icon is included so a diagram can identify that service. These marks are
+not MIT, and they are not infrasketch artwork. Do not present a mark as a
+claim that its owner made, sponsors, or endorses this package.

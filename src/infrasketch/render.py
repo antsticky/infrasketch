@@ -24,6 +24,13 @@ def footnote(diagram: Diagram) -> str:
         notes.append("Azure icons © Microsoft")
     if any(path.startswith("aws/") for path in paths):
         notes.append("AWS icons © Amazon Web Services")
+    for spec, credit in (
+        ("external/github.svg", "GitHub mark © GitHub"),
+        ("external/cloudflare.svg", "Cloudflare mark © Cloudflare"),
+        ("external/akamai.svg", "Akamai mark © Akamai"),
+    ):
+        if spec in paths:
+            notes.append(credit)
     if not notes:
         return "Architecture diagram"
     return " · ".join(notes) + " · for architecture diagrams"
