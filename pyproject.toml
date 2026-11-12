@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "infrasketch"
-version = "2.0.0"
+version = "2.1.0"
 description = "Draw Azure and AWS architecture diagrams as SVG with official resource icons. No Graphviz."
 readme = "README.md"
 requires-python = ">=3.10"

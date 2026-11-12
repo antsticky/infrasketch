@@ -99,6 +99,19 @@ diagram.save("orders.svg")</code></pre>
     </table>
     <p><code>style</code> is <code>"solid"</code>, <code>"dashed"</code>, or <code>"dotted"</code>. <code>color</code> is a hex color such as <code>"#0078D4"</code>.</p>
 
+    <h2>Decisions</h2>
+    <p>A review needs more than the service name. <code>sku</code>, <code>region</code>, and <code>public</code> become a second caption. <code>note</code> is the short decision under it. The same fields, except the link, work on a group. Pass a step number to a connector and the sentence is listed under the drawing. <code>href</code> makes the icon a link to an ADR, a repository, or a portal page.</p>
+    <pre><code>api = AppService(
+    "Orders API",
+    sku="P1v3",
+    region="West Europe",
+    public=False,
+    note="Private endpoint only",
+    href="https://learn.microsoft.com/azure/app-service/overview",
+)
+door &gt;&gt; Https("Front Door calls the API", 2) &gt;&gt; api</code></pre>
+    <p>See <code>examples/azure_decisions.py</code> and <code>examples/aws_decisions.py</code>.</p>
+
     <h2>Boundaries</h2>
     <p>Import Azure boundaries from <code>infrasketch.azure</code> and AWS boundaries from <code>infrasketch.aws</code>. <code>Group</code> comes from <code>infrasketch</code> and draws a box that belongs to neither cloud.</p>
     <h3>Azure</h3>

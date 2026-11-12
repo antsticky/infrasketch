@@ -67,13 +67,21 @@ def layout_scope(scope: Diagram | Group) -> None:
 def measure_node(node: Node) -> None:
     node.label_lines = wrap(node.label, LABEL_SIZE, TEXT_MAX)[:3]
     node.caption_lines = wrap(node.caption, CAPTION_SIZE, TEXT_MAX)[:2] if node.caption else []
+    node.detail_lines = wrap(node.facts(), CAPTION_SIZE, TEXT_MAX)[:2]
+    node.note_lines = wrap(node.note, CAPTION_SIZE, TEXT_MAX)[:2]
     widths = [text_width(line, LABEL_SIZE) for line in node.label_lines]
     widths += [text_width(line, CAPTION_SIZE) for line in node.caption_lines]
+    widths += [text_width(line, CAPTION_SIZE) for line in node.detail_lines]
+    widths += [text_width(line, CAPTION_SIZE) for line in node.note_lines]
     text_w = max(widths) if widths else 0.0
     node.w = max(ICON + 20.0, text_w + 12.0)
     text_h = len(node.label_lines) * LABEL_LEADING
     if node.caption_lines:
         text_h += 3.0 + len(node.caption_lines) * CAPTION_LEADING
+    if node.detail_lines:
+        text_h += len(node.detail_lines) * CAPTION_LEADING
+    if node.note_lines:
+        text_h += 2.0 + len(node.note_lines) * CAPTION_LEADING
     node.h = ICON + ICON_TEXT_GAP + text_h
     node.icon_box = ((node.w - ICON) / 2.0, 0.0, ICON, ICON)
 
@@ -81,7 +89,7 @@ def measure_node(node: Node) -> None:
 def apply_chrome(group: Group) -> None:
     style = BOUNDARIES[group.kind]
     spacing = SPACING[group.diagram.spacing]
-    header = measure_header(group.label, style)
+    header = measure_header(group.label, style, detail=group.facts(), note=group.note)
     group.header = header
     group.header_h = header["height"]
     pad = spacing["pad"]
@@ -93,18 +101,32 @@ def apply_chrome(group: Group) -> None:
     group.h = group.content_y + group.content_h + pad
 
 
-def measure_header(label: str, style: dict) -> dict:
+def measure_header(label: str, style: dict, detail: str = "", note: str = "") -> dict:
     title_lines = wrap(label, 13.5, 240.0)[:2] or [label]
+    detail_lines = wrap(detail, 11.0, 240.0)[:2] if detail else []
+    note_lines = wrap(note, 11.0, 240.0)[:2] if note else []
     title_w = max(text_width(line, 13.5) for line in title_lines)
+    detail_w = max((text_width(line, 11.0) for line in detail_lines), default=0.0)
+    note_w = max((text_width(line, 11.0) for line in note_lines), default=0.0)
     eyebrow = style["eyebrow"]
     eye_w = text_width(eyebrow, 10.0) * 1.18 if eyebrow else 0.0
     icon_slot = 28.0 if style["icon"] else 0.0
-    width = 16.0 + icon_slot + max(title_w, eye_w) + 18.0
+    width = 16.0 + icon_slot + max(title_w, eye_w, detail_w, note_w) + 18.0
     if eyebrow:
         height = 14.0 + 13.0 + len(title_lines) * 16.0 + 8.0
     else:
         height = 10.0 + len(title_lines) * 18.0 + 10.0
-    return {"height": height, "width": width, "title_lines": title_lines, "eyebrow": eyebrow}
+    extra = (len(detail_lines) + len(note_lines)) * 14.0
+    if extra:
+        height += extra + 2.0
+    return {
+        "height": height,
+        "width": width,
+        "title_lines": title_lines,
+        "eyebrow": eyebrow,
+        "detail_lines": detail_lines,
+        "note_lines": note_lines,
+    }
 
 
 def place_flow(scope: Diagram | Group) -> None:

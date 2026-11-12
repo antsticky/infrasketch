@@ -47,6 +47,23 @@ class Endpoint(Scope):
     """Something an arrow can connect to: a resource or a boundary."""
 
     label = ""
+    sku = ""
+    region = ""
+    public: bool | None = None
+    note = ""
+
+    def facts(self) -> str:
+        """SKU, region, and exposure, joined for the second caption."""
+        parts = []
+        if self.sku:
+            parts.append(self.sku)
+        if self.region:
+            parts.append(self.region)
+        if self.public is True:
+            parts.append("Public")
+        elif self.public is False:
+            parts.append("Private")
+        return " · ".join(parts)
 
     def __repr__(self) -> str:
         return f"{type(self).__name__}({self.label!r})"
@@ -75,6 +92,7 @@ class Endpoint(Scope):
                 color=edge.color,
                 style=edge.style or "solid",
                 direction=direction,
+                number=edge.number,
             )
         )
         return other
@@ -145,6 +163,7 @@ class Connection:
     color: str = ""
     style: str = "solid"
     direction: str = "forward"
+    number: int | None = None
     points: list[tuple[float, float]] = field(default_factory=list)
     lane: float = 0.0
 
@@ -155,6 +174,7 @@ class Edge:
     def __init__(
         self,
         label: str = "",
+        number: int | None = None,
         *,
         color: str = "",
         style: str = "solid",
@@ -163,6 +183,7 @@ class Edge:
         node: Endpoint | None = None,
     ) -> None:
         self.label = label or ""
+        self.number = _check_number(number)
         self.color = color or ""
         self.style = style or "solid"
         self.forward = forward
@@ -197,6 +218,7 @@ class Edge:
         for item in other:
             edge = Edge(
                 self.label,
+                self.number,
                 color=self.color,
                 style=self.style,
                 forward=forward or self.forward,
@@ -207,6 +229,8 @@ class Edge:
                 edge.label = item.label or edge.label
                 edge.color = item.color or edge.color
                 edge.style = item.style or edge.style
+                if item.number is not None:
+                    edge.number = item.number
             result.append(edge)
         return result
 
@@ -222,6 +246,8 @@ class Edge:
                 self.color = other.color
             if other.style:
                 self.style = other.style
+            if other.number is not None:
+                self.number = other.number
             return self
         if self.node is not None:
             return self.node.connect(other, self)
@@ -232,27 +258,27 @@ class Edge:
 class Https(Edge):
     """HTTPS connector in Azure blue."""
 
-    def __init__(self, label: str = "HTTPS", **kwargs) -> None:
+    def __init__(self, label: str = "HTTPS", number: int | None = None, **kwargs) -> None:
         kwargs.setdefault("color", "#0078D4")
-        super().__init__(label, **kwargs)
+        super().__init__(label, number, **kwargs)
 
 
 class Async(Edge):
     """Dashed connector for queues, events, and other asynchronous calls."""
 
-    def __init__(self, label: str = "", **kwargs) -> None:
+    def __init__(self, label: str = "", number: int | None = None, **kwargs) -> None:
         kwargs.setdefault("color", "#7C3AED")
         kwargs.setdefault("style", "dashed")
-        super().__init__(label, **kwargs)
+        super().__init__(label, number, **kwargs)
 
 
 class Private(Edge):
     """Dashed green connector for Private Link and private endpoints."""
 
-    def __init__(self, label: str = "", **kwargs) -> None:
+    def __init__(self, label: str = "", number: int | None = None, **kwargs) -> None:
         kwargs.setdefault("color", "#107C41")
         kwargs.setdefault("style", "dashed")
-        super().__init__(label, **kwargs)
+        super().__init__(label, number, **kwargs)
 
 
 class Node(Endpoint):
@@ -267,6 +293,11 @@ class Node(Endpoint):
         *,
         caption: str | bool | None = None,
         icon: str | None = None,
+        sku: str | None = None,
+        region: str | None = None,
+        public: bool | None = None,
+        note: str | None = None,
+        href: str | None = None,
     ) -> None:
         super().__init__()
         parent = _current_parent()
@@ -283,11 +314,18 @@ class Node(Endpoint):
             self.label = service
             self.caption = ""
         self.icon = icon if icon is not None else self.__class__.icon
+        self.sku = _text(sku, "sku")
+        self.region = _text(region, "region")
+        self.public = _check_public(public)
+        self.note = _text(note, "note")
+        self.href = _check_href(href)
         self.diagram = parent.diagram if not isinstance(parent, Diagram) else parent
         self.parent = parent
         parent.children.append(self)
         self.label_lines: list[str] = []
         self.caption_lines: list[str] = []
+        self.detail_lines: list[str] = []
+        self.note_lines: list[str] = []
         self.icon_box = (0.0, 0.0, 0.0, 0.0)
 
     def __init_subclass__(cls, **kwargs) -> None:
@@ -311,9 +349,17 @@ class Group(Endpoint):
         arrange: str | None = None,
         columns: int | None = None,
         align: str | None = None,
+        sku: str | None = None,
+        region: str | None = None,
+        public: bool | None = None,
+        note: str | None = None,
     ) -> None:
         super().__init__()
         self.label = label
+        self.sku = _text(sku, "sku")
+        self.region = _text(region, "region")
+        self.public = _check_public(public)
+        self.note = _text(note, "note")
         self.kind = kind or self.__class__.kind
         self.direction = _check_direction(direction) if direction else None
         self.arrange = arrange
@@ -417,6 +463,38 @@ def _check_direction(direction: str) -> str:
     value = direction.upper()
     if value not in {"LR", "TB"}:
         raise DiagramError("direction must be LR (left to right) or TB (top to bottom)")
+    return value
+
+
+def _text(value: str | None, name: str) -> str:
+    if value is None:
+        return ""
+    if not isinstance(value, str):
+        raise DiagramError(f"{name} must be text")
+    return value.strip()
+
+
+def _check_public(value: bool | None) -> bool | None:
+    if value is None:
+        return None
+    if not isinstance(value, bool):
+        raise DiagramError("public must be true or false")
+    return value
+
+
+def _check_href(value: str | None) -> str:
+    if value is None or value == "":
+        return ""
+    if not isinstance(value, str) or not re.match(r"https?://\S+$", value.strip(), re.IGNORECASE):
+        raise DiagramError("href must be an http or https URL")
+    return value.strip()
+
+
+def _check_number(value: int | None) -> int | None:
+    if value is None:
+        return None
+    if isinstance(value, bool) or not isinstance(value, int) or value < 1:
+        raise DiagramError("Edge number must be a positive integer")
     return value
 
 

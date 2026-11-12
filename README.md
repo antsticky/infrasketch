@@ -101,9 +101,25 @@ diagram.save("orders.svg")
 | `a >> Https() >> b` | Azure-blue HTTPS |
 | `a >> Async("enqueue") >> b` | Dashed queue or event |
 | `a >> Private() >> b` | Dashed Private Link |
+| `a >> Https("Open the store", 1) >> b` | Numbered step. The sentence is listed under the drawing |
 
 `style` is `"solid"`, `"dashed"`, or `"dotted"`. `color` is a hex color such
 as `"#0078D4"`.
+
+A resource can carry the design decision and a link. The SKU, region, and
+exposure are a second caption. `note` is the line under that. `href` makes the
+icon a link. The same fields, except `href`, work on a group:
+
+```python
+api = AppService(
+    "Orders API",
+    sku="P1v3",
+    region="West Europe",
+    public=False,
+    note="Private endpoint only",
+    href="https://learn.microsoft.com/azure/app-service/overview",
+)
+```
 
 ## Boundaries
 
@@ -173,6 +189,8 @@ to use your own artwork. Azure icons are never recoloured or stretched.
 | `examples/aws_orders.py` | CloudFront, API Gateway, Lambda, DynamoDB, and S3 in a VPC |
 | `examples/aws_eks.py` | EKS, a registry, ElastiCache, and RDS |
 | `examples/aws_events.py` | API Gateway, Lambda, SQS, DynamoDB, and S3 |
+| `examples/azure_decisions.py` | SKU, exposure, notes, numbered steps, and links |
+| `examples/aws_decisions.py` | The same decisions on an AWS drawing |
 
 ![Web, API, and Redis](examples/out/azure-web-api.svg)
 

@@ -35,10 +35,13 @@ def render_svg(diagram: Diagram) -> str:
     note = footnote(diagram)
     width, height = _canvas_size(diagram, note)
     ids = _Ids()
+    link_ns = ""
+    if any(getattr(node, "href", "") for node in _nodes(diagram)):
+        link_ns = ' xmlns:xlink="http://www.w3.org/1999/xlink"'
     parts = [
         '<?xml version="1.0" encoding="UTF-8"?>',
         (
-            f'<svg xmlns="http://www.w3.org/2000/svg" width="{width:.0f}" height="{height:.0f}" '
+            f'<svg xmlns="http://www.w3.org/2000/svg"{link_ns} width="{width:.0f}" height="{height:.0f}" '
             f'viewBox="0 0 {width:.1f} {height:.1f}" role="img" text-rendering="optimizeLegibility">'
         ),
         f"<title>{escape(diagram.title)}</title>",
@@ -66,6 +69,7 @@ def render_svg(diagram: Diagram) -> str:
     for node in _nodes(diagram):
         parts.append(_node(node, ids))
     parts.append(_edge_labels(diagram))
+    parts.append(_legend(diagram))
     parts.append(_title(diagram))
     parts.append(_footer(diagram, width, height, note))
     parts.append("</svg>")
@@ -87,8 +91,14 @@ def _canvas_size(diagram: Diagram, note: str) -> tuple[float, float]:
     note_w = text_width(note, 11) + PAGE_X * 2
     content_right = diagram.origin[0] + diagram.content_w
     content_bottom = diagram.origin[1] + diagram.content_h
-    width = max(content_right + PAGE_X, title_w, sub_w, note_w, 320)
-    height = max(content_bottom + FOOTER + 12, 120)
+    legend = _legend_entries(diagram)
+    legend_w = 0.0
+    legend_h = 0.0
+    if legend:
+        legend_w = max(text_width(f"{number}   {label}", 12) for number, label in legend) + PAGE_X * 2 + 28
+        legend_h = 16.0 + len(legend) * 18.0
+    width = max(content_right + PAGE_X, title_w, sub_w, note_w, legend_w, 320)
+    height = max(content_bottom + legend_h + FOOTER + 12, 120)
     return width, height
 
 
@@ -147,7 +157,10 @@ def _group_header(group: Group, ids: _Ids) -> str:
         icon_y = y + (group.header_h - 20) / 2
         chunks.append(embed_icon(style["icon"], ids.next("g"), x, icon_y, 20))
         text_x = x + 28
-    cursor = y + (14 if header["eyebrow"] else (group.header_h - len(header["title_lines"]) * 16) / 2 + 12)
+    if header.get("detail_lines") or header.get("note_lines"):
+        cursor = y + (14 if header["eyebrow"] else 18)
+    else:
+        cursor = y + (14 if header["eyebrow"] else (group.header_h - len(header["title_lines"]) * 16) / 2 + 12)
     if header["eyebrow"]:
         chunks.append(
             f'<text x="{text_x:.1f}" y="{cursor:.1f}" fill="{style["accent"]}" '
@@ -161,6 +174,18 @@ def _group_header(group: Group, ids: _Ids) -> str:
             f'font-size="13.5" font-weight="600">{escape(line)}</text>'
         )
         cursor += 16
+    for line in header.get("detail_lines", []):
+        chunks.append(
+            f'<text x="{text_x:.1f}" y="{cursor:.1f}" fill="{MUTED}" font-family="{FONT_ATTR}" '
+            f'font-size="11">{escape(line)}</text>'
+        )
+        cursor += 14
+    for line in header.get("note_lines", []):
+        chunks.append(
+            f'<text x="{text_x:.1f}" y="{cursor:.1f}" fill="#475569" font-family="{FONT_ATTR}" '
+            f'font-size="11">{escape(line)}</text>'
+        )
+        cursor += 14
     return "".join(chunks)
 
 
@@ -195,7 +220,26 @@ def _node(node: Node, ids: _Ids) -> str:
                 f'font-family="{FONT_ATTR}" font-size="11">{escape(line)}</text>'
             )
             cursor += 14
-    return "".join(chunks)
+    for line in node.detail_lines:
+        chunks.append(
+            f'<text x="{center:.1f}" y="{cursor:.1f}" text-anchor="middle" fill="{MUTED}" '
+            f'font-family="{FONT_ATTR}" font-size="11">{escape(line)}</text>'
+        )
+        cursor += 14
+    if node.note_lines:
+        cursor += 1
+    for line in node.note_lines:
+        chunks.append(
+            f'<text x="{center:.1f}" y="{cursor:.1f}" text-anchor="middle" fill="#475569" '
+            f'font-family="{FONT_ATTR}" font-size="11">{escape(line)}</text>'
+        )
+        cursor += 14
+    body = "".join(chunks)
+    if not node.href:
+        return body
+    href = escape(node.href, {'"': "&quot;"})
+    tip = escape(node.note or node.label)
+    return f'<a href="{href}" xlink:href="{href}" target="_blank"><title>{tip}</title>{body}</a>'
 
 
 def _edge_path(edge: Connection) -> str:
@@ -219,9 +263,14 @@ def _edge_labels(diagram: Diagram) -> str:
         (group.abs_x, group.abs_y, group.w, min(group.header_h + 4, group.h)) for group in _groups(diagram)
     )
     for edge in diagram.edges:
-        if not edge.label or len(edge.points) < 2:
+        if len(edge.points) < 2 or not (edge.label or edge.number):
             continue
         start, end = _longest(edge.points)
+        if edge.number:
+            labels.append(_number_badge(edge, start, end, occupied))
+            continue
+        if not edge.label:
+            continue
         x = (start[0] + end[0]) / 2
         y = (start[1] + end[1]) / 2
         width = text_width(edge.label, 11) + 14
@@ -240,6 +289,61 @@ def _edge_labels(diagram: Diagram) -> str:
             f'fill="{INK}" font-family="{FONT_ATTR}" font-size="11">{escape(edge.label)}</text>'
         )
     return "".join(labels)
+
+
+def _number_badge(edge: Connection, start, end, occupied: list) -> str:
+    text = str(edge.number)
+    size = max(16.0, text_width(text, 11) + 8)
+    x = (start[0] + end[0]) / 2
+    y = (start[1] + end[1]) / 2
+    box = (x - size / 2, y - size / 2, size, size)
+    for dx, dy in ((0, 0), (0, 16), (0, -16), (18, 0), (-18, 0)):
+        candidate = (box[0] + dx, box[1] + dy, box[2], box[3])
+        if not any(_overlaps(candidate, other) for other in occupied):
+            box = candidate
+            break
+    occupied.append(box)
+    color = edge.color or EDGE
+    cx = box[0] + box[2] / 2
+    cy = box[1] + box[3] / 2
+    return (
+        f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{box[2] / 2:.1f}" fill="#FFFFFF" stroke="{color}" stroke-width="1.4"/>'
+        f'<text x="{cx:.1f}" y="{cy + 4:.1f}" text-anchor="middle" fill="{INK}" '
+        f'font-family="{FONT_ATTR}" font-size="11" font-weight="600">{escape(text)}</text>'
+    )
+
+
+def _legend_entries(diagram: Diagram) -> list[tuple[int, str]]:
+    seen: set[tuple[int, str]] = set()
+    entries = []
+    for edge in diagram.edges:
+        if edge.number is None:
+            continue
+        item = (edge.number, edge.label)
+        if item in seen:
+            continue
+        seen.add(item)
+        entries.append(item)
+    entries.sort(key=lambda item: (item[0], item[1]))
+    return entries
+
+
+def _legend(diagram: Diagram) -> str:
+    entries = _legend_entries(diagram)
+    if not entries:
+        return ""
+    top = diagram.origin[1] + diagram.content_h + 22
+    lines = []
+    for index, (number, label) in enumerate(entries):
+        y = top + index * 18
+        lines.append(
+            f'<circle cx="{PAGE_X + 8:.1f}" cy="{y - 3:.1f}" r="8" fill="#FFFFFF" stroke="{LINE}" stroke-width="1.2"/>'
+            f'<text x="{PAGE_X + 8:.1f}" y="{y:.1f}" text-anchor="middle" fill="{INK}" '
+            f'font-family="{FONT_ATTR}" font-size="11" font-weight="600">{number}</text>'
+            f'<text x="{PAGE_X + 24:.1f}" y="{y:.1f}" fill="{INK}" font-family="{FONT_ATTR}" font-size="12">'
+            f"{escape(label)}</text>"
+        )
+    return "".join(lines)
 
 
 def _title(diagram: Diagram) -> str:
