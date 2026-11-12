@@ -141,6 +141,8 @@ its database. `arrange="row"` forces a single row, `arrange="column"` a
 single column, and `arrange="grid"` with `columns=3` a grid.
 `folded=True` draws the boundary closed, with a count of the resources
 inside. Connectors from outside land on that box. The default is open.
+`foldable=True` makes that title a button: click it in a browser to open
+and close the box. `folded` chooses the state it starts in.
 
 ## Finding an icon
 
@@ -204,6 +206,7 @@ to use your own artwork. Azure icons are never recoloured or stretched.
 | `examples/aws_eks.py` | EKS, a registry, ElastiCache, and RDS |
 | `examples/aws_events.py` | API Gateway, Lambda, SQS, DynamoDB, and S3 |
 | `examples/azure_decisions.py` | SKU, exposure, notes, numbered steps, and links |
+| `examples/azure_folded.py` | An open resource group beside a folded one |
 | `examples/aws_decisions.py` | The same decisions on an AWS drawing |
 | `examples/external_github.py` | A GitHub repository deploying an App Service |
 | `examples/external_edge.py` | Cloudflare and Akamai in front of an App Service |

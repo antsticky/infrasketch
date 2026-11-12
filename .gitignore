@@ -10,3 +10,4 @@ build/
 .aws-icons.zip
 .aws-icons.html
 site/
+.DS_Store

@@ -189,13 +189,13 @@ door &gt;&gt; Https("Front Door calls the API", 2) &gt;&gt; api</code></pre>
 
       <section class="panel" id="folded" hidden>
         <h2>Folded groups</h2>
-        <p><code>folded=False</code> is the default, so a boundary draws every resource inside it. Pass <code>folded=True</code> when the box should stay closed: the resources remain in the model, the box shows how many there are, and a connector from outside lands on the box.</p>
-        <pre><code>with ResourceGroup("rg-observe", folded=True, note="Shown closed"):
+        <p><code>folded=False</code> is the default, so a boundary draws every resource inside it. Pass <code>folded=True</code> when the box should start closed: the resources remain in the model, the box shows how many there are, and a connector from outside lands on the box.</p>
+        <pre><code>with ResourceGroup("rg-observe", folded=True, foldable=True, note="Click to open"):
     alerts = Monitor("Alerts")
     logs = LogAnalytics("Workspace")
 
 api &gt;&gt; Private("The API reports failures", 4) &gt;&gt; alerts</code></pre>
-        <p>Lines that start and end inside the closed box are not drawn. Open the group by leaving <code>folded</code> off, or by setting it back to <code>False</code>.</p>
+        <p><code>foldable=True</code> makes the title a button in the SVG. Click it to open the box, and click the title again to close it. <code>folded</code> is only the state it starts in. Open the SVG in a browser; an image preview does not run the click. Lines that start and end inside a closed box are not drawn. See <code>examples/azure_folded.py</code>.</p>
       </section>
 
       <section class="panel" id="boundaries" hidden>

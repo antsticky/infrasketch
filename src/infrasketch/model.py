@@ -355,6 +355,7 @@ class Group(Endpoint):
         public: bool | None = None,
         note: str | None = None,
         folded: bool = False,
+        foldable: bool = False,
     ) -> None:
         super().__init__()
         self.label = label
@@ -364,7 +365,11 @@ class Group(Endpoint):
         self.note = _text(note, "note")
         if not isinstance(folded, bool):
             raise DiagramError("folded must be true or false")
+        if not isinstance(foldable, bool):
+            raise DiagramError("foldable must be true or false")
         self.folded = folded
+        self.foldable = foldable
+        self.fold_id = ""
         self.fold_caption = ""
         self.kind = kind or self.__class__.kind
         self.direction = _check_direction(direction) if direction else None

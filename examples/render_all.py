@@ -14,6 +14,7 @@ from azure_aks import main as azure_aks  # noqa: E402
 from azure_container_apps import main as azure_container_apps  # noqa: E402
 from azure_data import main as azure_data  # noqa: E402
 from azure_decisions import main as azure_decisions  # noqa: E402
+from azure_folded import main as azure_folded  # noqa: E402
 from azure_functions import main as azure_functions  # noqa: E402
 from azure_network import main as azure_network  # noqa: E402
 from azure_web_api import main as azure_web_api  # noqa: E402
@@ -31,6 +32,7 @@ def main() -> None:
         azure_data,
         azure_network,
         azure_decisions,
+        azure_folded,
         aws_orders,
         aws_eks,
         aws_events,

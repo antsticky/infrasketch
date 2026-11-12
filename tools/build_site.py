@@ -27,6 +27,7 @@ EXAMPLES = (
     "aws-eks.svg",
     "aws-events.svg",
     "azure-decisions.svg",
+    "azure-folded.svg",
     "aws-decisions.svg",
     "external-github.svg",
     "external-edge.svg",

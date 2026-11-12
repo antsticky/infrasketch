@@ -6,7 +6,7 @@ from xml.sax.saxutils import escape
 
 from infrasketch.icons import embed_icon
 from infrasketch.layout import LABEL_LEADING, LABEL_SIZE, layout_diagram, text_width
-from infrasketch.model import Connection, Diagram, Group, Node, inside_folded
+from infrasketch.model import Connection, Diagram, DiagramError, Group, Node, inside_folded
 from infrasketch.route import route_diagram
 from infrasketch.theme import BOUNDARIES, CANVAS, EDGE, FONT_ATTR, FOOTER, INK, LINE, MUTED, PAGE_X
 
@@ -37,6 +37,9 @@ def footnote(diagram: Diagram) -> str:
 
 
 def render_svg(diagram: Diagram) -> str:
+    foldable = _foldable_groups(diagram)
+    if foldable:
+        return _render_foldable(diagram, foldable)
     layout_diagram(diagram)
     route_diagram(diagram)
     note = footnote(diagram)
@@ -91,6 +94,148 @@ def render_svg(diagram: Diagram) -> str:
     parts.append(_footer(diagram, width, height, note))
     parts.append("</svg>")
     return "\n".join(part for part in parts if part)
+
+
+def _foldable_groups(diagram: Diagram) -> list[Group]:
+    found = []
+    for group in _groups(diagram):
+        if not getattr(group, "foldable", False):
+            continue
+        parent = group.parent
+        hidden = False
+        while isinstance(parent, Group):
+            if parent.folded and not parent.foldable:
+                hidden = True
+                break
+            parent = parent.parent
+        if not hidden:
+            found.append(group)
+    if len(found) > 4:
+        raise DiagramError("A diagram can have at most 4 foldable groups")
+    return found
+
+
+def _render_foldable(diagram: Diagram, foldable: list[Group]) -> str:
+    """One drawing per open/closed combination, switched by a click on the title."""
+    note = footnote(diagram)
+    if diagram.as_of:
+        note = f"{note} · as of {diagram.as_of}"
+    saved = [group.folded for group in foldable]
+    for index, group in enumerate(foldable):
+        group.fold_id = f"f{index}"
+    initial = 0
+    for index, folded in enumerate(saved):
+        if folded:
+            initial |= 1 << index
+    ids = _Ids()
+    scenes: list[tuple[str, str]] = []
+    sizes: list[tuple[float, float]] = []
+    for mask in range(1 << len(foldable)):
+        for index, group in enumerate(foldable):
+            group.folded = bool(mask & (1 << index))
+        layout_diagram(diagram)
+        route_diagram(diagram)
+        sizes.append(_canvas_size(diagram, note))
+        scenes.append(_scene(diagram, ids))
+    for group, folded in zip(foldable, saved):
+        group.folded = folded
+    width = max(size[0] for size in sizes)
+    height = max(size[1] for size in sizes)
+    link_ns = ""
+    if any(getattr(node, "href", "") for node in _nodes(diagram)):
+        link_ns = ' xmlns:xlink="http://www.w3.org/1999/xlink"'
+    folds = " ".join(group.fold_id for group in foldable)
+    parts = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        (
+            f'<svg xmlns="http://www.w3.org/2000/svg"{link_ns} width="{width:.0f}" height="{height:.0f}" '
+            f'viewBox="0 0 {width:.1f} {height:.1f}" data-folds="{folds}" role="img" '
+            f'text-rendering="optimizeLegibility">'
+        ),
+        f"<title>{escape(diagram.title)}</title>",
+        f"<desc>{escape(diagram.subtitle or diagram.title)}. {escape(note)}</desc>",
+        f'<rect width="100%" height="100%" fill="{CANVAS}"/>',
+        "<defs>",
+    ]
+    for color in sorted({edge.color or EDGE for edge in diagram.edges}):
+        parts.append(_marker(color))
+    for clips, _body in scenes:
+        parts.append(clips)
+    parts.append("</defs>")
+    for mask, (_clips, body) in enumerate(scenes):
+        hidden = "" if mask == initial else ' style="display:none"'
+        parts.append(f'<g data-fold-view="{mask}"{hidden}>{body}</g>')
+    parts.append(_title(diagram))
+    parts.append(_footer(diagram, width, height, note))
+    parts.append(_fold_script())
+    parts.append("</svg>")
+    layout_diagram(diagram)
+    route_diagram(diagram)
+    return "\n".join(part for part in parts if part)
+
+
+def _scene(diagram: Diagram, ids: _Ids) -> tuple[str, str]:
+    clips = []
+    for group in _groups(diagram):
+        if inside_folded(group):
+            continue
+        clip = ids.next("clip")
+        group.clip_id = clip
+        clips.append(
+            f'<clipPath id="{clip}"><rect x="{group.abs_x:.1f}" y="{group.abs_y:.1f}" '
+            f'width="{group.w:.1f}" height="{group.h:.1f}" rx="{BOUNDARIES[group.kind]["radius"]}"/></clipPath>'
+        )
+    parts = []
+    for group in _groups(diagram):
+        if inside_folded(group):
+            continue
+        parts.append(_group_body(group))
+    for edge in diagram.edges:
+        parts.append(_edge_path(edge))
+    for group in _groups(diagram):
+        if inside_folded(group):
+            continue
+        parts.append(_group_header(group, ids))
+    for node in _nodes(diagram):
+        if inside_folded(node):
+            continue
+        parts.append(_node(node, ids))
+    for group in _groups(diagram):
+        if group.foldable and not inside_folded(group):
+            parts.append(_fold_toggle(group))
+    parts.append(_edge_labels(diagram))
+    parts.append(_legend(diagram))
+    return "".join(clips), "".join(part for part in parts if part)
+
+
+def _fold_toggle(group: Group) -> str:
+    height = group.h if group.folded else group.header_h
+    action = "Close" if not group.folded else "Open"
+    return (
+        f'<rect x="{group.abs_x:.1f}" y="{group.abs_y:.1f}" width="{group.w:.1f}" height="{height:.1f}" '
+        f'fill="transparent" style="cursor:pointer" '
+        f'onclick="infrasketchFold(\'{group.fold_id}\', this.ownerSVGElement)">'
+        f"<title>{action}</title></rect>"
+    )
+
+
+def _fold_script() -> str:
+    return """<script><![CDATA[
+function infrasketchFold(id, svg) {
+  var order = svg.getAttribute("data-folds").split(" ");
+  var index = order.indexOf(id);
+  if (index < 0) return;
+  var views = svg.querySelectorAll("[data-fold-view]");
+  var current = 0;
+  for (var i = 0; i < views.length; i++) {
+    if (views[i].style.display !== "none") current = Number(views[i].getAttribute("data-fold-view"));
+  }
+  var next = current ^ (1 << index);
+  for (var j = 0; j < views.length; j++) {
+    views[j].style.display = Number(views[j].getAttribute("data-fold-view")) === next ? "" : "none";
+  }
+}
+]]></script>"""
 
 
 class _Ids:
