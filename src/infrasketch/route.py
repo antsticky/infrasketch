@@ -46,11 +46,11 @@ class Rect:
 def route_diagram(diagram: Diagram) -> None:
     obstacles: list[tuple[Endpoint | None, Rect]] = []
     for element in _nodes(diagram):
-        obstacles.append((element, _bounds(element).expanded(8)))
+        obstacles.append((element, _node_obstacle(element)))
     for element in diagram.walk():
         if isinstance(element, Group):
-            # Titles stay clear. The rest of a boundary can be crossed.
-            obstacles.append((None, Rect(element.abs_x - 3, element.abs_y - 3, element.w + 6, element.header_h + 8)))
+            # Titles stay clear. The padding under a title is a lane for connectors.
+            obstacles.append((None, _header_obstacle(element)))
     _assign_lanes(diagram.edges)
     for edge in diagram.edges:
         edge.points = _route(edge, obstacles)
@@ -64,6 +64,17 @@ def _nodes(diagram: Diagram):
 
 def _bounds(element: Endpoint) -> Rect:
     return Rect(element.abs_x, element.abs_y, element.w, element.h)
+
+
+def _node_obstacle(element: Endpoint) -> Rect:
+    """Keep lines off the icon and the label, and leave a lane above the icon."""
+    rect = _bounds(element)
+    return Rect(rect.x - 8, rect.y - 4, rect.w + 16, rect.h + 12)
+
+
+def _header_obstacle(element: Group) -> Rect:
+    """Cover the title band without consuming the padding underneath it."""
+    return Rect(element.abs_x - 2, element.abs_y - 2, element.w + 4, element.header_h + 4)
 
 
 def _icon_bounds(element: Endpoint) -> Rect:
@@ -221,16 +232,16 @@ def _bridge(leave, arrive, obstacles: list[Rect], *, horizontal: bool):
     xs = {round(x1), round(x2), round((x1 + x2) / 2)}
     ys = {round(y1), round(y2), round((y1 + y2) / 2)}
     for rect in relevant:
-        xs.update((round(rect.left - 14), round(rect.right + 14)))
-        ys.update((round(rect.top - 14), round(rect.bottom + 14)))
+        xs.update(round(value) for value in (rect.left - 12, rect.left - 6, rect.right + 6, rect.right + 12))
+        ys.update(round(value) for value in (rect.top - 12, rect.top - 6, rect.bottom + 6, rect.bottom + 12))
     cursor = min_x
     while cursor <= max_x:
         xs.add(round(cursor))
-        cursor += 14
+        cursor += 10
     cursor = min_y
     while cursor <= max_y:
         ys.add(round(cursor))
-        cursor += 14
+        cursor += 10
 
     best = None
     best_cost = None
@@ -243,6 +254,9 @@ def _bridge(leave, arrive, obstacles: list[Rect], *, horizontal: bool):
             if not all(_clear(a, b, c, d, obstacles) for a, b, c, d in segments):
                 continue
             cost = abs(y - y1) + abs(y - y2) + abs(x - x1) + abs(x - x2)
+            # A clear lane above the icons beats a detour underneath the boxes.
+            if horizontal and y > max(y1, y2) + 10:
+                cost += (y - max(y1, y2)) * 4
             if best is None or cost < best_cost:
                 best = (x, y)
                 best_cost = cost
