@@ -429,9 +429,6 @@ def _edge_path(edge: Connection) -> str:
 def _edge_labels(diagram: Diagram) -> str:
     labels = []
     occupied = [(node.abs_x, node.abs_y, node.w, node.h) for node in _nodes(diagram)]
-    occupied.extend(
-        (group.abs_x, group.abs_y, group.w, min(group.header_h + 4, group.h)) for group in _groups(diagram)
-    )
     for edge in diagram.edges:
         if len(edge.points) < 2 or not (edge.label or edge.number):
             continue
@@ -441,16 +438,9 @@ def _edge_labels(diagram: Diagram) -> str:
             continue
         if not edge.label:
             continue
-        x = (start[0] + end[0]) / 2
-        y = (start[1] + end[1]) / 2
         width = text_width(edge.label, 11) + 14
         height = 18
-        box = (x - width / 2, y - height / 2, width, height)
-        for dx, dy in ((0, 0), (0, 18), (0, -18), (22, 0), (-22, 0), (0, 36), (0, -36)):
-            candidate = (box[0] + dx, box[1] + dy, box[2], box[3])
-            if not any(_overlaps(candidate, other) for other in occupied):
-                box = candidate
-                break
+        box = _on_line(start, end, width, height, occupied)
         occupied.append(box)
         labels.append(
             f'<rect x="{box[0]:.1f}" y="{box[1]:.1f}" width="{box[2]:.1f}" height="{box[3]:.1f}" rx="9" '
@@ -461,17 +451,33 @@ def _edge_labels(diagram: Diagram) -> str:
     return "".join(labels)
 
 
+def _on_line(start, end, width: float, height: float, occupied: list) -> tuple[float, float, float, float]:
+    """Keep the chip centered on the stroke. Slide along the segment to clear a resource."""
+    x1, y1 = start
+    x2, y2 = end
+    dx, dy = x2 - x1, y2 - y1
+    midpoint = _chip(x1 + dx * 0.5, y1 + dy * 0.5, width, height)
+    if not any(_overlaps(midpoint, other) for other in occupied):
+        return midpoint
+    for step in range(1, 8):
+        for sign in (1, -1):
+            t = 0.5 + sign * step * 0.06
+            if not 0.18 <= t <= 0.82:
+                continue
+            box = _chip(x1 + dx * t, y1 + dy * t, width, height)
+            if not any(_overlaps(box, other) for other in occupied):
+                return box
+    return midpoint
+
+
+def _chip(cx: float, cy: float, width: float, height: float) -> tuple[float, float, float, float]:
+    return (cx - width / 2, cy - height / 2, width, height)
+
+
 def _number_badge(edge: Connection, start, end, occupied: list) -> str:
     text = str(edge.number)
     size = max(16.0, text_width(text, 11) + 8)
-    x = (start[0] + end[0]) / 2
-    y = (start[1] + end[1]) / 2
-    box = (x - size / 2, y - size / 2, size, size)
-    for dx, dy in ((0, 0), (0, 16), (0, -16), (18, 0), (-18, 0)):
-        candidate = (box[0] + dx, box[1] + dy, box[2], box[3])
-        if not any(_overlaps(candidate, other) for other in occupied):
-            box = candidate
-            break
+    box = _on_line(start, end, size, size, occupied)
     occupied.append(box)
     color = edge.color or EDGE
     cx = box[0] + box[2] / 2
