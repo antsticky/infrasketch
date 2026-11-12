@@ -100,7 +100,7 @@ def measure_node(node: Node) -> None:
 def apply_chrome(group: Group) -> None:
     style = BOUNDARIES[group.kind]
     spacing = SPACING[group.diagram.spacing]
-    note = "" if group.foldable and not group.folded else group.note
+    note = group.note
     header = measure_header(group.label, style, detail=group.facts(), note=note)
     group.header = header
     group.header_h = header["height"]

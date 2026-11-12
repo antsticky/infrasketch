@@ -21,36 +21,48 @@
 
   <main class="wrap guide">
     <nav class="cats" id="guide-nav" aria-label="Guide sections">
-      <button class="cat" type="button" data-section="install">Install</button>
-      <button class="cat" type="button" data-section="azure">Azure</button>
-      <button class="cat" type="button" data-section="aws">AWS</button>
-      <button class="cat" type="button" data-section="external">External</button>
-      <button class="cat" type="button" data-section="diagram">Draw a diagram</button>
-      <button class="cat" type="button" data-section="connectors">Connectors</button>
-      <button class="cat" type="button" data-section="decisions">Decisions</button>
-      <button class="cat" type="button" data-section="folded">Folded groups</button>
-      <button class="cat" type="button" data-section="boundaries">Boundaries</button>
-      <button class="cat" type="button" data-section="names">Names</button>
+      <button class="cat" type="button" data-section="installation">Installation</button>
+      <button class="cat" type="button" data-section="diagram">Diagram</button>
+      <button class="cat" type="button" data-section="nodes">Nodes</button>
+      <button class="cat" type="button" data-section="edges">Edges</button>
+      <button class="cat" type="button" data-section="boundaries">Boundaries &amp; Groups</button>
     </nav>
 
     <div class="results">
-      <section class="panel" id="install">
-        <h2>Install</h2>
+      <section class="panel" id="installation">
+        <h2>Installation</h2>
         <p>Python 3.10 or newer. There are no runtime dependencies.</p>
         <pre><code>pip install infrasketch</code></pre>
-        <p>A diagram is a <code>with</code> block. Resources created inside it belong to that diagram, and <code>&gt;&gt;</code> draws the arrow. The SVG is written when the block ends.</p>
       </section>
 
-      <section class="panel" id="azure" hidden>
-        <h2>Azure</h2>
-        <p>Azure resources live in <code>infrasketch.azure</code>. <code>ResourceGroup</code>, <code>VNet</code>, <code>Subnet</code>, and <code>PrivateNetwork</code> are boundaries. The icon says which service it is. The label is your name for that piece of the system, and the caption under it is the service name.</p>
-        <pre><code>from infrasketch import Diagram, Https, Private
+      <section class="panel" id="diagram" hidden>
+        <h2>Diagram</h2>
+        <p>A diagram is a <code>with</code> block. Resources created inside it belong to that diagram, and <code>&gt;&gt;</code> draws the arrow. The SVG is written when the block ends. Groups are context managers too, so the indentation is the architecture. The second argument is the SVG path. Leave it out and the file is named from the title.</p>
+        <table>
+          <thead><tr><th>Argument</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><code>direction="LR"</code></td><td>Left to right. <code>"TB"</code> flows top to bottom.</td></tr>
+            <tr><td><code>spacing="regular"</code></td><td>Also <code>"compact"</code> or <code>"relaxed"</code>.</td></tr>
+            <tr><td><code>align="top"</code></td><td>Resources in a step share the top. <code>"center"</code> centers them.</td></tr>
+            <tr><td><code>subtitle="Production"</code></td><td>A line under the title.</td></tr>
+            <tr><td><code>as_of="12 Nov 2026"</code></td><td>Prints “as of” on its own line under the icon credit. A <code>datetime.date</code> is formatted for you.</td></tr>
+            <tr><td><code>autosave=False</code></td><td>Keeps the SVG in memory until you call <code>save</code>.</td></tr>
+          </tbody>
+        </table>
+        <pre><code>from datetime import date
+from infrasketch import Diagram, Https, Private
 from infrasketch.azure import (
     ResourceGroup, VNet, Subnet, PrivateNetwork,
     Users, FrontDoor, StaticWebApp, AppService, Redis, SQLDatabase, KeyVault,
 )
 
-with Diagram("Web, API, and Redis", "platform.svg", subtitle="Production · West Europe"):
+with Diagram(
+    "Web, API, and Redis",
+    "platform.svg",
+    subtitle="Production · West Europe",
+    as_of=date(2026, 11, 12),
+    autosave=False,
+) as diagram:
     customers = Users("Customers")
     with ResourceGroup("rg-edge"):
         door = FrontDoor("Entry")
@@ -67,82 +79,56 @@ with Diagram("Web, API, and Redis", "platform.svg", subtitle="Production · West
 
     customers &gt;&gt; Https() &gt;&gt; door &gt;&gt; web &gt;&gt; api
     api &gt;&gt; [cache, database]
-    api &gt;&gt; Private("secrets") &gt;&gt; vault</code></pre>
+    api &gt;&gt; Private("secrets") &gt;&gt; vault
+
+svg = diagram.svg()
+diagram.save("platform.svg")</code></pre>
+        <p>Leave <code>as_of</code> out and the footer is only the icon credit.</p>
       </section>
 
-      <section class="panel" id="aws" hidden>
-        <h2>AWS</h2>
-        <p>AWS resources live in <code>infrasketch.aws</code>. <code>VPC</code>, <code>PublicSubnet</code>, and <code>PrivateSubnet</code> are boundaries. The label and caption work the same way as on an Azure resource.</p>
-        <pre><code>from infrasketch import Diagram
-from infrasketch.aws import (
-    APIGateway, CloudFront, DynamoDB, Lambda, PrivateSubnet, PublicSubnet, S3, Users, VPC,
-)
+      <section class="panel" id="nodes" hidden>
+        <h2>Nodes</h2>
+        <p>A node is one resource. The icon says which service it is. The label is your name for that piece of the system, and the caption under it is the service name.</p>
+        <p>Azure resources live in <code>infrasketch.azure</code>. AWS resources live in <code>infrasketch.aws</code>. Services outside both clouds live in <code>infrasketch.external</code>. The icon browser groups the external marks into source control and DevOps, CDN and edge, containers, observability, security, messaging, databases, data and analytics, and SaaS.</p>
+        <pre><code>from infrasketch.azure import AppService
+from infrasketch.aws import Lambda
+from infrasketch.external import Cloudflare, GitHub
 
-with Diagram("Orders", "orders.svg", subtitle="Production · eu-west-1"):
-    customers = Users("Customers")
-    edge = CloudFront("Entry")
-    with VPC("vpc-orders"):
-        with PublicSubnet("public"):
-            api = APIGateway("Orders")
-        with PrivateSubnet("data"):
-            checkout = Lambda("Checkout")
-            orders = DynamoDB("Orders")
-            images = S3("Images")
-    customers &gt;&gt; edge &gt;&gt; api &gt;&gt; checkout
-    checkout &gt;&gt; [orders, images]</code></pre>
-      </section>
-
-      <section class="panel" id="external" hidden>
-        <h2>External</h2>
-        <p>Services outside Azure and AWS live in <code>infrasketch.external</code>. Each one is a node. The icon is the service, and the label is your name for that piece of the system. The set is <code>GitHub</code>, <code>Cloudflare</code>, and <code>Akamai</code>.</p>
-        <pre><code>from infrasketch import Diagram, Https
-from infrasketch.azure import AppService, ResourceGroup
-from infrasketch.external import Akamai, Cloudflare, GitHub
-
-with Diagram("Edge and source", "edge.svg"):
-    repo = GitHub("Orders")
-    primary = Cloudflare("Primary")
-    failover = Akamai("Failover")
-    with ResourceGroup("rg-app"):
-        api = AppService("Orders API")
-
-    primary &gt;&gt; Https() &gt;&gt; api
-    failover &gt;&gt; Https() &gt;&gt; api
-    repo &gt;&gt; api</code></pre>
-        <p>See <code>examples/external_edge.py</code> and <code>examples/external_github.py</code>. The <a href="icons.html?provider=external">icon browser</a> lists the import for each mark. A diagram credits only the marks it actually draws.</p>
-      </section>
-
-      <section class="panel" id="diagram" hidden>
-        <h2>Draw a diagram</h2>
-        <p>Groups are context managers too, so the indentation is the architecture. The second argument is the SVG path. Leave it out and the file is named from the title.</p>
+api = AppService("Orders API")
+worker = Lambda("Checkout")
+repo = GitHub("Orders")
+edge = Cloudflare("Primary")</code></pre>
+        <p><code>AppService("Orders API")</code> labels the box "Orders API" and captions it "App Service". <code>AppService()</code> uses the service name as the only label. <code>caption=False</code> hides the caption.</p>
+        <p>A review needs more than the service name. These fields are optional. Leave them out and the box is unchanged.</p>
         <table>
-          <thead><tr><th>Argument</th><th>What it does</th></tr></thead>
+          <thead><tr><th>Field</th><th>Where it appears</th></tr></thead>
           <tbody>
-            <tr><td><code>direction="LR"</code></td><td>Left to right. <code>"TB"</code> flows top to bottom.</td></tr>
-            <tr><td><code>spacing="regular"</code></td><td>Also <code>"compact"</code> or <code>"relaxed"</code>.</td></tr>
-            <tr><td><code>align="top"</code></td><td>Resources in a step share the top. <code>"center"</code> centers them.</td></tr>
-            <tr><td><code>subtitle="Production"</code></td><td>A line under the title.</td></tr>
-            <tr><td><code>as_of="12 Nov 2026"</code></td><td>Prints “as of” on its own line under the icon credit. A <code>datetime.date</code> is formatted for you.</td></tr>
-            <tr><td><code>autosave=False</code></td><td>Keeps the SVG in memory until you call <code>save</code>.</td></tr>
+            <tr><td><code>sku</code></td><td>Second caption, with the region and exposure</td></tr>
+            <tr><td><code>region</code></td><td>Second caption</td></tr>
+            <tr><td><code>public=True</code></td><td>Prints “Public”. <code>False</code> prints “Private”.</td></tr>
+            <tr><td><code>note</code></td><td>Its own line under the caption</td></tr>
+            <tr><td><code>href</code></td><td>Makes the icon a link. Only <code>http</code> and <code>https</code> links are accepted.</td></tr>
           </tbody>
         </table>
-        <pre><code>from datetime import date
+        <pre><code>api = AppService(
+    "Orders API",
+    sku="P1v3",
+    region="West Europe",
+    public=False,
+    note="Private endpoint only",
+    href="https://learn.microsoft.com/azure/app-service/overview",
+)</code></pre>
+        <p>See <code>examples/azure_decisions.py</code> and <code>examples/aws_decisions.py</code>.</p>
+        <p>A resource with no icon draws a neutral placeholder. Pass <code>icon</code> a picture file to draw that resource with your own artwork. SVG, PNG, JPEG, GIF, WebP, BMP, and ICO all work. The picture is fitted inside the icon square without cropping or stretching. The same argument replaces the icon of a named resource. Azure and AWS icons stay at their original colors and proportions when you do not pass <code>icon</code>.</p>
+        <pre><code>from infrasketch import Node
 
-with Diagram(
-    "Orders",
-    "orders.svg",
-    subtitle="Production · West Europe",
-    as_of=date(2026, 11, 12),
-    autosave=False,
-) as diagram:
-    ...
-svg = diagram.svg()
-diagram.save("orders.svg")</code></pre>
-        <p>Leave <code>as_of</code> out and the footer is only the icon credit, the same as before.</p>
+billing = Node("Billing", icon="billing.png", caption="Own service")
+api = AppService("Orders", icon="logo.ico")</code></pre>
+        <p>See <code>examples/custom_icon.py</code>. The <a href="icons.html">icon browser</a> shows the import line for every icon. From a terminal, <code>python -m infrasketch search cosmos</code> prints the same line. A diagram credits only the marks it actually draws.</p>
       </section>
 
-      <section class="panel" id="connectors" hidden>
-        <h2>Connectors</h2>
+      <section class="panel" id="edges" hidden>
+        <h2>Edges</h2>
         <table>
           <thead><tr><th>Code</th><th>Result</th></tr></thead>
           <tbody>
@@ -160,47 +146,12 @@ diagram.save("orders.svg")</code></pre>
         </table>
         <p><code>style</code> is <code>"solid"</code>, <code>"dashed"</code>, or <code>"dotted"</code>. <code>color</code> is a hex color such as <code>"#0078D4"</code>. <code>Https</code>, <code>Async</code>, and <code>Private</code> take the same label, number, color, and style as <code>Edge</code>. Hovering a resource fades the other resources and the arrows that do not touch it.</p>
         <p>The step number is a positive integer. The circle is drawn on the line, and the sentence appears once in the legend. The number in the legend jumps to that circle. Repeating the same number and sentence does not add a second row.</p>
-      </section>
-
-      <section class="panel" id="decisions" hidden>
-        <h2>Decisions</h2>
-        <p>A review needs more than the service name. These fields are optional. Leave them out and the box is unchanged.</p>
-        <table>
-          <thead><tr><th>Field</th><th>Where it appears</th></tr></thead>
-          <tbody>
-            <tr><td><code>sku</code></td><td>Second caption, with the region and exposure</td></tr>
-            <tr><td><code>region</code></td><td>Second caption</td></tr>
-            <tr><td><code>public=True</code></td><td>Prints “Public”. <code>False</code> prints “Private”.</td></tr>
-            <tr><td><code>note</code></td><td>Its own line under the caption</td></tr>
-            <tr><td><code>href</code></td><td>Makes the icon a link. Only <code>http</code> and <code>https</code> links are accepted. Groups do not take a link.</td></tr>
-          </tbody>
-        </table>
-        <pre><code>api = AppService(
-    "Orders API",
-    sku="P1v3",
-    region="West Europe",
-    public=False,
-    note="Private endpoint only",
-    href="https://learn.microsoft.com/azure/app-service/overview",
-)
-door &gt;&gt; Https("Front Door calls the API", 2) &gt;&gt; api</code></pre>
-        <p>A group takes <code>sku</code>, <code>region</code>, <code>public</code>, and <code>note</code> on the title band. See <code>examples/azure_decisions.py</code> and <code>examples/aws_decisions.py</code>.</p>
-      </section>
-
-      <section class="panel" id="folded" hidden>
-        <h2>Folded groups</h2>
-        <p><code>folded=False</code> is the default, so a boundary draws every resource inside it. Pass <code>folded=True</code> when the box should start closed: the resources remain in the model, the box shows how many there are, and a connector from outside lands on the box.</p>
-        <pre><code>with ResourceGroup("rg-observe", folded=True, foldable=True, note="Click to open"):
-    alerts = Monitor("Alerts")
-    logs = LogAnalytics("Workspace")
-
-api &gt;&gt; Private("The API reports failures", 4) &gt;&gt; alerts</code></pre>
-        <p><code>foldable=True</code> makes the title a button in the SVG. Click it, or focus it and press Enter or Space, to open the box, and do the same again to close it. A keyboard focus draws a ring on the box. <code>folded</code> is only the state it starts in. Open the SVG in a browser; an image preview does not run the click. Lines that start and end inside a closed box are not drawn. See <code>examples/azure_folded.py</code>.</p>
+        <pre><code>door &gt;&gt; Https("Front Door calls the API", 2) &gt;&gt; api</code></pre>
       </section>
 
       <section class="panel" id="boundaries" hidden>
-        <h2>Boundaries</h2>
-        <p>Import Azure boundaries from <code>infrasketch.azure</code> and AWS boundaries from <code>infrasketch.aws</code>. <code>Group</code> comes from <code>infrasketch</code> and draws a box that belongs to neither cloud.</p>
+        <h2>Boundaries &amp; Groups</h2>
+        <p>Import Azure boundaries from <code>infrasketch.azure</code> and AWS boundaries from <code>infrasketch.aws</code>. <code>Group</code> comes from <code>infrasketch</code> and draws a box that belongs to neither cloud. A group takes <code>sku</code>, <code>region</code>, <code>public</code>, and <code>note</code> on the title band. Groups do not take a link.</p>
         <h3>Azure</h3>
         <table>
           <thead><tr><th>Group</th><th>Use it for</th></tr></thead>
@@ -226,6 +177,21 @@ api &gt;&gt; Private("The API reports failures", 4) &gt;&gt; alerts</code></pre>
             <tr><td><code>AutoScaling("workers")</code></td><td>An Auto Scaling group</td></tr>
           </tbody>
         </table>
+        <p>Every boundary starts open, and its title is a button. Click the title, or focus it and press Enter or Space, to close the box, and do the same again to open it. A keyboard focus draws a ring on the box. This is the same for a resource group, a virtual network, a subnet, a VPC, and the other boundaries.</p>
+        <p><code>folded=True</code> starts that box closed. The resources stay in the model, the box shows how many there are, and a connector from outside lands on the box. <code>foldable=False</code> leaves a boundary fixed. Open the SVG in a browser; an image preview does not run the click. Lines that start and end inside a closed box are not drawn. If a diagram has too many boundaries to open and close, set <code>foldable=False</code> on the ones that should stay fixed.</p>
+        <pre><code>from infrasketch import Diagram, Private
+from infrasketch.azure import AppService, Monitor, ResourceGroup, Subnet, VNet
+
+with Diagram("Orders", "orders.svg"):
+    with ResourceGroup("rg-app"):
+        with VNet("vnet-app", folded=True):
+            with Subnet("snet-api"):
+                api = AppService("Orders API")
+    with ResourceGroup("rg-observe"):
+        alerts = Monitor("Alerts")
+
+    api &gt;&gt; Private("The API reports failures") &gt;&gt; alerts</code></pre>
+        <p>See <code>examples/azure_folded.py</code>.</p>
         <p>Inside a boundary, connected resources flow in the diagram direction. Resources at the same step stack. <code>arrange="row"</code> forces a single row, <code>arrange="column"</code> a single column, and <code>arrange="grid"</code> with <code>columns=3</code> a grid. A short last row is centered under the rows above it. <code>direction</code> and <code>align</code> on a group override the diagram for that box.</p>
         <pre><code>with ResourceGroup("rg-shared", arrange="grid", columns=3):
     vault = KeyVault("Keys")
@@ -234,27 +200,6 @@ api &gt;&gt; Private("The API reports failures", 4) &gt;&gt; alerts</code></pre>
     logs = LogAnalytics("Logs")
     traces = ApplicationInsights("Traces")</code></pre>
         <p>Five resources fill two rows. Logs and Traces sit in the centered row. See <code>examples/azure_grid.py</code>.</p>
-      </section>
-
-      <section class="panel" id="names" hidden>
-        <h2>Names</h2>
-        <p>Common Azure names come from <code>infrasketch.azure</code>: <code>FunctionApp</code>, <code>ContainerApp</code>, <code>ACR</code>, <code>AKS</code>, <code>Redis</code>, <code>SQLDatabase</code>, <code>KeyVault</code>, <code>FrontDoor</code>.</p>
-        <p>Common AWS names come from <code>infrasketch.aws</code>: <code>Lambda</code>, <code>EC2</code>, <code>S3</code>, <code>DynamoDB</code>, <code>RDS</code>, <code>APIGateway</code>, <code>CloudFront</code>, <code>EKS</code>.</p>
-        <p>External names come from <code>infrasketch.external</code>: <code>GitHub</code>, <code>Cloudflare</code>, and <code>Akamai</code>.</p>
-        <p>Every icon in these sets is included. The <a href="icons.html">icon browser</a> shows the import line. From a terminal:</p>
-        <pre><code>python -m infrasketch search private endpoint
-python -m infrasketch categories</code></pre>
-        <pre><code>from infrasketch import search
-
-for hit in search("cosmos"):
-    print(hit.import_line)</code></pre>
-        <p><code>FunctionApp("Orders")</code> labels the box "Orders" and captions it "Function App". <code>FunctionApp()</code> uses the service name as the only label. <code>caption=False</code> hides the caption.</p>
-        <p>A resource with no icon draws a neutral placeholder. Pass <code>icon</code> a picture file to draw that resource with your own artwork. SVG, PNG, JPEG, GIF, WebP, BMP, and ICO all work. The picture is fitted inside the icon square without cropping or stretching. The same argument replaces the icon of a named resource.</p>
-        <pre><code>from infrasketch import Node
-
-billing = Node("Billing", icon="billing.png", caption="Own service")
-api = AppService("Orders", icon="logo.ico")</code></pre>
-        <p>See <code>examples/custom_icon.py</code>. Azure and AWS icons stay at their original colors and proportions when you do not pass <code>icon</code>.</p>
       </section>
     </div>
   </main>
@@ -265,22 +210,33 @@ api = AppService("Orders", icon="logo.ico")</code></pre>
   <script>
     const buttons = [...document.querySelectorAll("#guide-nav .cat")];
     const panels = [...document.querySelectorAll(".guide .panel")];
+    const aliases = {
+      install: "installation",
+      azure: "nodes",
+      aws: "nodes",
+      external: "nodes",
+      connectors: "edges",
+      decisions: "nodes",
+      folded: "boundaries",
+      names: "nodes",
+    };
 
     function show(id) {
-      const known = panels.some((panel) => panel.id === id);
-      const section = known ? id : "install";
+      const requested = aliases[id] || id;
+      const known = panels.some((panel) => panel.id === requested);
+      const section = known ? requested : "installation";
       for (const panel of panels) panel.hidden = panel.id !== section;
       for (const button of buttons) {
         button.setAttribute("aria-pressed", String(button.dataset.section === section));
       }
-      const url = section === "install" ? "guide.html" : `guide.html?section=${section}`;
+      const url = section === "installation" ? "guide.html" : `guide.html?section=${section}`;
       history.replaceState(null, "", url);
     }
 
     for (const button of buttons) {
       button.addEventListener("click", () => show(button.dataset.section));
     }
-    show(new URLSearchParams(location.search).get("section") || "install");
+    show(new URLSearchParams(location.search).get("section") || "installation");
   </script>
 </body>
 </html>

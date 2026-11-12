@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from xml.sax.saxutils import escape
 
+from infrasketch.external import EXTERNAL_CREDITS
 from infrasketch.icons import embed_icon
 from infrasketch.layout import LABEL_LEADING, LABEL_SIZE, layout_diagram, text_width
 from infrasketch.model import Connection, Diagram, DiagramError, Group, Node, inside_folded
@@ -24,11 +25,7 @@ def footnote(diagram: Diagram) -> str:
         notes.append("Azure icons © Microsoft")
     if any(path.startswith("aws/") for path in paths):
         notes.append("AWS icons © Amazon Web Services")
-    for spec, credit in (
-        ("external/github.svg", "GitHub mark © GitHub"),
-        ("external/cloudflare.svg", "Cloudflare mark © Cloudflare"),
-        ("external/akamai.svg", "Akamai mark © Akamai"),
-    ):
+    for spec, credit in EXTERNAL_CREDITS.items():
         if spec in paths:
             notes.append(credit)
     if not notes:
@@ -94,10 +91,13 @@ def render_svg(diagram: Diagram) -> str:
     return "\n".join(part for part in parts if part)
 
 
+_MAX_FOLD_STATES = 64
+
+
 def _foldable_groups(diagram: Diagram) -> list[Group]:
     found = []
     for group in _groups(diagram):
-        if not getattr(group, "foldable", False):
+        if not group.foldable:
             continue
         parent = group.parent
         hidden = False
@@ -108,9 +108,73 @@ def _foldable_groups(diagram: Diagram) -> list[Group]:
             parent = parent.parent
         if not hidden:
             found.append(group)
-    if len(found) > 4:
-        raise DiagramError("A diagram can have at most 4 foldable groups")
     return found
+
+
+def _fold_parents(groups: list[Group]) -> list[int]:
+    index = {id(group): number for number, group in enumerate(groups)}
+    parents = []
+    for group in groups:
+        parent = group.parent
+        found = -1
+        while isinstance(parent, Group):
+            if id(parent) in index:
+                found = index[id(parent)]
+                break
+            parent = parent.parent
+        parents.append(found)
+    return parents
+
+
+def _ancestor_folded(bits: list[str], parents: list[int], number: int) -> bool:
+    ancestor = parents[number]
+    while ancestor >= 0:
+        if bits[ancestor] == "1":
+            return True
+        ancestor = parents[ancestor]
+    return False
+
+
+def _canonical_state(state: str, parents: list[int]) -> str:
+    bits = list(state)
+    guard = 0
+    changed = True
+    while changed and guard <= len(bits):
+        changed = False
+        guard += 1
+        for number in range(len(bits)):
+            if _ancestor_folded(bits, parents, number) and bits[number] != "0":
+                bits[number] = "0"
+                changed = True
+    return "".join(bits)
+
+
+def _fold_states(parents: list[int]) -> list[str]:
+    """Open and closed combinations. A closed boundary hides the ones inside it."""
+    states: list[str] = []
+    bits: list[str] = []
+
+    def walk(number: int) -> None:
+        if number == len(parents):
+            states.append("".join(bits))
+            return
+        if _ancestor_folded(bits, parents, number):
+            bits.append("0")
+            walk(number + 1)
+            bits.pop()
+            return
+        for bit in ("0", "1"):
+            bits.append(bit)
+            walk(number + 1)
+            bits.pop()
+
+    walk(0)
+    if len(states) > _MAX_FOLD_STATES:
+        raise DiagramError(
+            "A diagram can open and close at most 64 boundary combinations. "
+            "Set foldable=False on a boundary that should stay fixed."
+        )
+    return states
 
 
 def _link_ns(diagram: Diagram) -> str:
@@ -129,34 +193,37 @@ def _assign_node_ids(diagram: Diagram) -> None:
 def _render_foldable(diagram: Diagram, foldable: list[Group]) -> str:
     """One drawing per open/closed combination, switched by a click on the title."""
     note = footnote(diagram)
+    parents = _fold_parents(foldable)
     saved = [group.folded for group in foldable]
+    initial = "".join("1" if folded else "0" for folded in saved)
+    states = _fold_states(parents)
+    shown = _canonical_state(initial, parents)
     for index, group in enumerate(foldable):
         group.fold_id = f"f{index}"
-    initial = 0
-    for index, folded in enumerate(saved):
-        if folded:
-            initial |= 1 << index
     ids = _Ids()
-    scenes: list[tuple[str, str]] = []
+    scenes: list[tuple[str, str, str]] = []
     sizes: list[tuple[float, float]] = []
-    for mask in range(1 << len(foldable)):
-        for index, group in enumerate(foldable):
-            group.folded = bool(mask & (1 << index))
-        diagram.badge_prefix = f"v{mask}-"
+    for state in states:
+        for group, bit in zip(foldable, state):
+            group.folded = bit == "1"
+        diagram.badge_prefix = f"v{state}-"
         layout_diagram(diagram)
         route_diagram(diagram)
         sizes.append(_canvas_size(diagram, note))
-        scenes.append(_scene(diagram, ids))
+        clips, body = _scene(diagram, ids)
+        scenes.append((state, clips, body))
     for group, folded in zip(foldable, saved):
         group.folded = folded
     width = max(size[0] for size in sizes)
     height = max(size[1] for size in sizes)
     folds = " ".join(group.fold_id for group in foldable)
+    parent_attr = " ".join(str(parent) for parent in parents)
     parts = [
         '<?xml version="1.0" encoding="UTF-8"?>',
         (
             f'<svg xmlns="http://www.w3.org/2000/svg"{_link_ns(diagram)} width="{width:.0f}" height="{height:.0f}" '
-            f'viewBox="0 0 {width:.1f} {height:.1f}" data-folds="{folds}" role="img" '
+            f'viewBox="0 0 {width:.1f} {height:.1f}" data-folds="{folds}" '
+            f'data-fold-parents="{parent_attr}" data-fold-state="{initial}" role="img" '
             f'text-rendering="optimizeLegibility">'
         ),
         f"<title>{escape(diagram.title)}</title>",
@@ -167,12 +234,12 @@ def _render_foldable(diagram: Diagram, foldable: list[Group]) -> str:
     for color in sorted({edge.color or EDGE for edge in diagram.edges}):
         parts.append(_marker(color))
     parts.append(_interaction_style(diagram))
-    for clips, _body in scenes:
+    for _state, clips, _body in scenes:
         parts.append(clips)
     parts.append("</defs>")
-    for mask, (_clips, body) in enumerate(scenes):
-        hidden = "" if mask == initial else ' style="display:none"'
-        parts.append(f'<g data-fold-view="{mask}"{hidden}>{body}</g>')
+    for state, _clips, body in scenes:
+        hidden = "" if state == shown else ' style="display:none"'
+        parts.append(f'<g data-fold-view="{state}"{hidden}>{body}</g>')
     parts.append(_title(diagram))
     parts.append(_footer(diagram, width, height, note))
     parts.append(_fold_script())
@@ -238,22 +305,48 @@ def _fold_toggle(group: Group) -> str:
 
 def _fold_script() -> str:
     return """<script><![CDATA[
+function infrasketchCanonical(state, parents) {
+  var bits = state.split("");
+  var guard = 0;
+  var changed = true;
+  while (changed && guard <= bits.length) {
+    changed = false;
+    guard++;
+    for (var i = 0; i < bits.length; i++) {
+      var ancestor = parents[i];
+      var hidden = false;
+      while (ancestor >= 0) {
+        if (bits[ancestor] === "1") { hidden = true; break; }
+        ancestor = parents[ancestor];
+      }
+      if (hidden && bits[i] !== "0") {
+        bits[i] = "0";
+        changed = true;
+      }
+    }
+  }
+  return bits.join("");
+}
+function infrasketchShow(svg, state) {
+  var parents = svg.getAttribute("data-fold-parents").split(" ").map(Number);
+  var view = infrasketchCanonical(state, parents);
+  svg.setAttribute("data-fold-state", state);
+  var views = svg.querySelectorAll("[data-fold-view]");
+  var shown = null;
+  for (var j = 0; j < views.length; j++) {
+    var on = views[j].getAttribute("data-fold-view") === view;
+    views[j].style.display = on ? "" : "none";
+    if (on) shown = views[j];
+  }
+  return shown;
+}
 function infrasketchFold(id, svg) {
   var order = svg.getAttribute("data-folds").split(" ");
   var index = order.indexOf(id);
   if (index < 0) return;
-  var views = svg.querySelectorAll("[data-fold-view]");
-  var current = 0;
-  for (var i = 0; i < views.length; i++) {
-    if (views[i].style.display !== "none") current = Number(views[i].getAttribute("data-fold-view"));
-  }
-  var next = current ^ (1 << index);
-  var shown = null;
-  for (var j = 0; j < views.length; j++) {
-    var on = Number(views[j].getAttribute("data-fold-view")) === next;
-    views[j].style.display = on ? "" : "none";
-    if (on) shown = views[j];
-  }
+  var bits = svg.getAttribute("data-fold-state").split("");
+  bits[index] = bits[index] === "1" ? "0" : "1";
+  var shown = infrasketchShow(svg, bits.join(""));
   if (!shown) return;
   var focused = svg.querySelectorAll(".isk-focused");
   for (var p = 0; p < focused.length; p++) focused[p].classList.remove("isk-focused");

@@ -337,7 +337,11 @@ class Node(Endpoint):
 
 
 class Group(Endpoint):
-    """A rounded boundary. Prefer ``ResourceGroup``, ``VNet``, or ``Subnet``."""
+    """A rounded boundary. Prefer ``ResourceGroup``, ``VNet``, or ``Subnet``.
+
+    The title opens and closes the box. ``folded=True`` starts it closed.
+    ``foldable=False`` leaves the box fixed.
+    """
 
     kind = "group"
 
@@ -355,7 +359,7 @@ class Group(Endpoint):
         public: bool | None = None,
         note: str | None = None,
         folded: bool = False,
-        foldable: bool = False,
+        foldable: bool = True,
     ) -> None:
         super().__init__()
         self.label = label

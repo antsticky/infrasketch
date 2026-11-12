@@ -6,7 +6,7 @@
   <title>infrasketch</title>
   <meta name="description" content="Draw Azure and AWS architecture diagrams as SVG with official resource icons.">
   <link rel="icon" href="assets/favicon.svg">
-  <link rel="stylesheet" href="assets/site.css?v=6">
+  <link rel="stylesheet" href="assets/site.css?v=7">
 </head>
 <body>
   <header class="top">
@@ -22,7 +22,7 @@
   <main class="wrap">
     <section class="hero">
       <h1>Draw the architecture as SVG.</h1>
-      <p class="lede">infrasketch places official Azure and AWS icons, plus a few external service marks, on a white canvas and routes the connectors itself.</p>
+      <p class="lede">infrasketch places official Azure and AWS icons, plus external service marks, on a white canvas and routes the connectors itself.</p>
       <div class="actions">
         <a class="button" href="icons.html" data-icons>Browse the icons</a>
         <a class="button secondary" href="guide.html">Read the guide</a>
@@ -37,87 +37,636 @@
     </div>
 
     <section class="cloud" data-cloud="azure">
-    <pre><code>from infrasketch import Diagram
-from infrasketch.azure import FrontDoor, FunctionApp, Redis, ResourceGroup
-
-with Diagram("Orders", "orders.svg"):
-    with ResourceGroup("rg-app"):
-        web = FrontDoor("Frontend")
-        api = FunctionApp("API")
-        cache = Redis("Sessions")
-    web &gt;&gt; api &gt;&gt; cache</code></pre>
     <div class="gallery" id="azure-examples">
       <figure class="figure">
-        <img src="examples/azure-web-api.svg" alt="Front Door, a static web app, an API, Redis, SQL, and Key Vault.">
-        <figcaption>Front Door, a static web app, an API, Redis, SQL, and Key Vault.</figcaption>
+        <div class="flip">
+          <div class="face front">
+            <img src="examples/azure-web-api.svg" alt="Front Door, a static web app, an API, Redis, SQL, and Key Vault.">
+            <p class="caption">Front Door, a static web app, an API, Redis, SQL, and Key Vault.</p>
+          </div>
+          <div class="face back">
+            <pre><code>from infrasketch import Diagram, Https, Private
+from infrasketch.azure import (
+    AppService,
+    FrontDoor,
+    KeyVault,
+    PrivateNetwork,
+    Redis,
+    ResourceGroup,
+    SQLDatabase,
+    StaticWebApp,
+    Subnet,
+    Users,
+    VNet,
+)
+
+with Diagram("Web, API, and Redis", "azure-web-api.svg", subtitle="Production · West Europe"):
+    customers = Users("Customers")
+
+    with ResourceGroup("rg-edge"):
+        door = FrontDoor("Storefront entry")
+
+    with ResourceGroup("rg-app"):
+        with VNet("vnet-app"):
+            with Subnet("snet-web"):
+                web = StaticWebApp("Storefront")
+            with Subnet("snet-api"):
+                api = AppService("Orders API")
+            with PrivateNetwork("data"):
+                cache = Redis("Sessions")
+                database = SQLDatabase("Orders")
+                vault = KeyVault("Secrets")
+
+    customers &gt;&gt; Https() &gt;&gt; door &gt;&gt; Https() &gt;&gt; web &gt;&gt; api
+    api &gt;&gt; cache
+    api &gt;&gt; database
+    api &gt;&gt; Private("secrets") &gt;&gt; vault</code></pre>
+          </div>
+        </div>
       </figure>
       <figure class="figure">
-        <img src="examples/azure-container-apps.svg" alt="Container Apps environment behind an application gateway, with private Redis and SQL.">
-        <figcaption>Container Apps, ACR, and private endpoints.</figcaption>
+        <div class="flip">
+          <div class="face front">
+            <img src="examples/azure-container-apps.svg" alt="Container Apps environment behind an application gateway, with private Redis and SQL.">
+            <p class="caption">Container Apps, ACR, and private endpoints.</p>
+          </div>
+          <div class="face back">
+            <pre><code>from infrasketch import Async, Diagram, Private
+from infrasketch.azure import (
+    ACR,
+    ApplicationGateway,
+    ContainerApp,
+    ContainerAppsEnvironment,
+    ManagedRedis,
+    PrivateEndpoint,
+    PrivateNetwork,
+    ResourceGroup,
+    SQLDatabase,
+    Subnet,
+    Users,
+    VNet,
+)
+
+with Diagram(
+    "Container Apps platform",
+    "azure-container-apps.svg",
+    subtitle="Images, private endpoints, and a shared environment",
+):
+    clients = Users("Clients")
+
+    with ResourceGroup("rg-platform"):
+        registry = ACR("Images")
+
+        with VNet("vnet-prod"):
+            with Subnet("snet-ingress"):
+                gateway = ApplicationGateway("Ingress")
+            with Subnet("snet-apps", arrange="column"):
+                environment = ContainerAppsEnvironment("cae-prod")
+                frontend = ContainerApp("Frontend")
+                backend = ContainerApp("Backend")
+            with PrivateNetwork("private endpoints"):
+                redis_pe = PrivateEndpoint("Redis")
+                sql_pe = PrivateEndpoint("SQL")
+
+        cache = ManagedRedis("Cart")
+        database = SQLDatabase("Catalog")
+
+    clients &gt;&gt; gateway &gt;&gt; frontend
+    frontend &gt;&gt; backend
+    registry &gt;&gt; Async("pull") &gt;&gt; environment
+    backend &gt;&gt; Private() &gt;&gt; redis_pe &gt;&gt; cache
+    backend &gt;&gt; Private() &gt;&gt; sql_pe &gt;&gt; database</code></pre>
+          </div>
+        </div>
       </figure>
       <figure class="figure">
-        <img src="examples/azure-functions.svg" alt="API Management, functions, Service Bus, Cosmos DB, and storage.">
-        <figcaption>API Management, functions, Service Bus, Cosmos DB, and storage.</figcaption>
+        <div class="flip">
+          <div class="face front">
+            <img src="examples/azure-functions.svg" alt="API Management, functions, Service Bus, Cosmos DB, and storage.">
+            <p class="caption">API Management, functions, Service Bus, Cosmos DB, and storage.</p>
+          </div>
+          <div class="face back">
+            <pre><code>from infrasketch import Async, Diagram, Https
+from infrasketch.azure import (
+    APIManagement,
+    ApplicationInsights,
+    BlobStorage,
+    CosmosDB,
+    EventHub,
+    FunctionApp,
+    KeyVault,
+    LogAnalytics,
+    ManagedIdentity,
+    Monitor,
+    ResourceGroup,
+    ServiceBus,
+    Users,
+)
+
+with Diagram("Event-driven functions", "azure-functions.svg", subtitle="API, queue, and data"):
+    callers = Users("Partners")
+
+    with ResourceGroup("rg-integration"):
+        gateway = APIManagement("Public API")
+        orders = FunctionApp("Orders")
+        worker = FunctionApp("Fulfillment")
+        bus = ServiceBus("orders")
+        events = EventHub("Telemetry")
+
+    with ResourceGroup("rg-data", arrange="row"):
+        catalog = CosmosDB("Catalog")
+        documents = BlobStorage("Invoices")
+        identity = ManagedIdentity("Workload")
+        vault = KeyVault("Keys")
+
+    with ResourceGroup("rg-observe"):
+        insights = ApplicationInsights("API")
+        logs = LogAnalytics("Workspace")
+        monitor = Monitor("Alerts")
+
+    callers &gt;&gt; Https() &gt;&gt; gateway &gt;&gt; orders
+    orders &gt;&gt; Async("enqueue") &gt;&gt; bus &gt;&gt; worker
+    orders &gt;&gt; catalog
+    worker &gt;&gt; documents
+    worker &gt;&gt; events
+    orders &gt;&gt; identity
+    worker &gt;&gt; identity
+    identity &gt;&gt; vault
+    orders &gt;&gt; insights
+    worker &gt;&gt; insights
+    insights &gt;&gt; logs &gt;&gt; monitor</code></pre>
+          </div>
+        </div>
       </figure>
       <figure class="figure">
-        <img src="examples/azure-aks.svg" alt="AKS platform with Front Door, a container registry, and private data services.">
-        <figcaption>AKS, a registry, and private data.</figcaption>
+        <div class="flip">
+          <div class="face front">
+            <img src="examples/azure-aks.svg" alt="AKS platform with Front Door, a container registry, and private data services.">
+            <p class="caption">AKS, a registry, and private data.</p>
+          </div>
+          <div class="face back">
+            <pre><code>from infrasketch import Async, Diagram, Private
+from infrasketch.azure import (
+    ACR,
+    AKS,
+    ApplicationGateway,
+    ApplicationInsights,
+    FrontDoor,
+    KeyVault,
+    ManagedRedis,
+    PostgreSQL,
+    PrivateNetwork,
+    ResourceGroup,
+    Subnet,
+    Users,
+    VNet,
+)
+
+with Diagram("AKS platform", "azure-aks.svg", subtitle="Cluster, registry, and private data"):
+    users = Users("Customers")
+
+    with ResourceGroup("rg-edge"):
+        door = FrontDoor("Global entry")
+
+    with ResourceGroup("rg-runtime"):
+        registry = ACR("Platform images")
+        with VNet("vnet-aks"):
+            with Subnet("snet-ingress"):
+                gateway = ApplicationGateway("Ingress")
+            with Subnet("snet-cluster"):
+                cluster = AKS("prod")
+            with PrivateNetwork("data"):
+                cache = ManagedRedis("Cache")
+                database = PostgreSQL("App data")
+        vault = KeyVault("Cluster secrets")
+        insights = ApplicationInsights("Workloads")
+
+    users &gt;&gt; door &gt;&gt; gateway &gt;&gt; cluster
+    registry &gt;&gt; Async("pull") &gt;&gt; cluster
+    cluster &gt;&gt; cache
+    cluster &gt;&gt; Private() &gt;&gt; database
+    cluster &gt;&gt; vault
+    cluster &gt;&gt; insights</code></pre>
+          </div>
+        </div>
       </figure>
       <figure class="figure">
-        <img src="examples/azure-ai.svg" alt="Static web app, Azure OpenAI, AI Search, and storage.">
-        <figcaption>Static web app, Azure OpenAI, AI Search, and storage.</figcaption>
+        <div class="flip">
+          <div class="face front">
+            <img src="examples/azure-ai.svg" alt="Static web app, Azure OpenAI, AI Search, and storage.">
+            <p class="caption">Static web app, Azure OpenAI, AI Search, and storage.</p>
+          </div>
+          <div class="face back">
+            <pre><code>from infrasketch import Diagram, Https, Private
+from infrasketch.azure import (
+    AISearch,
+    AppService,
+    AzureOpenAI,
+    BlobStorage,
+    KeyVault,
+    PrivateNetwork,
+    ResourceGroup,
+    StaticWebApp,
+    Subnet,
+    Users,
+    VNet,
+)
+
+with Diagram("AI assistant", "azure-ai.svg", subtitle="Search, a model, and the source documents"):
+    people = Users("Analysts")
+
+    with ResourceGroup("rg-ai"):
+        site = StaticWebApp("Assistant")
+        with VNet("vnet-ai"):
+            with Subnet("snet-api"):
+                api = AppService("Chat API")
+            with PrivateNetwork("private"):
+                search = AISearch("Documents")
+                model = AzureOpenAI("gpt")
+                corpus = BlobStorage("Corpus")
+                vault = KeyVault("Keys")
+
+    people &gt;&gt; Https() &gt;&gt; site &gt;&gt; api
+    api &gt;&gt; search
+    api &gt;&gt; model
+    api &gt;&gt; corpus
+    api &gt;&gt; Private("secrets") &gt;&gt; vault</code></pre>
+          </div>
+        </div>
       </figure>
       <figure class="figure">
-        <img src="examples/azure-data.svg" alt="Event Hubs, Logic Apps, Data Factory, and SQL.">
-        <figcaption>Event Hubs, Logic Apps, Data Factory, and SQL.</figcaption>
+        <div class="flip">
+          <div class="face front">
+            <img src="examples/azure-data.svg" alt="Event Hubs, Logic Apps, Data Factory, and SQL.">
+            <p class="caption">Event Hubs, Logic Apps, Data Factory, and SQL.</p>
+          </div>
+          <div class="face back">
+            <pre><code>from infrasketch import Async, Diagram
+from infrasketch.azure import (
+    BlobStorage,
+    DataFactory,
+    EventHub,
+    KeyVault,
+    LogicApp,
+    ResourceGroup,
+    SQLDatabase,
+)
+
+with Diagram("Data pipeline", "azure-data.svg", subtitle="Ingest, transform, and store"):
+    events = EventHub("Telemetry")
+
+    with ResourceGroup("rg-data", arrange="row"):
+        trigger = LogicApp("Schedule")
+        factory = DataFactory("Nightly")
+        lake = BlobStorage("Raw")
+        warehouse = SQLDatabase("Curated")
+        vault = KeyVault("Connections")
+
+    events &gt;&gt; Async("ingest") &gt;&gt; factory
+    trigger &gt;&gt; factory
+    factory &gt;&gt; lake
+    factory &gt;&gt; warehouse
+    factory &gt;&gt; vault</code></pre>
+          </div>
+        </div>
       </figure>
       <figure class="figure">
-        <img src="examples/azure-network.svg" alt="Firewall, Application Gateway, Bastion, and a jump host.">
-        <figcaption>Firewall, Application Gateway, Bastion, and a jump host.</figcaption>
+        <div class="flip">
+          <div class="face front">
+            <img src="examples/azure-network.svg" alt="Firewall, Application Gateway, Bastion, and a jump host.">
+            <p class="caption">Firewall, Application Gateway, Bastion, and a jump host.</p>
+          </div>
+          <div class="face back">
+            <pre><code>from infrasketch import Diagram, Https
+from infrasketch.azure import (
+    AppService,
+    ApplicationGateway,
+    Bastion,
+    Firewall,
+    ResourceGroup,
+    Subnet,
+    Users,
+    VNet,
+    VirtualMachine,
+)
+
+with Diagram("Hub network", "azure-network.svg", subtitle="Firewall, ingress, and administration"):
+    people = Users("Operators")
+
+    with ResourceGroup("rg-hub"):
+        with VNet("vnet-hub"):
+            with Subnet("AzureFirewallSubnet"):
+                firewall = Firewall("Hub")
+            with Subnet("snet-app"):
+                gateway = ApplicationGateway("Ingress")
+                app = AppService("Internal app")
+            with Subnet("AzureBastionSubnet"):
+                bastion = Bastion("Admin")
+            with Subnet("snet-mgmt"):
+                jump = VirtualMachine("Jump host")
+
+    people &gt;&gt; Https() &gt;&gt; firewall &gt;&gt; gateway &gt;&gt; app
+    firewall &gt;&gt; bastion &gt;&gt; jump</code></pre>
+          </div>
+        </div>
       </figure>
       <figure class="figure">
-        <img src="examples/azure-grid.svg" alt="Five shared services arranged in a three-column grid.">
-        <figcaption>Five shared services in a three-column grid.</figcaption>
+        <div class="flip">
+          <div class="face front">
+            <img src="examples/azure-grid.svg" alt="Five shared services arranged in a three-column grid.">
+            <p class="caption">Five shared services in a three-column grid.</p>
+          </div>
+          <div class="face back">
+            <pre><code>from infrasketch import Diagram
+from infrasketch.azure import (
+    AppService,
+    ApplicationInsights,
+    KeyVault,
+    LogAnalytics,
+    Monitor,
+    ResourceGroup,
+    StorageAccount,
+)
+
+with Diagram("Shared services", "azure-grid.svg", subtitle="A grid of three columns"):
+    api = AppService("Orders API")
+    with ResourceGroup("rg-shared", arrange="grid", columns=3):
+        vault = KeyVault("Keys")
+        StorageAccount("Files")
+        Monitor("Health")
+        LogAnalytics("Logs")
+        ApplicationInsights("Traces")
+    api &gt;&gt; vault</code></pre>
+          </div>
+        </div>
       </figure>
       <figure class="figure">
-        <img src="examples/azure-decisions.svg" alt="Reviewed Azure design with SKU, exposure, notes, and numbered steps.">
-        <figcaption>SKU, exposure, notes, numbered steps, and links.</figcaption>
+        <div class="flip">
+          <div class="face front">
+            <img src="examples/azure-decisions.svg" alt="Reviewed Azure design with SKU, exposure, notes, and numbered steps.">
+            <p class="caption">SKU, exposure, notes, numbered steps, and links.</p>
+          </div>
+          <div class="face back">
+            <pre><code>from datetime import date
+
+from infrasketch import Diagram, Https, Private
+from infrasketch.azure import (
+    AppService,
+    FrontDoor,
+    KeyVault,
+    LogAnalytics,
+    Monitor,
+    ResourceGroup,
+    Users,
+)
+
+FRONT_DOOR = "https://learn.microsoft.com/azure/frontdoor/front-door-overview"
+APP_SERVICE = "https://learn.microsoft.com/azure/app-service/overview"
+KEY_VAULT = "https://learn.microsoft.com/azure/key-vault/general/overview"
+
+with Diagram(
+    "Orders review",
+    "azure-decisions.svg",
+    subtitle="Decisions for the production design",
+    as_of=date(2026, 11, 12),
+):
+    customers = Users("Customers", note="Public internet")
+    with ResourceGroup("rg-app", region="West Europe", note="Production workload"):
+        door = FrontDoor(
+            "Entry",
+            sku="Premium",
+            public=True,
+            href=FRONT_DOOR,
+        )
+        api = AppService(
+            "Orders API",
+            sku="P1v3",
+            region="West Europe",
+            public=False,
+            note="Private endpoint only",
+            href=APP_SERVICE,
+        )
+        vault = KeyVault(
+            "Secrets",
+            sku="Standard",
+            public=False,
+            note="RBAC, no public network",
+            href=KEY_VAULT,
+        )
+    with ResourceGroup("rg-observe", folded=True, foldable=True, note="Shown closed"):
+        alerts = Monitor("Alerts")
+        LogAnalytics("Workspace")
+    customers &gt;&gt; Https("Customers open the storefront", 1) &gt;&gt; door
+    door &gt;&gt; Https("Front Door calls the API", 2) &gt;&gt; api
+    api &gt;&gt; Private("The API reads secrets", 3) &gt;&gt; vault
+    api &gt;&gt; Private("The API reports failures", 4) &gt;&gt; alerts</code></pre>
+          </div>
+        </div>
       </figure>
       <figure class="figure">
-        <img src="examples/azure-folded.svg" alt="An open resource group beside a folded one.">
-        <figcaption>An open resource group beside a folded one.</figcaption>
+        <div class="flip">
+          <div class="face front">
+            <img src="examples/azure-folded.svg" alt="An open resource group beside a folded one.">
+            <p class="caption">An open resource group beside a folded one.</p>
+          </div>
+          <div class="face back">
+            <pre><code>from infrasketch import Diagram, Https, Private
+from infrasketch.azure import (
+    AppService,
+    ApplicationInsights,
+    LogAnalytics,
+    Monitor,
+    Redis,
+    ResourceGroup,
+    Users,
+)
+
+with Diagram(
+    "Orders, with observability closed",
+    "azure-folded.svg",
+    subtitle="The API is open. Monitoring stays folded.",
+):
+    customers = Users("Customers")
+    with ResourceGroup("rg-app"):
+        api = AppService("Orders API")
+        cache = Redis("Sessions")
+    with ResourceGroup("rg-observe", folded=True, foldable=True, note="Click to open"):
+        alerts = Monitor("Alerts")
+        LogAnalytics("Workspace")
+        ApplicationInsights("Workloads")
+    customers &gt;&gt; Https() &gt;&gt; api
+    api &gt;&gt; cache
+    api &gt;&gt; Private("The API reports failures") &gt;&gt; alerts</code></pre>
+          </div>
+        </div>
       </figure>
     </div>
     <button type="button" class="show-more" aria-controls="azure-examples" aria-expanded="false">Show more</button>
     </section>
 
     <section class="cloud" data-cloud="aws" hidden>
-    <pre><code>from infrasketch import Diagram
-from infrasketch.aws import APIGateway, CloudFront, DynamoDB, Lambda, S3, Users
-
-with Diagram("Orders", "orders.svg"):
-    customers = Users("Customers")
-    edge = CloudFront("Entry")
-    api = APIGateway("Orders")
-    checkout = Lambda("Checkout")
-    customers &gt;&gt; edge &gt;&gt; api &gt;&gt; checkout
-    checkout &gt;&gt; [DynamoDB("Orders"), S3("Images")]</code></pre>
     <div class="gallery" id="aws-examples">
       <figure class="figure">
-        <img src="examples/aws-orders.svg" alt="CloudFront, API Gateway, Lambda, DynamoDB, and S3.">
-        <figcaption>CloudFront, API Gateway, Lambda, DynamoDB, and S3.</figcaption>
+        <div class="flip">
+          <div class="face front">
+            <img src="examples/aws-orders.svg" alt="CloudFront, API Gateway, Lambda, DynamoDB, and S3.">
+            <p class="caption">CloudFront, API Gateway, Lambda, DynamoDB, and S3.</p>
+          </div>
+          <div class="face back">
+            <pre><code>from infrasketch import Diagram
+from infrasketch.aws import (
+    APIGateway,
+    CloudFront,
+    DynamoDB,
+    Lambda,
+    PrivateSubnet,
+    PublicSubnet,
+    S3,
+    Users,
+    VPC,
+)
+
+with Diagram("Orders", "aws-orders.svg", subtitle="Production · eu-west-1"):
+    customers = Users("Customers")
+    edge = CloudFront("Entry")
+    with VPC("vpc-orders"):
+        with PublicSubnet("public"):
+            api = APIGateway("Orders")
+        with PrivateSubnet("data"):
+            checkout = Lambda("Checkout")
+            orders = DynamoDB("Orders")
+            images = S3("Images")
+    customers &gt;&gt; edge &gt;&gt; api &gt;&gt; checkout
+    checkout &gt;&gt; [orders, images]</code></pre>
+          </div>
+        </div>
       </figure>
       <figure class="figure">
-        <img src="examples/aws-eks.svg" alt="EKS platform with a load balancer, a container registry, ElastiCache, and RDS.">
-        <figcaption>EKS, a registry, and private data.</figcaption>
+        <div class="flip">
+          <div class="face front">
+            <img src="examples/aws-eks.svg" alt="EKS platform with a load balancer, a container registry, ElastiCache, and RDS.">
+            <p class="caption">EKS, a registry, and private data.</p>
+          </div>
+          <div class="face back">
+            <pre><code>from infrasketch import Diagram
+from infrasketch.aws import (
+    ECR,
+    EKS,
+    ELB,
+    ElastiCache,
+    PrivateSubnet,
+    PublicSubnet,
+    RDS,
+    Users,
+    VPC,
+)
+
+with Diagram("EKS platform", "aws-eks.svg", subtitle="Cluster, registry, and private data"):
+    users = Users("Customers")
+    registry = ECR("Images")
+    with VPC("vpc-prod"):
+        with PublicSubnet("public"):
+            balancer = ELB("Ingress")
+        with PrivateSubnet("cluster"):
+            cluster = EKS("prod")
+        with PrivateSubnet("data"):
+            cache = ElastiCache("Cache")
+            database = RDS("App data")
+    users &gt;&gt; balancer &gt;&gt; cluster
+    registry &gt;&gt; cluster
+    cluster &gt;&gt; cache
+    cluster &gt;&gt; database</code></pre>
+          </div>
+        </div>
       </figure>
       <figure class="figure">
-        <img src="examples/aws-events.svg" alt="API Gateway and Lambda handing work to a queue, with DynamoDB, S3, and CloudWatch.">
-        <figcaption>Lambda, a queue, and the data behind it.</figcaption>
+        <div class="flip">
+          <div class="face front">
+            <img src="examples/aws-events.svg" alt="API Gateway and Lambda handing work to a queue, with DynamoDB, S3, and CloudWatch.">
+            <p class="caption">Lambda, a queue, and the data behind it.</p>
+          </div>
+          <div class="face back">
+            <pre><code>from infrasketch import Async, Diagram
+from infrasketch.aws import (
+    APIGateway,
+    CloudWatch,
+    DynamoDB,
+    Lambda,
+    S3,
+    SQS,
+    Users,
+)
+
+with Diagram("Event-driven functions", "aws-events.svg", subtitle="API, queue, and data"):
+    callers = Users("Partners")
+    gateway = APIGateway("Public API")
+    orders = Lambda("Orders")
+    queue = SQS("orders")
+    worker = Lambda("Fulfillment")
+    catalog = DynamoDB("Catalog")
+    documents = S3("Invoices")
+    logs = CloudWatch("Logs")
+
+    callers &gt;&gt; gateway &gt;&gt; orders
+    orders &gt;&gt; Async("enqueue") &gt;&gt; queue &gt;&gt; worker &gt;&gt; documents
+    orders &gt;&gt; catalog
+    worker &gt;&gt; logs</code></pre>
+          </div>
+        </div>
       </figure>
       <figure class="figure">
-        <img src="examples/aws-decisions.svg" alt="Reviewed AWS design with SKU, exposure, notes, and numbered steps.">
-        <figcaption>SKU, exposure, notes, numbered steps, and links.</figcaption>
+        <div class="flip">
+          <div class="face front">
+            <img src="examples/aws-decisions.svg" alt="Reviewed AWS design with SKU, exposure, notes, and numbered steps.">
+            <p class="caption">SKU, exposure, notes, numbered steps, and links.</p>
+          </div>
+          <div class="face back">
+            <pre><code>from datetime import date
+
+from infrasketch import Diagram, Group, Https, Private
+from infrasketch.aws import APIGateway, CloudWatch, Lambda, SecretsManager, Users, VPC
+
+API = "https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html"
+LAMBDA = "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+SECRETS = "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html"
+
+with Diagram(
+    "Orders review",
+    "aws-decisions.svg",
+    subtitle="Decisions for the production design",
+    as_of=date(2026, 11, 12),
+):
+    customers = Users("Customers", note="Public internet")
+    with VPC("vpc-orders", region="eu-west-1", note="Production account"):
+        api = APIGateway(
+            "Orders",
+            sku="HTTP API",
+            public=True,
+            href=API,
+        )
+        checkout = Lambda(
+            "Checkout",
+            sku="512 MB",
+            region="eu-west-1",
+            public=False,
+            note="VPC only, no function URL",
+            href=LAMBDA,
+        )
+        secrets = SecretsManager(
+            "Keys",
+            public=False,
+            note="Rotation every 30 days",
+            href=SECRETS,
+        )
+    with Group("Observability", folded=True, foldable=True, note="Shown closed"):
+        metrics = CloudWatch("Metrics")
+        CloudWatch("Alarms")
+    customers &gt;&gt; Https("Customers call the API", 1) &gt;&gt; api
+    api &gt;&gt; Https("API Gateway invokes checkout", 2) &gt;&gt; checkout
+    checkout &gt;&gt; Private("Checkout reads the keys", 3) &gt;&gt; secrets
+    checkout &gt;&gt; Private("Checkout emits metrics", 4) &gt;&gt; metrics</code></pre>
+          </div>
+        </div>
       </figure>
     </div>
     <button type="button" class="show-more" aria-controls="aws-examples" aria-expanded="false">Show more</button>
@@ -127,6 +676,93 @@ with Diagram("Orders", "orders.svg"):
     const sections = document.querySelectorAll(".cloud");
     const buttons = document.querySelectorAll(".cloud-switch .provider");
     const icons = document.querySelector("[data-icons]");
+    const copyMarkup = `<svg class="icon-copy" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><rect x="5.25" y="3.25" width="8" height="10" rx="1.25" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10.75 3.25V2.5A1.25 1.25 0 0 0 9.5 1.25h-6A1.25 1.25 0 0 0 2.25 2.5v8A1.25 1.25 0 0 0 3.5 11.75H5.25" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><svg class="icon-check" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5 6.5 11.5 12.5 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+    function sourceText(code) {
+      const text = code.textContent.replace(/^\n/, "").replace(/\s+$/, "");
+      const lines = text.split("\n");
+      const widths = lines.filter((line) => line.trim()).map((line) => line.match(/^ */)[0].length);
+      const margin = widths.length ? Math.min(...widths) : 0;
+      return lines.map((line) => line.slice(margin)).join("\n");
+    }
+
+    function fitCode(pre) {
+      const code = pre.querySelector("code");
+      const lines = code._full.split("\n");
+      if (pre.clientHeight < 24) return;
+      let low = 1;
+      let high = lines.length;
+      let best = 1;
+      while (low <= high) {
+        const mid = Math.floor((low + high) / 2);
+        code.textContent = lines.slice(0, mid).join("\n");
+        if (pre.scrollHeight <= pre.clientHeight + 1) {
+          best = mid;
+          low = mid + 1;
+        } else {
+          high = mid - 1;
+        }
+      }
+      const next = lines.slice(0, best).join("\n");
+      if (code.textContent !== next) code.textContent = next;
+    }
+
+    const pending = new WeakMap();
+    function schedule(pre) {
+      if (pending.has(pre)) return;
+      pending.set(pre, requestAnimationFrame(() => {
+        pending.delete(pre);
+        fitCode(pre);
+      }));
+    }
+
+    for (const back of document.querySelectorAll(".face.back")) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "code-copy";
+      button.setAttribute("aria-label", "Copy code");
+      button.title = "Copy code";
+      button.innerHTML = copyMarkup;
+      back.prepend(button);
+      const code = back.querySelector("code");
+      code._full = sourceText(code);
+      button.addEventListener("click", async (event) => {
+        event.stopPropagation();
+        try {
+          await navigator.clipboard.writeText(code._full);
+        } catch {
+          return;
+        }
+        button.classList.add("is-copied");
+        button.setAttribute("aria-label", "Copied");
+        button.title = "Copied";
+        setTimeout(() => {
+          button.classList.remove("is-copied");
+          button.setAttribute("aria-label", "Copy code");
+          button.title = "Copy code";
+        }, 1200);
+      });
+    }
+
+    const codeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) schedule(entry.target);
+    });
+    for (const pre of document.querySelectorAll(".face.back pre")) {
+      codeObserver.observe(pre);
+      schedule(pre);
+    }
+    for (const image of document.querySelectorAll(".flip img")) {
+      image.addEventListener("load", () => schedule(image.closest(".flip").querySelector("pre")));
+    }
+    const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    if (!canHover) {
+      for (const figure of document.querySelectorAll(".figure")) {
+        figure.addEventListener("click", (event) => {
+          if (event.target.closest(".code-copy")) return;
+          figure.classList.toggle("is-flipped");
+        });
+      }
+    }
 
     function show(provider) {
       for (const section of sections) section.hidden = section.dataset.cloud !== provider;
@@ -138,6 +774,7 @@ with Diagram("Orders", "orders.svg"):
       if (provider !== "azure") params.set("provider", provider);
       const next = params.toString();
       history.replaceState(null, "", next ? `?${next}` : location.pathname);
+      for (const pre of document.querySelectorAll(".face.back pre")) schedule(pre);
     }
 
     for (const button of buttons) {
@@ -149,6 +786,7 @@ with Diagram("Orders", "orders.svg"):
         const open = gallery.classList.toggle("is-open");
         button.textContent = open ? "Show less" : "Show more";
         button.setAttribute("aria-expanded", String(open));
+        for (const pre of gallery.querySelectorAll(".face.back pre")) schedule(pre);
       });
     }
     const requested = new URLSearchParams(location.search).get("provider");

@@ -1,23 +1,366 @@
 [
   {
-    "module": "external",
-    "name": "Akamai",
-    "service": "Akamai",
-    "icon": "external/akamai.svg",
+    "module": "source_control",
+    "name": "GitHub",
+    "service": "GitHub",
+    "icon": "external/github.svg",
     "provider": "external"
   },
   {
-    "module": "external",
+    "module": "source_control",
+    "name": "GitLab",
+    "service": "GitLab",
+    "icon": "external/gitlab.svg",
+    "provider": "external"
+  },
+  {
+    "module": "source_control",
+    "name": "Bitbucket",
+    "service": "Bitbucket",
+    "icon": "external/bitbucket.svg",
+    "provider": "external"
+  },
+  {
+    "module": "source_control",
+    "name": "Jenkins",
+    "service": "Jenkins",
+    "icon": "external/jenkins.svg",
+    "provider": "external"
+  },
+  {
+    "module": "source_control",
+    "name": "CircleCI",
+    "service": "CircleCI",
+    "icon": "external/circleci.svg",
+    "provider": "external"
+  },
+  {
+    "module": "source_control",
+    "name": "TravisCI",
+    "service": "Travis CI",
+    "icon": "external/travisci.svg",
+    "provider": "external"
+  },
+  {
+    "module": "source_control",
+    "name": "ArgoCD",
+    "service": "Argo CD",
+    "icon": "external/argocd.svg",
+    "provider": "external"
+  },
+  {
+    "module": "edge",
     "name": "Cloudflare",
     "service": "Cloudflare",
     "icon": "external/cloudflare.svg",
     "provider": "external"
   },
   {
-    "module": "external",
-    "name": "GitHub",
-    "service": "GitHub",
-    "icon": "external/github.svg",
+    "module": "edge",
+    "name": "Akamai",
+    "service": "Akamai",
+    "icon": "external/akamai.svg",
+    "provider": "external"
+  },
+  {
+    "module": "edge",
+    "name": "Fastly",
+    "service": "Fastly",
+    "icon": "external/fastly.svg",
+    "provider": "external"
+  },
+  {
+    "module": "edge",
+    "name": "Bunny",
+    "service": "Bunny.net",
+    "icon": "external/bunny.svg",
+    "provider": "external"
+  },
+  {
+    "module": "containers",
+    "name": "Kubernetes",
+    "service": "Kubernetes",
+    "icon": "external/kubernetes.svg",
+    "provider": "external"
+  },
+  {
+    "module": "containers",
+    "name": "Docker",
+    "service": "Docker",
+    "icon": "external/docker.svg",
+    "provider": "external"
+  },
+  {
+    "module": "containers",
+    "name": "Rancher",
+    "service": "Rancher",
+    "icon": "external/rancher.svg",
+    "provider": "external"
+  },
+  {
+    "module": "containers",
+    "name": "OpenShift",
+    "service": "Red Hat OpenShift",
+    "icon": "external/openshift.svg",
+    "provider": "external"
+  },
+  {
+    "module": "containers",
+    "name": "Helm",
+    "service": "Helm",
+    "icon": "external/helm.svg",
+    "provider": "external"
+  },
+  {
+    "module": "observability",
+    "name": "Datadog",
+    "service": "Datadog",
+    "icon": "external/datadog.svg",
+    "provider": "external"
+  },
+  {
+    "module": "observability",
+    "name": "NewRelic",
+    "service": "New Relic",
+    "icon": "external/newrelic.svg",
+    "provider": "external"
+  },
+  {
+    "module": "observability",
+    "name": "Grafana",
+    "service": "Grafana",
+    "icon": "external/grafana.svg",
+    "provider": "external"
+  },
+  {
+    "module": "observability",
+    "name": "Prometheus",
+    "service": "Prometheus",
+    "icon": "external/prometheus.svg",
+    "provider": "external"
+  },
+  {
+    "module": "observability",
+    "name": "Dynatrace",
+    "service": "Dynatrace",
+    "icon": "external/dynatrace.svg",
+    "provider": "external"
+  },
+  {
+    "module": "observability",
+    "name": "Splunk",
+    "service": "Splunk",
+    "icon": "external/splunk.svg",
+    "provider": "external"
+  },
+  {
+    "module": "security",
+    "name": "Okta",
+    "service": "Okta",
+    "icon": "external/okta.svg",
+    "provider": "external"
+  },
+  {
+    "module": "security",
+    "name": "Auth0",
+    "service": "Auth0",
+    "icon": "external/auth0.svg",
+    "provider": "external"
+  },
+  {
+    "module": "security",
+    "name": "PaloAltoNetworks",
+    "service": "Palo Alto Networks",
+    "icon": "external/palo-alto.svg",
+    "provider": "external"
+  },
+  {
+    "module": "security",
+    "name": "Fortinet",
+    "service": "Fortinet",
+    "icon": "external/fortinet.svg",
+    "provider": "external"
+  },
+  {
+    "module": "messaging",
+    "name": "ApacheKafka",
+    "service": "Apache Kafka",
+    "icon": "external/kafka.svg",
+    "provider": "external"
+  },
+  {
+    "module": "messaging",
+    "name": "RabbitMQ",
+    "service": "RabbitMQ",
+    "icon": "external/rabbitmq.svg",
+    "provider": "external"
+  },
+  {
+    "module": "messaging",
+    "name": "NATS",
+    "service": "NATS",
+    "icon": "external/nats.svg",
+    "provider": "external"
+  },
+  {
+    "module": "databases",
+    "name": "MongoDB",
+    "service": "MongoDB",
+    "icon": "external/mongodb.svg",
+    "provider": "external"
+  },
+  {
+    "module": "databases",
+    "name": "PostgreSQL",
+    "service": "PostgreSQL",
+    "icon": "external/postgresql.svg",
+    "provider": "external"
+  },
+  {
+    "module": "databases",
+    "name": "MySQL",
+    "service": "MySQL",
+    "icon": "external/mysql.svg",
+    "provider": "external"
+  },
+  {
+    "module": "databases",
+    "name": "Redis",
+    "service": "Redis",
+    "icon": "external/redis.svg",
+    "provider": "external"
+  },
+  {
+    "module": "databases",
+    "name": "Elasticsearch",
+    "service": "Elasticsearch",
+    "icon": "external/elasticsearch.svg",
+    "provider": "external"
+  },
+  {
+    "module": "databases",
+    "name": "Cassandra",
+    "service": "Cassandra",
+    "icon": "external/cassandra.svg",
+    "provider": "external"
+  },
+  {
+    "module": "databases",
+    "name": "MariaDB",
+    "service": "MariaDB",
+    "icon": "external/mariadb.svg",
+    "provider": "external"
+  },
+  {
+    "module": "databases",
+    "name": "SQLite",
+    "service": "SQLite",
+    "icon": "external/sqlite.svg",
+    "provider": "external"
+  },
+  {
+    "module": "databases",
+    "name": "Neo4j",
+    "service": "Neo4j",
+    "icon": "external/neo4j.svg",
+    "provider": "external"
+  },
+  {
+    "module": "databases",
+    "name": "Couchbase",
+    "service": "Couchbase",
+    "icon": "external/couchbase.svg",
+    "provider": "external"
+  },
+  {
+    "module": "databases",
+    "name": "CouchDB",
+    "service": "CouchDB",
+    "icon": "external/couchdb.svg",
+    "provider": "external"
+  },
+  {
+    "module": "databases",
+    "name": "InfluxDB",
+    "service": "InfluxDB",
+    "icon": "external/influxdb.svg",
+    "provider": "external"
+  },
+  {
+    "module": "databases",
+    "name": "CockroachDB",
+    "service": "CockroachDB",
+    "icon": "external/cockroachdb.svg",
+    "provider": "external"
+  },
+  {
+    "module": "databases",
+    "name": "ClickHouse",
+    "service": "ClickHouse",
+    "icon": "external/clickhouse.svg",
+    "provider": "external"
+  },
+  {
+    "module": "databases",
+    "name": "ScyllaDB",
+    "service": "ScyllaDB",
+    "icon": "external/scylladb.svg",
+    "provider": "external"
+  },
+  {
+    "module": "databases",
+    "name": "OpenSearch",
+    "service": "OpenSearch",
+    "icon": "external/opensearch.svg",
+    "provider": "external"
+  },
+  {
+    "module": "databases",
+    "name": "DuckDB",
+    "service": "DuckDB",
+    "icon": "external/duckdb.svg",
+    "provider": "external"
+  },
+  {
+    "module": "databases",
+    "name": "TimescaleDB",
+    "service": "TimescaleDB",
+    "icon": "external/timescaledb.svg",
+    "provider": "external"
+  },
+  {
+    "module": "databases",
+    "name": "ArangoDB",
+    "service": "ArangoDB",
+    "icon": "external/arangodb.svg",
+    "provider": "external"
+  },
+  {
+    "module": "databases",
+    "name": "SingleStore",
+    "service": "SingleStore",
+    "icon": "external/singlestore.svg",
+    "provider": "external"
+  },
+  {
+    "module": "analytics",
+    "name": "Snowflake",
+    "service": "Snowflake",
+    "icon": "external/snowflake.svg",
+    "provider": "external"
+  },
+  {
+    "module": "analytics",
+    "name": "Databricks",
+    "service": "Databricks",
+    "icon": "external/databricks.svg",
+    "provider": "external"
+  },
+  {
+    "module": "saas",
+    "name": "Jira",
+    "service": "Atlassian Jira",
+    "icon": "external/jira.svg",
     "provider": "external"
   }
 ]

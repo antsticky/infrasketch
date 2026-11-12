@@ -141,10 +141,12 @@ Resources at the same step stack, which is what you want for a cache beside
 its database. `arrange="row"` forces a single row, `arrange="column"` a
 single column, and `arrange="grid"` with `columns=3` a grid. A short last row is centered
 under the rows above it. See `examples/azure_grid.py`.
-`folded=True` draws the boundary closed, with a count of the resources
-inside. Connectors from outside land on that box. The default is open.
-`foldable=True` makes that title a button: click it, or focus it and press Enter or Space, to open
-and close the box. `folded` chooses the state it starts in.
+Every boundary starts open, and its title is a button. Click it, or focus it
+and press Enter or Space, to close the box, and do the same again to open it.
+That works for a resource group, a virtual network, a subnet, a VPC, and the
+other boundaries. `folded=True` starts the box closed, with a count of the
+resources inside. Connectors from outside land on that box. `foldable=False`
+leaves a boundary fixed.
 
 ## Finding an icon
 
@@ -157,7 +159,8 @@ Common AWS names, imported from `infrasketch.aws`: `Lambda`, `EC2`, `S3`,
 `DynamoDB`, `APIGateway`, `CloudFront`, `SQS`, `EKS`.
 
 Services outside both clouds are in `infrasketch.external`. `GitHub`,
-`Cloudflare`, and `Akamai` are nodes like any other resource:
+`Cloudflare`, and `Akamai` are nodes like any other resource. The icon
+browser has the rest, grouped by category:
 
 ```python
 from infrasketch.external import Akamai, Cloudflare, GitHub
@@ -241,6 +244,6 @@ a logo or to represent your own product. The terms travel with the files in
 `NOTICE`, `src/infrasketch/data/icons/LICENSE.txt`, and
 `src/infrasketch/data/icons/aws/LICENSE.txt`.
 
-`GitHub`, `Cloudflare`, and `Akamai` use the marks from Simple Icons (CC0 1.0).
-The names and logos remain trademarks of their owners. The terms are in
+External marks come from Simple Icons (CC0 1.0). The names and logos remain
+trademarks of their owners. The terms are in
 `src/infrasketch/data/icons/external/LICENSE.txt`.

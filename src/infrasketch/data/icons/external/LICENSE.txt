@@ -1,12 +1,30 @@
 External service marks
 
-The icons in this folder are the service marks from Simple Icons
+The icons in this folder are service marks from Simple Icons
 (https://simpleicons.org/), dedicated to the public domain under CC0 1.0.
-
-GitHub and the GitHub logo are trademarks of GitHub, Inc.
-Cloudflare and the Cloudflare logo are trademarks of Cloudflare, Inc.
-Akamai and the Akamai logo are trademarks of Akamai Technologies, Inc.
+The names and logos remain trademarks of their respective owners.
 
 Each icon is included so a diagram can identify that service. These marks are
 not MIT, and they are not infrasketch artwork. Do not present a mark as a
 claim that its owner made, sponsors, or endorses this package.
+
+Source control and DevOps: GitHub, GitLab, Bitbucket, Jenkins, CircleCI,
+Travis CI, Argo CD.
+
+CDN, edge, and DNS: Cloudflare, Akamai, Fastly, Bunny.net.
+
+Containers and Kubernetes: Kubernetes, Docker, Rancher, Red Hat OpenShift, Helm.
+
+Observability: Datadog, New Relic, Grafana, Prometheus, Dynatrace, Splunk.
+
+Security and identity: Okta, Auth0, Palo Alto Networks, Fortinet.
+
+Messaging: Apache Kafka, RabbitMQ, NATS.
+
+Databases: MongoDB, PostgreSQL, MySQL, Redis, Elasticsearch, Cassandra,
+MariaDB, SQLite, Neo4j, Couchbase, CouchDB, InfluxDB, CockroachDB, ClickHouse,
+ScyllaDB, OpenSearch, DuckDB, TimescaleDB, ArangoDB, SingleStore.
+
+Data and analytics: Snowflake, Databricks.
+
+SaaS: Atlassian Jira.

@@ -15,16 +15,31 @@ const providers = document.querySelectorAll(".provider");
 
 const WORDS = { ai: "AI", iot: "IoT", devops: "DevOps" };
 
+const EXTERNAL_LABELS = {
+  source_control: "Source Control & DevOps",
+  edge: "CDN, Edge & DNS",
+  containers: "Containers & Kubernetes",
+  observability: "Observability & Monitoring",
+  security: "Security & Identity",
+  messaging: "Messaging & Streaming",
+  databases: "Databases",
+  analytics: "Data & Analytics",
+  saas: "SaaS & Collaboration",
+};
+
+const EXTERNAL_ORDER = Object.keys(EXTERNAL_LABELS);
+
 function providerOf(item) {
   return item.provider || "azure";
 }
 
-function categoryLabel(module) {
+function categoryLabel(module, provider = state.provider) {
+  if (provider === "external" && EXTERNAL_LABELS[module]) return EXTERNAL_LABELS[module];
   return module.split("_").map((part) => WORDS[part] || part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
 }
 
 function haystack(item) {
-  return [item.provider, item.module, item.name, item.service, ...(item.aliases || [])].join(" ").toLowerCase();
+  return [providerOf(item), item.module, categoryLabel(item.module, providerOf(item)), item.name, item.service, ...(item.aliases || [])].join(" ").toLowerCase();
 }
 
 function inProvider(item) {
@@ -45,7 +60,14 @@ function renderCategories() {
   for (const item of state.items) {
     if (inProvider(item)) counts.set(item.module, (counts.get(item.module) || 0) + 1);
   }
-  const names = [...counts.keys()].sort((a, b) => categoryLabel(a).localeCompare(categoryLabel(b)));
+  const names = [...counts.keys()].sort((a, b) => {
+    if (state.provider === "external") {
+      const left = EXTERNAL_ORDER.indexOf(a);
+      const right = EXTERNAL_ORDER.indexOf(b);
+      return (left < 0 ? EXTERNAL_ORDER.length : left) - (right < 0 ? EXTERNAL_ORDER.length : right);
+    }
+    return categoryLabel(a).localeCompare(categoryLabel(b));
+  });
   const total = [...counts.values()].reduce((sum, value) => sum + value, 0);
   const entries = [["all", "All", total], ...names.map((name) => [name, categoryLabel(name), counts.get(name)])];
   cats.replaceChildren(...entries.map(([id, label, total]) => {
@@ -128,7 +150,9 @@ function renderDetail() {
   title.textContent = item.service;
   const meta = document.createElement("p");
   meta.className = "muted";
-  meta.textContent = `${providerOf(item)} · ${item.module}.${item.name}`;
+  meta.textContent = providerOf(item) === "external"
+    ? `external · ${categoryLabel(item.module, "external")} · ${item.name}`
+    : `${providerOf(item)} · ${item.module}.${item.name}`;
   detail.append(preview, title, meta);
 
   if (item.aliases?.length) {
