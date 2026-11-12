@@ -9,7 +9,12 @@ from __future__ import annotations
 import json
 import shutil
 import sys
+import time
+import urllib.request
+from datetime import datetime
+from html import escape
 from pathlib import Path
+from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
@@ -55,6 +60,65 @@ def aliases() -> dict[tuple[str, str, str], list[str]]:
     return found
 
 
+PYPI = "https://pypi.org/pypi/infrasketch/json"
+VERSIONS = '<tbody id="versions"></tbody>'
+
+
+def project_version() -> str:
+    for line in (ROOT / "pyproject.toml").read_text().splitlines():
+        if line.startswith("version = "):
+            return line.split("=", 1)[1].strip().strip('"').strip("'")
+    raise SystemExit("pyproject.toml has no version")
+
+
+def pypi_releases() -> dict[str, datetime]:
+    """Upload time of every version currently listed on PyPI."""
+    request = urllib.request.Request(PYPI, headers={"User-Agent": "infrasketch-docs"})
+    with urllib.request.urlopen(request, timeout=30) as response:
+        payload = json.load(response)
+    found = {}
+    for version, files in payload["releases"].items():
+        uploaded = [item["upload_time"] for item in files if item.get("upload_time")]
+        if uploaded:
+            found[version] = datetime.fromisoformat(min(uploaded))
+    return found
+
+
+def wait_for_release(version: str) -> None:
+    """Poll PyPI until the version that was just published is listed."""
+    deadline = time.monotonic() + 180
+    while True:
+        if version in pypi_releases():
+            print(f"PyPI lists {version}")
+            return
+        if time.monotonic() >= deadline:
+            raise SystemExit(f"PyPI has not listed {version}")
+        time.sleep(5)
+
+
+def published_versions() -> list[tuple[str, str]]:
+    """Every PyPI release, newest first."""
+    ordered = sorted(pypi_releases().items(), key=lambda item: item[1], reverse=True)
+    return [
+        (version, f"{moment.day} {moment.strftime('%b')} {moment.year}")
+        for version, moment in ordered
+    ]
+
+
+def fill_versions(html: str) -> str:
+    if VERSIONS not in html:
+        raise SystemExit("guide.html is missing the versions table")
+    rows = []
+    for version, published in published_versions():
+        href = "https://pypi.org/project/infrasketch/" + quote(version) + "/"
+        rows.append(
+            f'<tr><td><a href="{href}"><code>{escape(version)}</code></a></td>'
+            f"<td>{escape(published)}</td></tr>"
+        )
+    body = '<tbody id="versions">\n' + "\n".join(rows) + "\n</tbody>"
+    return html.replace(VERSIONS, body, 1)
+
+
 def catalog(alias_map: dict[tuple[str, str, str], list[str]]) -> list[dict]:
     from infrasketch.search import catalog as load_catalog
 
@@ -78,9 +142,13 @@ def catalog(alias_map: dict[tuple[str, str, str], list[str]]) -> list[dict]:
 
 
 def main() -> None:
+    if "--wait-for-release" in sys.argv:
+        wait_for_release(project_version())
     if OUT.exists():
         shutil.rmtree(OUT)
     shutil.copytree(DOCS, OUT)
+    guide = OUT / "guide.html"
+    guide.write_text(fill_versions(guide.read_text()))
     shutil.copytree(ICONS, OUT / "icons")
     (OUT / "catalog.json").write_text(json.dumps(catalog(aliases()), indent=2) + "\n")
     example_dir = OUT / "examples"
