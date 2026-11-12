@@ -48,7 +48,7 @@ def main() -> str:
                 note="Rotation every 30 days",
                 href=SECRETS,
             )
-        with Group("Observability", folded=True, note="Shown closed"):
+        with Group("Observability", folded=True, foldable=True, note="Shown closed"):
             metrics = CloudWatch("Metrics")
             CloudWatch("Alarms")
         customers >> Https("Customers call the API", 1) >> api

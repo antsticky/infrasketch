@@ -37,33 +37,31 @@ def footnote(diagram: Diagram) -> str:
 
 
 def render_svg(diagram: Diagram) -> str:
+    _assign_node_ids(diagram)
     foldable = _foldable_groups(diagram)
     if foldable:
         return _render_foldable(diagram, foldable)
+    diagram.badge_prefix = ""
     layout_diagram(diagram)
     route_diagram(diagram)
     note = footnote(diagram)
-    if diagram.as_of:
-        note = f"{note} · as of {diagram.as_of}"
     width, height = _canvas_size(diagram, note)
     ids = _Ids()
-    link_ns = ""
-    if any(getattr(node, "href", "") for node in _nodes(diagram)):
-        link_ns = ' xmlns:xlink="http://www.w3.org/1999/xlink"'
     parts = [
         '<?xml version="1.0" encoding="UTF-8"?>',
         (
-            f'<svg xmlns="http://www.w3.org/2000/svg"{link_ns} width="{width:.0f}" height="{height:.0f}" '
+            f'<svg xmlns="http://www.w3.org/2000/svg"{_link_ns(diagram)} width="{width:.0f}" height="{height:.0f}" '
             f'viewBox="0 0 {width:.1f} {height:.1f}" role="img" text-rendering="optimizeLegibility">'
         ),
         f"<title>{escape(diagram.title)}</title>",
-        f"<desc>{escape(diagram.subtitle or diagram.title)}. {escape(note)}</desc>",
+        f"<desc>{escape(_description(diagram, note))}</desc>",
         f'<rect width="100%" height="100%" fill="{CANVAS}"/>',
         "<defs>",
     ]
     colors = sorted({edge.color or EDGE for edge in diagram.edges})
     for color in colors:
         parts.append(_marker(color))
+    parts.append(_interaction_style(diagram))
     for group in _groups(diagram):
         if inside_folded(group):
             continue
@@ -115,11 +113,22 @@ def _foldable_groups(diagram: Diagram) -> list[Group]:
     return found
 
 
+def _link_ns(diagram: Diagram) -> str:
+    linked = any(getattr(node, "href", "") for node in _nodes(diagram))
+    numbered = any(edge.number for edge in diagram.edges)
+    if linked or numbered:
+        return ' xmlns:xlink="http://www.w3.org/1999/xlink"'
+    return ""
+
+
+def _assign_node_ids(diagram: Diagram) -> None:
+    for index, node in enumerate(_nodes(diagram), start=1):
+        node.sketch_id = f"n{index}"
+
+
 def _render_foldable(diagram: Diagram, foldable: list[Group]) -> str:
     """One drawing per open/closed combination, switched by a click on the title."""
     note = footnote(diagram)
-    if diagram.as_of:
-        note = f"{note} · as of {diagram.as_of}"
     saved = [group.folded for group in foldable]
     for index, group in enumerate(foldable):
         group.fold_id = f"f{index}"
@@ -133,6 +142,7 @@ def _render_foldable(diagram: Diagram, foldable: list[Group]) -> str:
     for mask in range(1 << len(foldable)):
         for index, group in enumerate(foldable):
             group.folded = bool(mask & (1 << index))
+        diagram.badge_prefix = f"v{mask}-"
         layout_diagram(diagram)
         route_diagram(diagram)
         sizes.append(_canvas_size(diagram, note))
@@ -141,24 +151,22 @@ def _render_foldable(diagram: Diagram, foldable: list[Group]) -> str:
         group.folded = folded
     width = max(size[0] for size in sizes)
     height = max(size[1] for size in sizes)
-    link_ns = ""
-    if any(getattr(node, "href", "") for node in _nodes(diagram)):
-        link_ns = ' xmlns:xlink="http://www.w3.org/1999/xlink"'
     folds = " ".join(group.fold_id for group in foldable)
     parts = [
         '<?xml version="1.0" encoding="UTF-8"?>',
         (
-            f'<svg xmlns="http://www.w3.org/2000/svg"{link_ns} width="{width:.0f}" height="{height:.0f}" '
+            f'<svg xmlns="http://www.w3.org/2000/svg"{_link_ns(diagram)} width="{width:.0f}" height="{height:.0f}" '
             f'viewBox="0 0 {width:.1f} {height:.1f}" data-folds="{folds}" role="img" '
             f'text-rendering="optimizeLegibility">'
         ),
         f"<title>{escape(diagram.title)}</title>",
-        f"<desc>{escape(diagram.subtitle or diagram.title)}. {escape(note)}</desc>",
+        f"<desc>{escape(_description(diagram, note))}</desc>",
         f'<rect width="100%" height="100%" fill="{CANVAS}"/>',
         "<defs>",
     ]
     for color in sorted({edge.color or EDGE for edge in diagram.edges}):
         parts.append(_marker(color))
+    parts.append(_interaction_style(diagram))
     for clips, _body in scenes:
         parts.append(clips)
     parts.append("</defs>")
@@ -209,13 +217,22 @@ def _scene(diagram: Diagram, ids: _Ids) -> tuple[str, str]:
 
 
 def _fold_toggle(group: Group) -> str:
-    height = group.h if group.folded else group.header_h
+    hit = group.h if group.folded else group.header_h
     action = "Close" if not group.folded else "Open"
+    label = escape(group.label, {'"': "&quot;"})
+    radius = BOUNDARIES[group.kind]["radius"]
+    x, y, w = group.abs_x, group.abs_y, group.w
     return (
-        f'<rect x="{group.abs_x:.1f}" y="{group.abs_y:.1f}" width="{group.w:.1f}" height="{height:.1f}" '
-        f'fill="transparent" style="cursor:pointer" '
-        f'onclick="infrasketchFold(\'{group.fold_id}\', this.ownerSVGElement)">'
-        f"<title>{action}</title></rect>"
+        f'<g class="isk-fold" tabindex="0" role="button" data-fold="{group.fold_id}" '
+        f'aria-label="{action} {label}" '
+        f'onfocus="this.classList.add(\'isk-focused\')" onblur="this.classList.remove(\'isk-focused\')" '
+        f'onclick="infrasketchFold(\'{group.fold_id}\', this.ownerSVGElement)" '
+        f'onkeydown="infrasketchFoldKey(event, \'{group.fold_id}\', this.ownerSVGElement)">'
+        f'<rect class="isk-fold-hit" x="{x:.1f}" y="{y:.1f}" width="{w:.1f}" height="{hit:.1f}" '
+        f'fill="transparent"><title>{action}</title></rect>'
+        f'<rect class="isk-fold-ring" x="{x:.1f}" y="{y:.1f}" width="{w:.1f}" height="{group.h:.1f}" '
+        f'rx="{radius}" ry="{radius}" fill="none" stroke="transparent" pointer-events="none"/>'
+        f"</g>"
     )
 
 
@@ -231,9 +248,28 @@ function infrasketchFold(id, svg) {
     if (views[i].style.display !== "none") current = Number(views[i].getAttribute("data-fold-view"));
   }
   var next = current ^ (1 << index);
+  var shown = null;
   for (var j = 0; j < views.length; j++) {
-    views[j].style.display = Number(views[j].getAttribute("data-fold-view")) === next ? "" : "none";
+    var on = Number(views[j].getAttribute("data-fold-view")) === next;
+    views[j].style.display = on ? "" : "none";
+    if (on) shown = views[j];
   }
+  if (!shown) return;
+  var focused = svg.querySelectorAll(".isk-focused");
+  for (var p = 0; p < focused.length; p++) focused[p].classList.remove("isk-focused");
+  var controls = shown.querySelectorAll("[data-fold]");
+  for (var k = 0; k < controls.length; k++) {
+    if (controls[k].getAttribute("data-fold") === id) {
+      controls[k].classList.add("isk-focused");
+      controls[k].focus();
+      return;
+    }
+  }
+}
+function infrasketchFoldKey(event, id, svg) {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  event.preventDefault();
+  infrasketchFold(id, svg);
 }
 ]]></script>"""
 
@@ -251,6 +287,7 @@ def _canvas_size(diagram: Diagram, note: str) -> tuple[float, float]:
     title_w = text_width(diagram.title, 22) + PAGE_X * 2
     sub_w = text_width(diagram.subtitle, 13) + PAGE_X * 2 if diagram.subtitle else 0
     note_w = text_width(note, 11) + PAGE_X * 2
+    date_w = text_width(f"as of {diagram.as_of}", 11) + PAGE_X * 2 if diagram.as_of else 0.0
     content_right = diagram.origin[0] + diagram.content_w
     content_bottom = diagram.origin[1] + diagram.content_h
     legend = _legend_entries(diagram)
@@ -259,8 +296,9 @@ def _canvas_size(diagram: Diagram, note: str) -> tuple[float, float]:
     if legend:
         legend_w = max(text_width(f"{number}   {label}", 12) for number, label in legend) + PAGE_X * 2 + 28
         legend_h = 16.0 + len(legend) * 18.0
-    width = max(content_right + PAGE_X, title_w, sub_w, note_w, legend_w, 320)
-    height = max(content_bottom + legend_h + FOOTER + 12, 120)
+    width = max(content_right + PAGE_X, title_w, sub_w, note_w, date_w, legend_w, 320)
+    extra = 16.0 if diagram.as_of else 0.0
+    height = max(content_bottom + legend_h + FOOTER + 12 + extra, 120)
     return width, height
 
 
@@ -293,7 +331,7 @@ def _group_body(group: Group) -> str:
     caption = ""
     if group.folded and group.fold_caption:
         caption = (
-            f'<text x="{x + w / 2:.1f}" y="{y + group.header_h + (h - group.header_h) / 2 + 4:.1f}" '
+            f'<text x="{x + w / 2:.1f}" y="{y + h - 12:.1f}" '
             f'text-anchor="middle" fill="{MUTED}" font-family="{FONT_ATTR}" font-size="11">'
             f"{escape(group.fold_caption)}</text>"
         )
@@ -405,11 +443,12 @@ def _node(node: Node, ids: _Ids) -> str:
         )
         cursor += 14
     body = "".join(chunks)
-    if not node.href:
-        return body
-    href = escape(node.href, {'"': "&quot;"})
-    tip = escape(node.note or node.label)
-    return f'<a href="{href}" xlink:href="{href}" target="_blank"><title>{tip}</title>{body}</a>'
+    wrapped = body
+    if node.href:
+        href = escape(node.href, {'"': "&quot;"})
+        tip = escape(node.note or node.label)
+        wrapped = f'<a href="{href}" xlink:href="{href}" target="_blank"><title>{tip}</title>{body}</a>'
+    return f'<g class="isk-item" data-node="{node.sketch_id}">{wrapped}</g>'
 
 
 def _edge_path(edge: Connection) -> str:
@@ -420,21 +459,24 @@ def _edge_path(edge: Connection) -> str:
     start = ' marker-start="url(#{0})"'.format(marker) if edge.direction in {"back", "both"} else ""
     end = ' marker-end="url(#{0})"'.format(marker) if edge.direction in {"forward", "both"} else ""
     dash = {"dashed": ' stroke-dasharray="6 4"', "dotted": ' stroke-dasharray="1.4 4"'}.get(edge.style, "")
+    touch = _touch(edge)
+    linked = f' data-touch="{touch}"' if touch else ""
     return (
-        f'<path d="{_polyline(edge.points)}" fill="none" stroke="{color}" stroke-width="1.6" '
+        f'<path class="isk-item"{linked} d="{_polyline(edge.points)}" fill="none" stroke="{color}" stroke-width="1.6" '
         f'stroke-linecap="butt" stroke-linejoin="miter"{dash}{start}{end}/>'
     )
 
 
 def _edge_labels(diagram: Diagram) -> str:
+    _mark_badges(diagram)
     labels = []
     occupied = [(node.abs_x, node.abs_y, node.w, node.h) for node in _nodes(diagram)]
     for edge in diagram.edges:
         if len(edge.points) < 2 or not (edge.label or edge.number):
             continue
-        start, end = _longest(edge.points)
+        start, end = _own_line(edge, diagram.edges)
         if edge.number:
-            labels.append(_number_badge(edge, start, end, occupied))
+            labels.append(_item(edge, _number_badge(edge, start, end, occupied)))
             continue
         if not edge.label:
             continue
@@ -443,10 +485,13 @@ def _edge_labels(diagram: Diagram) -> str:
         box = _on_line(start, end, width, height, occupied)
         occupied.append(box)
         labels.append(
-            f'<rect x="{box[0]:.1f}" y="{box[1]:.1f}" width="{box[2]:.1f}" height="{box[3]:.1f}" rx="9" '
-            f'fill="#FFFFFF" stroke="{LINE}"/>'
-            f'<text x="{box[0] + box[2] / 2:.1f}" y="{box[1] + 12.5:.1f}" text-anchor="middle" '
-            f'fill="{INK}" font-family="{FONT_ATTR}" font-size="11">{escape(edge.label)}</text>'
+            _item(
+                edge,
+                f'<rect x="{box[0]:.1f}" y="{box[1]:.1f}" width="{box[2]:.1f}" height="{box[3]:.1f}" rx="9" '
+                f'fill="#FFFFFF" stroke="{LINE}"/>'
+                f'<text x="{box[0] + box[2] / 2:.1f}" y="{box[1] + 12.5:.1f}" text-anchor="middle" '
+                f'fill="{INK}" font-family="{FONT_ATTR}" font-size="11">{escape(edge.label)}</text>',
+            )
         )
     return "".join(labels)
 
@@ -512,14 +557,87 @@ def _legend(diagram: Diagram) -> str:
     lines = []
     for index, (number, label) in enumerate(entries):
         y = top + index * 18
-        lines.append(
+        target = _badge_target(diagram, number, label)
+        row = (
             f'<circle cx="{PAGE_X + 8:.1f}" cy="{y - 3:.1f}" r="8" fill="#FFFFFF" stroke="{LINE}" stroke-width="1.2"/>'
             f'<text x="{PAGE_X + 8:.1f}" y="{y:.1f}" text-anchor="middle" fill="{INK}" '
             f'font-family="{FONT_ATTR}" font-size="11" font-weight="600">{number}</text>'
             f'<text x="{PAGE_X + 24:.1f}" y="{y:.1f}" fill="{INK}" font-family="{FONT_ATTR}" font-size="12">'
             f"{escape(label)}</text>"
         )
+        if not target:
+            lines.append(row)
+            continue
+        width = 28 + text_width(label, 12)
+        lines.append(
+            f'<a class="isk-legend" href="#{target}" xlink:href="#{target}" '
+            f'onfocus="this.classList.add(\'isk-focused\')" onblur="this.classList.remove(\'isk-focused\')">'
+            f'<rect class="isk-legend-ring" x="{PAGE_X - 6:.1f}" y="{y - 15:.1f}" width="{width:.1f}" height="20" '
+            f'rx="10" fill="none" stroke="transparent"/>'
+            f"{row}</a>"
+        )
     return "".join(lines)
+
+
+def _interaction_style(diagram: Diagram) -> str:
+    rules = [
+        ".isk-item{transition:opacity 140ms ease}",
+        "svg:has([data-node]:hover) .isk-item{opacity:.22}",
+    ]
+    for node in _nodes(diagram):
+        ident = node.sketch_id
+        rules.append(
+            f'svg:has([data-node="{ident}"]:hover) .isk-item[data-node="{ident}"]'
+            f',svg:has([data-node="{ident}"]:hover) .isk-item[data-touch~="{ident}"]{{opacity:1}}'
+        )
+    rules.extend(
+        [
+            ".isk-fold{outline:none;cursor:pointer}",
+            ".isk-fold.isk-focused .isk-fold-ring,.isk-fold:focus .isk-fold-ring,.isk-fold:focus-visible .isk-fold-ring{stroke:#0078D4;stroke-width:2}",
+            ".isk-legend{cursor:pointer}",
+            ".isk-legend.isk-focused .isk-legend-ring,.isk-legend:focus .isk-legend-ring,.isk-legend:focus-visible .isk-legend-ring{stroke:#0078D4;stroke-width:1.6}",
+            ".isk-badge:target{filter:drop-shadow(0 0 2.5px #0078D4)}",
+        ]
+    )
+    return "<style>" + "".join(rules) + "</style>"
+
+
+def _touch(edge: Connection) -> str:
+    found = []
+    for end in (edge.source, edge.target):
+        ident = getattr(end, "sketch_id", "")
+        if ident and ident not in found:
+            found.append(ident)
+    return " ".join(found)
+
+
+def _mark_badges(diagram: Diagram) -> None:
+    prefix = getattr(diagram, "badge_prefix", "") or ""
+    seen: dict[tuple[int, str], str] = {}
+    for edge in diagram.edges:
+        edge.badge_id = ""
+        if edge.number is None or len(edge.points) < 2:
+            continue
+        key = (edge.number, edge.label)
+        if key in seen:
+            continue
+        seen[key] = f"{prefix}step-{edge.number}-{len(seen) + 1}"
+        edge.badge_id = seen[key]
+
+
+def _badge_target(diagram: Diagram, number: int, label: str) -> str:
+    for edge in diagram.edges:
+        if edge.number == number and edge.label == label and getattr(edge, "badge_id", ""):
+            return edge.badge_id
+    return ""
+
+
+def _item(edge: Connection, inner: str) -> str:
+    touch = _touch(edge)
+    linked = f' data-touch="{touch}"' if touch else ""
+    if edge.badge_id:
+        return f'<g class="isk-item isk-badge" id="{edge.badge_id}"{linked}>{inner}</g>'
+    return f'<g class="isk-item"{linked}>{inner}</g>'
 
 
 def _title(diagram: Diagram) -> str:
@@ -535,11 +653,23 @@ def _title(diagram: Diagram) -> str:
     )
 
 
+def _description(diagram: Diagram, note: str) -> str:
+    text = f"{diagram.subtitle or diagram.title}. {note}"
+    if diagram.as_of:
+        text = f"{text}. As of {diagram.as_of}"
+    return text
+
+
 def _footer(diagram: Diagram, width: float, height: float, note: str) -> str:
-    return (
-        f'<text x="{PAGE_X}" y="{height - 12:.1f}" fill="#94A3B8" font-family="{FONT_ATTR}" font-size="11">'
-        f"{escape(note)}</text>"
-    )
+    def line(y: float, text: str) -> str:
+        return (
+            f'<text x="{PAGE_X}" y="{y:.1f}" fill="#94A3B8" font-family="{FONT_ATTR}" font-size="11">'
+            f"{escape(text)}</text>"
+        )
+
+    if not diagram.as_of:
+        return line(height - 12, note)
+    return line(height - 28, note) + line(height - 12, f"as of {diagram.as_of}")
 
 
 def _polyline(points: list[tuple[float, float]]) -> str:
@@ -552,6 +682,85 @@ def _polyline(points: list[tuple[float, float]]) -> str:
     for x, y in pts[1:]:
         commands.append(f"L {x:.1f} {y:.1f}")
     return " ".join(commands)
+
+
+def _own_line(edge: Connection, edges: list[Connection]) -> tuple[tuple[float, float], tuple[float, float]]:
+    """Middle of the run that belongs to this arrow, once a shared stretch is removed."""
+    best = None
+    best_len = 0.0
+    for start, end in _runs(edge.points):
+        for left, right in _without_meet(start, end, edge, edges):
+            length = abs(right[0] - left[0]) + abs(right[1] - left[1])
+            if length > best_len:
+                best = (left, right)
+                best_len = length
+    if best is not None and best_len >= 12.0:
+        return best
+    return _longest(edge.points)
+
+
+def _without_meet(start, end, edge: Connection, edges: list[Connection]):
+    """Pieces of one run that no other arrow travels along."""
+    x1, y1 = start
+    x2, y2 = end
+    horizontal = abs(y1 - y2) <= 1.0
+    vertical = abs(x1 - x2) <= 1.0
+    if horizontal == vertical:
+        return [(start, end)]
+    if horizontal:
+        origin, a, b = y1, x1, x2
+    else:
+        origin, a, b = x1, y1, y2
+    lo, hi = (a, b) if a <= b else (b, a)
+    blocked: list[tuple[float, float]] = []
+    for other in edges:
+        if other is edge:
+            continue
+        for left, right in _runs(other.points):
+            if horizontal:
+                if abs(left[1] - right[1]) > 1.0 or abs(left[1] - origin) > 1.0 or abs(right[1] - origin) > 1.0:
+                    continue
+                span = sorted((left[0], right[0]))
+            else:
+                if abs(left[0] - right[0]) > 1.0 or abs(left[0] - origin) > 1.0 or abs(right[0] - origin) > 1.0:
+                    continue
+                span = sorted((left[1], right[1]))
+            cover_lo = max(lo, span[0])
+            cover_hi = min(hi, span[1])
+            if cover_hi - cover_lo > 2.0:
+                blocked.append((cover_lo, cover_hi))
+    if not blocked:
+        return [(start, end)]
+    blocked.sort()
+    merged = [blocked[0]]
+    for cover_lo, cover_hi in blocked[1:]:
+        if cover_lo <= merged[-1][1] + 0.5:
+            merged[-1] = (merged[-1][0], max(merged[-1][1], cover_hi))
+        else:
+            merged.append((cover_lo, cover_hi))
+    free: list[tuple[float, float]] = []
+    cursor = lo
+    for cover_lo, cover_hi in merged:
+        if cover_lo - cursor > 0.6:
+            free.append((cursor, cover_lo))
+        cursor = max(cursor, cover_hi)
+    if hi - cursor > 0.6:
+        free.append((cursor, hi))
+    pieces = []
+    for left, right in free:
+        if horizontal:
+            pieces.append(((left, origin), (right, origin)))
+        else:
+            pieces.append(((origin, left), (origin, right)))
+    return pieces
+
+
+def _runs(points: list[tuple[float, float]]):
+    return [
+        (start, end)
+        for start, end in zip(points, points[1:])
+        if abs(end[0] - start[0]) >= 0.6 or abs(end[1] - start[1]) >= 0.6
+    ]
 
 
 def _longest(points: list[tuple[float, float]]) -> tuple[tuple[float, float], tuple[float, float]]:

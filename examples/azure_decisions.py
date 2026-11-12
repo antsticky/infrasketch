@@ -57,7 +57,7 @@ def main() -> str:
                 note="RBAC, no public network",
                 href=KEY_VAULT,
             )
-        with ResourceGroup("rg-observe", folded=True, note="Shown closed"):
+        with ResourceGroup("rg-observe", folded=True, foldable=True, note="Shown closed"):
             alerts = Monitor("Alerts")
             LogAnalytics("Workspace")
         customers >> Https("Customers open the storefront", 1) >> door

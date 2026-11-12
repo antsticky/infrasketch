@@ -79,8 +79,8 @@ with Diagram("Web, API, and Redis", "platform.svg", subtitle="Production · West
 ```
 
 `direction="TB"` flows top to bottom. `spacing` is `"compact"`, `"regular"`,
-or `"relaxed"`. `align` is `"top"` or `"center"`. `as_of` prints a date in
-the footer beside the icon credit. Pass `autosave=False` when you want the
+or `"relaxed"`. `align` is `"top"` or `"center"`. `as_of` prints a date on
+the line under the icon credit. Pass `autosave=False` when you want the
 SVG string yourself:
 
 ```python
@@ -103,10 +103,11 @@ diagram.save("orders.svg")
 | `a >> Https() >> b` | Azure-blue HTTPS |
 | `a >> Async("enqueue") >> b` | Dashed queue or event |
 | `a >> Private() >> b` | Dashed Private Link |
-| `a >> Https("Open the store", 1) >> b` | Numbered step. The sentence is listed under the drawing |
+| `a >> Https("Open the store", 1) >> b` | Numbered step. The sentence is listed under the drawing, and that number jumps to the circle |
 
 `style` is `"solid"`, `"dashed"`, or `"dotted"`. `color` is a hex color such
-as `"#0078D4"`.
+as `"#0078D4"`. Hovering a resource fades the other resources and the arrows
+that do not touch it.
 
 A resource can carry the design decision and a link. The SKU, region, and
 exposure are a second caption. `note` is the line under that. `href` makes the
@@ -138,10 +139,11 @@ api = AppService(
 Inside a boundary, connected resources flow in the diagram direction.
 Resources at the same step stack, which is what you want for a cache beside
 its database. `arrange="row"` forces a single row, `arrange="column"` a
-single column, and `arrange="grid"` with `columns=3` a grid.
+single column, and `arrange="grid"` with `columns=3` a grid. A short last row is centered
+under the rows above it. See `examples/azure_grid.py`.
 `folded=True` draws the boundary closed, with a count of the resources
 inside. Connectors from outside land on that box. The default is open.
-`foldable=True` makes that title a button: click it in a browser to open
+`foldable=True` makes that title a button: click it, or focus it and press Enter or Space, to open
 and close the box. `folded` chooses the state it starts in.
 
 ## Finding an icon
@@ -188,8 +190,12 @@ from infrasketch.aws.compute import AWSLambda
 `FunctionApp()` uses the service name as the only label. `caption=False` hides
 the caption.
 
-A resource with no icon draws a neutral placeholder. Pass `icon="path/to.svg"`
-to use your own artwork. Azure icons are never recoloured or stretched.
+A resource with no icon draws a neutral placeholder. Pass `icon` a picture
+file to use your own artwork for that resource. SVG, PNG, JPEG, GIF, WebP,
+BMP, and ICO all work, and the picture is fitted inside the icon square
+without cropping or stretching. The same argument replaces the icon of a
+named resource, such as `AppService("Orders", icon="logo.png")`. Azure icons
+are never recoloured or stretched.
 
 ## Examples
 
@@ -201,6 +207,8 @@ to use your own artwork. Azure icons are never recoloured or stretched.
 | `examples/azure_aks.py` | AKS, ACR, PostgreSQL, managed Redis |
 | `examples/azure_ai.py` | Static web app, Azure OpenAI, AI Search, storage |
 | `examples/azure_data.py` | Event Hubs, Logic Apps, Data Factory, SQL |
+| `examples/azure_grid.py` | Five shared services in a grid, last row centered |
+| `examples/custom_icon.py` | A PNG used as a resource icon |
 | `examples/azure_network.py` | Firewall, Application Gateway, Bastion, a jump host |
 | `examples/aws_orders.py` | CloudFront, API Gateway, Lambda, DynamoDB, and S3 in a VPC |
 | `examples/aws_eks.py` | EKS, a registry, ElastiCache, and RDS |

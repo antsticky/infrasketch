@@ -22,6 +22,8 @@ EXAMPLES = (
     "azure-aks.svg",
     "azure-ai.svg",
     "azure-data.svg",
+    "azure-grid.svg",
+    "custom-icon.svg",
     "azure-network.svg",
     "aws-orders.svg",
     "aws-eks.svg",

@@ -100,7 +100,8 @@ def measure_node(node: Node) -> None:
 def apply_chrome(group: Group) -> None:
     style = BOUNDARIES[group.kind]
     spacing = SPACING[group.diagram.spacing]
-    header = measure_header(group.label, style, detail=group.facts(), note=group.note)
+    note = "" if group.foldable and not group.folded else group.note
+    header = measure_header(group.label, style, detail=group.facts(), note=note)
     group.header = header
     group.header_h = header["height"]
     pad = spacing["pad"]
@@ -231,9 +232,12 @@ def place_grid(scope: Diagram | Group) -> None:
         widths = [row[column].w for row in rows if column < len(row)]
         col_w.append(max(widths) if widths else 0.0)
     row_h = [max(child.h for child in row) for row in rows]
+    full = sum(col_w) + gap * (len(col_w) - 1)
     for row_index, row in enumerate(rows):
+        used = sum(col_w[: len(row)]) + gap * max(len(row) - 1, 0)
+        pad = (full - used) / 2.0
         for column, child in enumerate(row):
-            child.x = sum(col_w[:column]) + gap * column + (col_w[column] - child.w) / 2.0
+            child.x = pad + sum(col_w[:column]) + gap * column + (col_w[column] - child.w) / 2.0
             child.y = sum(row_h[:row_index]) + gap * row_index
     scope.content_w = sum(col_w) + gap * (len(col_w) - 1)
     scope.content_h = sum(row_h) + gap * (len(row_h) - 1)

@@ -2,6 +2,9 @@
 
 A clear run stays straight. A turn is a real step, never a kink of a few pixels.
 A connector also stays off every label, caption, and title.
+When one end sits outside a box, the turn sits halfway between that icon and the box edge.
+When two boxes meet, the turn sits halfway between their borders.
+A closed box is met on its body, below the title, and that meeting is one turn.
 """
 
 from __future__ import annotations
@@ -198,7 +201,7 @@ def _group_text(group: Group) -> list[Rect]:
         rects.append(_ink(text_x, cursor, text_width(line, 11.0), 11.0))
         cursor += 14.0
     if group.folded and group.fold_caption:
-        baseline = group.abs_y + group.header_h + (group.h - group.header_h) / 2.0 + 4.0
+        baseline = group.abs_y + group.h - 12.0
         rects.append(
             _ink(group.abs_x + group.w / 2.0, baseline, text_width(group.fold_caption, 11.0), 11.0, middle=True)
         )
@@ -221,11 +224,33 @@ def _ports(source: Endpoint, target: Endpoint) -> tuple[tuple[float, float], tup
     dy = dst.cy - src.cy
     if abs(dx) >= abs(dy):
         if dx >= 0:
-            return (src.right, src.cy), (dst.x, dst.cy), "h"
-        return (src.x, src.cy), (dst.right, dst.cy), "h"
+            return _side_port(source, src, "right"), _side_port(target, dst, "left"), "h"
+        return _side_port(source, src, "left"), _side_port(target, dst, "right"), "h"
     if dy >= 0:
         return (src.cx, src_box.bottom), (dst.cx, dst.y), "v"
     return (src.cx, src.y), (dst.cx, dst_box.bottom), "v"
+
+
+def _folded_body(group: Group) -> Rect:
+    """The open part of a closed box, under the title and clear of the count."""
+    box = _bounds(group)
+    top = box.top + group.header_h + 10.0
+    bottom = box.bottom - 20.0
+    if bottom - top < 12.0:
+        top = box.top + group.header_h + 4.0
+        bottom = box.bottom - 4.0
+    return Rect(box.x, top, box.w, max(4.0, bottom - top))
+
+
+def _side_port(element: Endpoint, icon: Rect, side: str) -> tuple[float, float]:
+    """A closed box takes the arrow on the body, not through the title."""
+    if isinstance(element, Group) and element.folded and side in ("left", "right"):
+        body = _folded_body(element)
+        x = body.left if side == "left" else body.right
+        return (x, body.cy)
+    if side == "left":
+        return (icon.left, icon.cy)
+    return (icon.right, icon.cy)
 
 
 def _assign_lanes(edges: list[Connection]) -> None:
@@ -277,11 +302,11 @@ def _route(
     start, end, orient = _ports(source, target)
     blocked = _blocked(obstacles, source, target)
     if orient == "h":
-        return _route_horizontal(start, end, edge.lane, blocked)
-    return _route_vertical(start, end, edge.lane, blocked)
+        return _route_horizontal(start, end, edge.lane, blocked, source, target)
+    return _route_vertical(start, end, edge.lane, blocked, source, target)
 
 
-def _route_horizontal(start, end, lane, obstacles: list[Rect]) -> list[tuple[float, float]]:
+def _route_horizontal(start, end, lane, obstacles: list[Rect], source: Endpoint, target: Endpoint) -> list[tuple[float, float]]:
     forward = end[0] >= start[0]
     sign = 1.0 if forward else -1.0
     leave = _approach(start, sign, 0.0, obstacles)
@@ -289,13 +314,9 @@ def _route_horizontal(start, end, lane, obstacles: list[Rect]) -> list[tuple[flo
     if abs(start[1] - end[1]) < 1 and (end[0] - start[0]) * sign > 0 and _clear(start[0], start[1], end[0], end[1], obstacles):
         return [start, end]
     low, high = sorted((leave[0], arrive[0]))
-    center = (leave[0] + arrive[0]) / 2.0 + (lane if forward else -lane)
-    candidates = [center]
-    if high - low > 8:
-        cursor = low + 4
-        while cursor <= high - 4:
-            candidates.append(cursor)
-            cursor += 6
+    signed = lane if forward else -lane
+    center = (leave[0] + arrive[0]) / 2.0 + signed
+    candidates = _turn_candidates(low, high, center, _gap_turn(source, target, horizontal=True, lane=signed))
     seen: set[float] = set()
     for candidate in candidates:
         key = round(candidate, 1)
@@ -308,10 +329,17 @@ def _route_horizontal(start, end, lane, obstacles: list[Rect]) -> list[tuple[flo
             and _clear(candidate, arrive[1], arrive[0], arrive[1], obstacles)
         ):
             return _clean([start, leave, (candidate, leave[1]), (candidate, arrive[1]), arrive, end])
+    if _one_folded(source, target)[0] is not None:
+        direct = _one_turn(start, end, leave, arrive, obstacles)
+        if direct is not None:
+            return direct
+        slid = _slide_closed(start, end, lane, obstacles, source, target)
+        if slid is not None:
+            return slid
     return _detour_horizontal(start, end, leave, arrive, lane, obstacles)
 
 
-def _route_vertical(start, end, lane, obstacles: list[Rect]) -> list[tuple[float, float]]:
+def _route_vertical(start, end, lane, obstacles: list[Rect], source: Endpoint, target: Endpoint) -> list[tuple[float, float]]:
     forward = end[1] >= start[1]
     sign = 1.0 if forward else -1.0
     leave = _approach(start, 0.0, sign, obstacles)
@@ -319,13 +347,9 @@ def _route_vertical(start, end, lane, obstacles: list[Rect]) -> list[tuple[float
     if abs(start[0] - end[0]) < 1 and (end[1] - start[1]) * sign > 0 and _clear(start[0], start[1], end[0], end[1], obstacles):
         return [start, end]
     low, high = sorted((leave[1], arrive[1]))
-    center = (leave[1] + arrive[1]) / 2.0 + (lane if forward else -lane)
-    candidates = [center]
-    if high - low > 8:
-        cursor = low + 4
-        while cursor <= high - 4:
-            candidates.append(cursor)
-            cursor += 6
+    signed = lane if forward else -lane
+    center = (leave[1] + arrive[1]) / 2.0 + signed
+    candidates = _turn_candidates(low, high, center, _gap_turn(source, target, horizontal=False, lane=signed))
     seen: set[float] = set()
     for candidate in candidates:
         key = round(candidate, 1)
@@ -339,6 +363,199 @@ def _route_vertical(start, end, lane, obstacles: list[Rect]) -> list[tuple[float
         ):
             return _clean([start, leave, (leave[0], candidate), (arrive[0], candidate), arrive, end])
     return _detour_vertical(start, end, leave, arrive, lane, obstacles)
+
+
+def _one_turn(start, end, leave, arrive, obstacles: list[Rect]):
+    """Leave the icon, then run straight into the other port. No second step."""
+    points = _clean([start, leave, (leave[0], arrive[1]), (arrive[0], arrive[1]), arrive, end])
+    if _bends(points) > 2 or not _path_clear(points, obstacles):
+        return None
+    return points
+
+
+def _slide_closed(start, end, lane, obstacles, source, target):
+    """Move the landing along a closed box until one turn is clear."""
+    group, at_target = _one_folded(source, target)
+    if group is None:
+        return None
+    body = _folded_body(group)
+    port = end if at_target else start
+    other = start if at_target else end
+    if min(abs(port[0] - body.left), abs(port[0] - body.right)) > 2.0:
+        return None
+    side = body.left if abs(port[0] - body.left) <= abs(port[0] - body.right) else body.right
+    caption = group.abs_y + group.h - 12.0
+    marks = []
+    cursor = body.top
+    while cursor <= body.bottom + 0.1:
+        marks.append(cursor)
+        cursor += 4.0
+    aligned = min(max(other[1], body.top), body.bottom)
+    marks.append(aligned)
+    marks.sort(key=lambda value: (abs(value - caption) < 14.0, abs(value - other[1]), value))
+    seen: set[float] = set()
+    for y in marks:
+        key = round(y, 1)
+        if key in seen:
+            continue
+        seen.add(key)
+        moved = (side, y)
+        trial_start = start if at_target else moved
+        trial_end = moved if at_target else end
+        routed = _elbow_only(trial_start, trial_end, lane, obstacles, source, target)
+        if routed is not None:
+            return routed
+    return None
+
+
+def _one_folded(source: Endpoint, target: Endpoint) -> tuple[Group | None, bool]:
+    source_folded = isinstance(source, Group) and source.folded
+    target_folded = isinstance(target, Group) and target.folded
+    if source_folded == target_folded:
+        return None, False
+    if target_folded:
+        return target, True
+    return source, False
+
+
+def _elbow_only(start, end, lane, obstacles, source, target):
+    """The single-turn search, without the staircase used when nothing else fits."""
+    forward = end[0] >= start[0]
+    sign = 1.0 if forward else -1.0
+    leave = _approach(start, sign, 0.0, obstacles)
+    arrive = _approach(end, -sign, 0.0, obstacles)
+    low, high = sorted((leave[0], arrive[0]))
+    signed = lane if forward else -lane
+    center = (leave[0] + arrive[0]) / 2.0 + signed
+    candidates = _turn_candidates(low, high, center, _gap_turn(source, target, horizontal=True, lane=signed))
+    seen: set[float] = set()
+    for candidate in candidates:
+        key = round(candidate, 1)
+        if key in seen:
+            continue
+        seen.add(key)
+        if (
+            _clear(leave[0], leave[1], candidate, leave[1], obstacles)
+            and _clear(candidate, leave[1], candidate, arrive[1], obstacles)
+            and _clear(candidate, arrive[1], arrive[0], arrive[1], obstacles)
+        ):
+            return _clean([start, leave, (candidate, leave[1]), (candidate, arrive[1]), arrive, end])
+    return _one_turn(start, end, leave, arrive, obstacles)
+
+
+def _turn_candidates(low: float, high: float, center: float, gap: tuple[float, float, float] | None) -> list[float]:
+    """Try the margin outside a box before the midpoint of the two resources."""
+    candidates = []
+    if gap is not None:
+        preferred, glo, ghi = gap
+        if low + 4 <= preferred <= high - 4:
+            candidates.append(preferred)
+        cursor = max(glo, low + 4)
+        stop = min(ghi, high - 4)
+        while cursor <= stop:
+            candidates.append(cursor)
+            cursor += 6
+    candidates.append(center)
+    if high - low > 8:
+        cursor = low + 4
+        while cursor <= high - 4:
+            candidates.append(cursor)
+            cursor += 6
+    return candidates
+
+
+def _gap_turn(source: Endpoint, target: Endpoint, *, horizontal: bool, lane: float) -> tuple[float, float, float] | None:
+    """Where a connector should turn: between two boxes, or between an icon and a box."""
+    groups = _separating_groups(source, target)
+    if len(groups) == 2:
+        return _between_boxes(groups[0], groups[1], horizontal=horizontal, lane=lane)
+    if len(groups) != 1:
+        return None
+    group = groups[0]
+    outside = target if _holds(group, source) else source
+    icon = _icon_bounds(outside)
+    box = _bounds(group)
+    if horizontal:
+        if icon.cx < box.left:
+            border, middle = box.left, icon.cx
+            low, high = icon.right + 6.0, border - 10.0
+        elif icon.cx > box.right:
+            border, middle = box.right, icon.cx
+            low, high = border + 10.0, icon.left - 6.0
+        else:
+            return None
+    elif icon.cy < box.top:
+        border, middle = box.top, icon.cy
+        low, high = icon.bottom + 6.0, border - 10.0
+    elif icon.cy > box.bottom:
+        border, middle = box.bottom, icon.cy
+        low, high = border + 10.0, icon.top - 6.0
+    else:
+        return None
+    if high - low < 8.0:
+        return None
+    preferred = min(max((middle + border) / 2.0 + lane, low), high)
+    return preferred, low, high
+
+
+def _between_boxes(left: Group, right: Group, *, horizontal: bool, lane: float) -> tuple[float, float, float] | None:
+    """Halfway across the open gap where two boxes face each other."""
+    a, b = _bounds(left), _bounds(right)
+    if horizontal:
+        if a.right <= b.left:
+            start, end = a.right, b.left
+        elif b.right <= a.left:
+            start, end = b.right, a.left
+        else:
+            return None
+    elif a.bottom <= b.top:
+        start, end = a.bottom, b.top
+    elif b.bottom <= a.top:
+        start, end = b.bottom, a.top
+    else:
+        return None
+    span = end - start
+    if span < 8.0:
+        return None
+    inset = 8.0 if span >= 24.0 else 2.0
+    low, high = start + inset, end - inset
+    preferred = min(max((start + end) / 2.0 + lane, low), high)
+    return preferred, low, high
+
+
+def _separating_groups(source: Endpoint, target: Endpoint) -> list[Group]:
+    """Outermost boxes that contain one end of the connector and not the other."""
+    found: list[Group] = []
+    for inner, outer in ((target, source), (source, target)):
+        parent = inner.parent
+        while isinstance(parent, Group):
+            if not _holds(parent, outer):
+                found.append(parent)
+            parent = parent.parent
+        if isinstance(inner, Group) and not _holds(inner, outer):
+            found.append(inner)
+    kept: list[Group] = []
+    seen: set[int] = set()
+    for group in found:
+        if id(group) in seen:
+            continue
+        if any(other is not group and _holds(other, group) for other in found):
+            continue
+        seen.add(id(group))
+        kept.append(group)
+    return kept
+
+
+def _holds(group: Group, element: Endpoint) -> bool:
+    current: Endpoint | None = element
+    while isinstance(current, Endpoint):
+        if current is group:
+            return True
+        parent = current.parent
+        if not isinstance(parent, Endpoint):
+            return False
+        current = parent
+    return False
 
 
 def _approach(port: tuple[float, float], dx: float, dy: float, obstacles: list[Rect]) -> tuple[float, float]:
@@ -849,6 +1066,10 @@ def _acceptable(pts, obstacles, source, target, start, end) -> bool:
 
 def _on_side(element: Endpoint, original, moved) -> bool:
     rect = _icon_bounds(element)
+    if isinstance(element, Group) and element.folded:
+        full = rect
+        if abs(original[0] - full.left) <= 1.5 or abs(original[0] - full.right) <= 1.5:
+            rect = _folded_body(element)
     ox, oy = original
     x, y = moved
     if abs(ox - rect.left) <= 1.5 or abs(ox - rect.right) <= 1.5:

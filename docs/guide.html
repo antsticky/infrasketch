@@ -122,7 +122,7 @@ with Diagram("Edge and source", "edge.svg"):
             <tr><td><code>spacing="regular"</code></td><td>Also <code>"compact"</code> or <code>"relaxed"</code>.</td></tr>
             <tr><td><code>align="top"</code></td><td>Resources in a step share the top. <code>"center"</code> centers them.</td></tr>
             <tr><td><code>subtitle="Production"</code></td><td>A line under the title.</td></tr>
-            <tr><td><code>as_of="12 Nov 2026"</code></td><td>Prints “as of” in the footer, after the icon credit. A <code>datetime.date</code> is formatted for you.</td></tr>
+            <tr><td><code>as_of="12 Nov 2026"</code></td><td>Prints “as of” on its own line under the icon credit. A <code>datetime.date</code> is formatted for you.</td></tr>
             <tr><td><code>autosave=False</code></td><td>Keeps the SVG in memory until you call <code>save</code>.</td></tr>
           </tbody>
         </table>
@@ -158,8 +158,8 @@ diagram.save("orders.svg")</code></pre>
             <tr><td><code>a &gt;&gt; Https("Open the store", 1) &gt;&gt; b</code></td><td>Numbered step. The sentence is listed under the drawing</td></tr>
           </tbody>
         </table>
-        <p><code>style</code> is <code>"solid"</code>, <code>"dashed"</code>, or <code>"dotted"</code>. <code>color</code> is a hex color such as <code>"#0078D4"</code>. <code>Https</code>, <code>Async</code>, and <code>Private</code> take the same label, number, color, and style as <code>Edge</code>.</p>
-        <p>The step number is a positive integer. The circle is drawn on the line, and the sentence appears once in the legend. Repeating the same number and sentence does not add a second row.</p>
+        <p><code>style</code> is <code>"solid"</code>, <code>"dashed"</code>, or <code>"dotted"</code>. <code>color</code> is a hex color such as <code>"#0078D4"</code>. <code>Https</code>, <code>Async</code>, and <code>Private</code> take the same label, number, color, and style as <code>Edge</code>. Hovering a resource fades the other resources and the arrows that do not touch it.</p>
+        <p>The step number is a positive integer. The circle is drawn on the line, and the sentence appears once in the legend. The number in the legend jumps to that circle. Repeating the same number and sentence does not add a second row.</p>
       </section>
 
       <section class="panel" id="decisions" hidden>
@@ -195,7 +195,7 @@ door &gt;&gt; Https("Front Door calls the API", 2) &gt;&gt; api</code></pre>
     logs = LogAnalytics("Workspace")
 
 api &gt;&gt; Private("The API reports failures", 4) &gt;&gt; alerts</code></pre>
-        <p><code>foldable=True</code> makes the title a button in the SVG. Click it to open the box, and click the title again to close it. <code>folded</code> is only the state it starts in. Open the SVG in a browser; an image preview does not run the click. Lines that start and end inside a closed box are not drawn. See <code>examples/azure_folded.py</code>.</p>
+        <p><code>foldable=True</code> makes the title a button in the SVG. Click it, or focus it and press Enter or Space, to open the box, and do the same again to close it. A keyboard focus draws a ring on the box. <code>folded</code> is only the state it starts in. Open the SVG in a browser; an image preview does not run the click. Lines that start and end inside a closed box are not drawn. See <code>examples/azure_folded.py</code>.</p>
       </section>
 
       <section class="panel" id="boundaries" hidden>
@@ -226,7 +226,14 @@ api &gt;&gt; Private("The API reports failures", 4) &gt;&gt; alerts</code></pre>
             <tr><td><code>AutoScaling("workers")</code></td><td>An Auto Scaling group</td></tr>
           </tbody>
         </table>
-        <p>Inside a boundary, connected resources flow in the diagram direction. Resources at the same step stack. <code>arrange="row"</code> forces a single row, <code>arrange="column"</code> a single column, and <code>arrange="grid"</code> with <code>columns=3</code> a grid. <code>direction</code> and <code>align</code> on a group override the diagram for that box.</p>
+        <p>Inside a boundary, connected resources flow in the diagram direction. Resources at the same step stack. <code>arrange="row"</code> forces a single row, <code>arrange="column"</code> a single column, and <code>arrange="grid"</code> with <code>columns=3</code> a grid. A short last row is centered under the rows above it. <code>direction</code> and <code>align</code> on a group override the diagram for that box.</p>
+        <pre><code>with ResourceGroup("rg-shared", arrange="grid", columns=3):
+    vault = KeyVault("Keys")
+    files = StorageAccount("Files")
+    health = Monitor("Health")
+    logs = LogAnalytics("Logs")
+    traces = ApplicationInsights("Traces")</code></pre>
+        <p>Five resources fill two rows. Logs and Traces sit in the centered row. See <code>examples/azure_grid.py</code>.</p>
       </section>
 
       <section class="panel" id="names" hidden>
@@ -242,7 +249,12 @@ python -m infrasketch categories</code></pre>
 for hit in search("cosmos"):
     print(hit.import_line)</code></pre>
         <p><code>FunctionApp("Orders")</code> labels the box "Orders" and captions it "Function App". <code>FunctionApp()</code> uses the service name as the only label. <code>caption=False</code> hides the caption.</p>
-        <p>A resource with no icon draws a neutral placeholder. Pass <code>icon="path/to.svg"</code> to use your own artwork. Azure and AWS icons stay at their original colors and proportions.</p>
+        <p>A resource with no icon draws a neutral placeholder. Pass <code>icon</code> a picture file to draw that resource with your own artwork. SVG, PNG, JPEG, GIF, WebP, BMP, and ICO all work. The picture is fitted inside the icon square without cropping or stretching. The same argument replaces the icon of a named resource.</p>
+        <pre><code>from infrasketch import Node
+
+billing = Node("Billing", icon="billing.png", caption="Own service")
+api = AppService("Orders", icon="logo.ico")</code></pre>
+        <p>See <code>examples/custom_icon.py</code>. Azure and AWS icons stay at their original colors and proportions when you do not pass <code>icon</code>.</p>
       </section>
     </div>
   </main>
