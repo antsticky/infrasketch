@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
+from datetime import date
 from typing import Iterator
 
 _stack: list[Scope] = []
@@ -353,6 +354,7 @@ class Group(Endpoint):
         region: str | None = None,
         public: bool | None = None,
         note: str | None = None,
+        folded: bool = False,
     ) -> None:
         super().__init__()
         self.label = label
@@ -360,6 +362,10 @@ class Group(Endpoint):
         self.region = _text(region, "region")
         self.public = _check_public(public)
         self.note = _text(note, "note")
+        if not isinstance(folded, bool):
+            raise DiagramError("folded must be true or false")
+        self.folded = folded
+        self.fold_caption = ""
         self.kind = kind or self.__class__.kind
         self.direction = _check_direction(direction) if direction else None
         self.arrange = arrange
@@ -385,6 +391,16 @@ class Group(Endpoint):
         _stack.pop()
 
 
+def inside_folded(element: Endpoint) -> bool:
+    """True when a folded boundary hides this resource."""
+    parent = element.parent
+    while isinstance(parent, Group):
+        if parent.folded:
+            return True
+        parent = parent.parent
+    return False
+
+
 class Diagram(Scope):
     """An architecture diagram. Use it as a context manager.
 
@@ -402,10 +418,12 @@ class Diagram(Scope):
         spacing: str = "regular",
         align: str = "top",
         autosave: bool = True,
+        as_of: str | date | None = None,
     ) -> None:
         super().__init__()
         self.title = title
         self.subtitle = subtitle or ""
+        self.as_of = _as_of(as_of)
         self.path = path or _slug(title) + ".svg"
         self.direction = _check_direction(direction)
         if spacing not in {"compact", "regular", "relaxed"}:
@@ -464,6 +482,16 @@ def _check_direction(direction: str) -> str:
     if value not in {"LR", "TB"}:
         raise DiagramError("direction must be LR (left to right) or TB (top to bottom)")
     return value
+
+
+def _as_of(value: str | date | None) -> str:
+    if value is None or value == "":
+        return ""
+    if isinstance(value, date):
+        return f"{value.day} {value.strftime('%b %Y')}"
+    if not isinstance(value, str):
+        raise DiagramError("as_of must be text or a date")
+    return value.strip()
 
 
 def _text(value: str | None, name: str) -> str:

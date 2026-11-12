@@ -172,13 +172,18 @@ th { color: var(--muted); font-size: 12px; font-weight: 650; letter-spacing: 0.0
 
 .page-title { padding: 36px 0 8px; }
 
-.browser {
+.browser, .guide {
   display: grid;
   grid-template-columns: 210px minmax(0, 1fr) 300px;
   gap: 18px;
   align-items: start;
   padding-bottom: 48px;
 }
+
+.guide { grid-template-columns: 210px minmax(0, 1fr); }
+
+.guide .panel { padding: 6px 22px 8px; }
+.guide .panel h2:first-child { margin-top: 16px; }
 
 .cats, .detail, .results {
   border: 1px solid var(--line);
@@ -350,7 +355,7 @@ li { margin: 4px 0; }
 @media (max-width: 980px) {
   .toolbar { grid-template-columns: 1fr; }
   .providers, .cloud-switch .providers { width: 100%; }
-  .browser { grid-template-columns: 1fr; }
+  .browser, .guide { grid-template-columns: 1fr; }
   .cats, .detail { position: static; max-height: none; }
   .cats { display: flex; gap: 6px; overflow-x: auto; }
   .cat { width: auto; white-space: nowrap; }

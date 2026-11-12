@@ -79,7 +79,9 @@ with Diagram("Web, API, and Redis", "platform.svg", subtitle="Production · West
 ```
 
 `direction="TB"` flows top to bottom. `spacing` is `"compact"`, `"regular"`,
-or `"relaxed"`. Pass `autosave=False` when you want the SVG string yourself:
+or `"relaxed"`. `align` is `"top"` or `"center"`. `as_of` prints a date in
+the footer beside the icon credit. Pass `autosave=False` when you want the
+SVG string yourself:
 
 ```python
 with Diagram("Orders", autosave=False) as diagram:
@@ -137,6 +139,8 @@ Inside a boundary, connected resources flow in the diagram direction.
 Resources at the same step stack, which is what you want for a cache beside
 its database. `arrange="row"` forces a single row, `arrange="column"` a
 single column, and `arrange="grid"` with `columns=3` a grid.
+`folded=True` draws the boundary closed, with a count of the resources
+inside. Connectors from outside land on that box. The default is open.
 
 ## Finding an icon
 

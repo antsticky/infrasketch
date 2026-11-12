@@ -6,7 +6,7 @@ from xml.sax.saxutils import escape
 
 from infrasketch.icons import embed_icon
 from infrasketch.layout import LABEL_LEADING, LABEL_SIZE, layout_diagram, text_width
-from infrasketch.model import Connection, Diagram, Group, Node
+from infrasketch.model import Connection, Diagram, Group, Node, inside_folded
 from infrasketch.route import route_diagram
 from infrasketch.theme import BOUNDARIES, CANVAS, EDGE, FONT_ATTR, FOOTER, INK, LINE, MUTED, PAGE_X
 
@@ -33,6 +33,8 @@ def render_svg(diagram: Diagram) -> str:
     layout_diagram(diagram)
     route_diagram(diagram)
     note = footnote(diagram)
+    if diagram.as_of:
+        note = f"{note} · as of {diagram.as_of}"
     width, height = _canvas_size(diagram, note)
     ids = _Ids()
     link_ns = ""
@@ -53,6 +55,8 @@ def render_svg(diagram: Diagram) -> str:
     for color in colors:
         parts.append(_marker(color))
     for group in _groups(diagram):
+        if inside_folded(group):
+            continue
         clip = ids.next("clip")
         group.clip_id = clip
         parts.append(
@@ -61,12 +65,18 @@ def render_svg(diagram: Diagram) -> str:
         )
     parts.append("</defs>")
     for group in _groups(diagram):
+        if inside_folded(group):
+            continue
         parts.append(_group_body(group))
     for edge in diagram.edges:
         parts.append(_edge_path(edge))
     for group in _groups(diagram):
+        if inside_folded(group):
+            continue
         parts.append(_group_header(group, ids))
     for node in _nodes(diagram):
+        if inside_folded(node):
+            continue
         parts.append(_node(node, ids))
     parts.append(_edge_labels(diagram))
     parts.append(_legend(diagram))
@@ -128,6 +138,13 @@ def _group_body(group: Group) -> str:
     dash = f' stroke-dasharray="{style["dash"]}"' if style["dash"] else ""
     x, y, w, h = group.abs_x, group.abs_y, group.w, group.h
     radius = style["radius"]
+    caption = ""
+    if group.folded and group.fold_caption:
+        caption = (
+            f'<text x="{x + w / 2:.1f}" y="{y + group.header_h + (h - group.header_h) / 2 + 4:.1f}" '
+            f'text-anchor="middle" fill="{MUTED}" font-family="{FONT_ATTR}" font-size="11">'
+            f"{escape(group.fold_caption)}</text>"
+        )
     return (
         f'<g clip-path="url(#{group.clip_id})">'
         f'<rect x="{x:.1f}" y="{y:.1f}" width="{w:.1f}" height="{h:.1f}" fill="{style["fill"]}"/>'
@@ -137,6 +154,7 @@ def _group_body(group: Group) -> str:
         f'fill="none" stroke="{style["stroke"]}" stroke-width="{style["stroke_width"]}"{dash}/>'
         f'<line x1="{x + 1:.1f}" y1="{y + group.header_h:.1f}" x2="{x + w - 1:.1f}" y2="{y + group.header_h:.1f}" '
         f'stroke="{LINE}" stroke-width="1"/>'
+        f"{caption}"
     )
 
 
@@ -317,7 +335,7 @@ def _legend_entries(diagram: Diagram) -> list[tuple[int, str]]:
     seen: set[tuple[int, str]] = set()
     entries = []
     for edge in diagram.edges:
-        if edge.number is None:
+        if edge.number is None or len(edge.points) < 2:
             continue
         item = (edge.number, edge.label)
         if item in seen:

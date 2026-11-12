@@ -39,6 +39,9 @@ def layout_diagram(diagram: Diagram) -> None:
 
 
 def layout_scope(scope: Diagram | Group) -> None:
+    if isinstance(scope, Group) and scope.folded:
+        _layout_folded(scope)
+        return
     for child in scope.children:
         if isinstance(child, Group):
             layout_scope(child)
@@ -62,6 +65,14 @@ def layout_scope(scope: Diagram | Group) -> None:
         scope.h = scope.content_h
         scope.content_x = 0.0
         scope.content_y = 0.0
+
+
+def _layout_folded(group: Group) -> None:
+    count = sum(1 for _ in group.walk())
+    group.fold_caption = "1 resource" if count == 1 else f"{count} resources"
+    group.content_w = max(132.0, text_width(group.fold_caption, 11.0) + 28.0, text_width(group.label, 13.5) + 36.0)
+    group.content_h = 28.0
+    apply_chrome(group)
 
 
 def measure_node(node: Node) -> None:

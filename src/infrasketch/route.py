@@ -46,14 +46,44 @@ class Rect:
 def route_diagram(diagram: Diagram) -> None:
     obstacles: list[tuple[Endpoint | None, Rect]] = []
     for element in _nodes(diagram):
+        if _inside_folded(element):
+            continue
         obstacles.append((element, _node_obstacle(element)))
     for element in diagram.walk():
-        if isinstance(element, Group):
+        if not isinstance(element, Group) or _inside_folded(element):
+            continue
+        if element.folded:
+            obstacles.append((element, _node_obstacle(element)))
+        else:
             # Titles stay clear. The padding under a title is a lane for connectors.
             obstacles.append((None, _header_obstacle(element)))
     _assign_lanes(diagram.edges)
     for edge in diagram.edges:
-        edge.points = _route(edge, obstacles)
+        source, target = _shown(edge.source), _shown(edge.target)
+        if source is target:
+            edge.points = [] if source is not edge.source else _loop(source)
+            continue
+        edge.points = _route(edge, obstacles, source, target)
+
+
+def _shown(element: Endpoint) -> Endpoint:
+    """A folded boundary stands in for the resources it hides."""
+    shown = element
+    parent = element.parent
+    while isinstance(parent, Group):
+        if parent.folded:
+            shown = parent
+        parent = parent.parent
+    return shown
+
+
+def _inside_folded(element: Endpoint) -> bool:
+    parent = element.parent
+    while isinstance(parent, Group):
+        if parent.folded:
+            return True
+        parent = parent.parent
+    return False
 
 
 def _nodes(diagram: Diagram):
@@ -103,10 +133,11 @@ def _ports(source: Endpoint, target: Endpoint) -> tuple[tuple[float, float], tup
 def _assign_lanes(edges: list[Connection]) -> None:
     buckets: dict[tuple, list[Connection]] = defaultdict(list)
     for edge in edges:
-        if edge.source is edge.target:
+        source, target = _shown(edge.source), _shown(edge.target)
+        if source is target:
             edge.lane = 0.0
             continue
-        start, end, orient = _ports(edge.source, edge.target)
+        start, end, orient = _ports(source, target)
         if orient == "h":
             key = ("h", round(start[1] / 34), round(end[1] / 34), int(end[0] >= start[0]))
         else:
@@ -118,15 +149,21 @@ def _assign_lanes(edges: list[Connection]) -> None:
             edge.lane = (index - (count - 1) / 2.0) * 18.0
 
 
-def _route(edge: Connection, obstacles: list[tuple[Endpoint, Rect]]) -> list[tuple[float, float]]:
-    source, target = edge.source, edge.target
+def _route(
+    edge: Connection,
+    obstacles: list[tuple[Endpoint, Rect]],
+    source: Endpoint | None = None,
+    target: Endpoint | None = None,
+) -> list[tuple[float, float]]:
+    source = source or edge.source
+    target = target or edge.target
     if source is target:
         return _loop(source)
     start, end, orient = _ports(source, target)
     blocked = [rect for element, rect in obstacles if element is not source and element is not target]
-    if isinstance(target, Group):
+    if isinstance(target, Group) and not target.folded:
         blocked = [rect for element, rect in obstacles if element is not source]
-    if isinstance(source, Group):
+    if isinstance(source, Group) and not source.folded:
         blocked = [rect for element, rect in obstacles if element is not target]
     if orient == "h":
         return _route_horizontal(start, end, edge.lane, blocked)
