@@ -6,7 +6,7 @@
   <title>infrasketch</title>
   <meta name="description" content="Draw Azure and AWS architecture diagrams as SVG with official resource icons.">
   <link rel="icon" href="assets/favicon.svg">
-  <link rel="stylesheet" href="assets/site.css?v=7">
+  <link rel="stylesheet" href="assets/site.css?v=8">
 </head>
 <body>
   <header class="top">
@@ -686,6 +686,56 @@ with Diagram(
       return lines.map((line) => line.slice(margin)).join("\n");
     }
 
+    const PYTHON_KEYWORDS = new Set("False None True and as assert async await break class continue def del elif else except finally for from global if import in is lambda nonlocal not or pass raise return try while with yield".split(" "));
+
+    function escapeHtml(text) {
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function highlightPython(source) {
+      const stringPattern = /^(?:[rRuUbBfF]{1,2})?(?:'''[\s\S]*?'''|"""[\s\S]*?"""|'(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*")/;
+      let html = "";
+      let i = 0;
+      while (i < source.length) {
+        const rest = source.slice(i);
+        if (source[i] === "#") {
+          const end = source.indexOf("\n", i);
+          const stop = end === -1 ? source.length : end;
+          html += `<span class="py-comment">${escapeHtml(source.slice(i, stop))}</span>`;
+          i = stop;
+          continue;
+        }
+        const stringMatch = rest.match(stringPattern);
+        if (stringMatch) {
+          html += `<span class="py-string">${escapeHtml(stringMatch[0])}</span>`;
+          i += stringMatch[0].length;
+          continue;
+        }
+        const name = rest.match(/^[A-Za-z_][A-Za-z0-9_]*/);
+        if (name) {
+          const token = name[0];
+          const after = source.slice(i + token.length);
+          const kind = PYTHON_KEYWORDS.has(token) ? "keyword" : /^\s*\(/.test(after) ? "call" : "";
+          html += kind ? `<span class="py-${kind}">${escapeHtml(token)}</span>` : escapeHtml(token);
+          i += token.length;
+          continue;
+        }
+        const number = rest.match(/^\d+(?:\.\d+)?/);
+        if (number) {
+          html += `<span class="py-number">${number[0]}</span>`;
+          i += number[0].length;
+          continue;
+        }
+        html += escapeHtml(source[i]);
+        i += 1;
+      }
+      return html;
+    }
+
+    function paintCode(code, text) {
+      code.innerHTML = highlightPython(text);
+    }
+
     function fitCode(pre) {
       const code = pre.querySelector("code");
       const lines = code._full.split("\n");
@@ -695,7 +745,7 @@ with Diagram(
       let best = 1;
       while (low <= high) {
         const mid = Math.floor((low + high) / 2);
-        code.textContent = lines.slice(0, mid).join("\n");
+        paintCode(code, lines.slice(0, mid).join("\n"));
         if (pre.scrollHeight <= pre.clientHeight + 1) {
           best = mid;
           low = mid + 1;
@@ -703,8 +753,7 @@ with Diagram(
           high = mid - 1;
         }
       }
-      const next = lines.slice(0, best).join("\n");
-      if (code.textContent !== next) code.textContent = next;
+      paintCode(code, lines.slice(0, best).join("\n"));
     }
 
     const pending = new WeakMap();

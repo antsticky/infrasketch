@@ -1,15 +1,10 @@
-"""An assistant app in front of Azure OpenAI and AI Search.
-
-    python examples/azure_ai.py
-"""
-
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from infrasketch import Diagram, Https, Private  # noqa: E402
-from infrasketch.azure import (  # noqa: E402
+from infrasketch import Diagram, Https, Private
+from infrasketch.azure import (
     AISearch,
     AppService,
     AzureOpenAI,
@@ -24,7 +19,6 @@ from infrasketch.azure import (  # noqa: E402
 )
 
 OUT = Path(__file__).resolve().parent / "out" / "azure-ai.svg"
-
 
 def main() -> str:
     with Diagram("AI assistant", OUT, subtitle="Search, a model, and the source documents") as diagram:
@@ -47,7 +41,6 @@ def main() -> str:
         api >> corpus
         api >> Private("secrets") >> vault
     return diagram.path
-
 
 if __name__ == "__main__":
     print(main())

@@ -87,6 +87,8 @@ def main() -> None:
     example_dir.mkdir()
     for name in EXAMPLES:
         shutil.copy(ROOT / "examples" / "out" / name, example_dir / name)
+    for path in sorted((ROOT / "examples").glob("*.py")):
+        shutil.copy(path, example_dir / path.name)
     (OUT / ".nojekyll").write_text("")
     count = sum(1 for _ in (OUT / "icons").rglob("*.svg"))
     print(f"wrote {OUT} with {count} icons")

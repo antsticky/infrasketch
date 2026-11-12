@@ -1,16 +1,11 @@
-"""A reviewed Azure design: SKU, exposure, notes, a date, and a folded group.
-
-    python examples/azure_decisions.py
-"""
-
 import sys
 from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from infrasketch import Diagram, Https, Private  # noqa: E402
-from infrasketch.azure import (  # noqa: E402
+from infrasketch import Diagram, Https, Private
+from infrasketch.azure import (
     AppService,
     FrontDoor,
     KeyVault,
@@ -25,7 +20,6 @@ OUT = Path(__file__).resolve().parent / "out" / "azure-decisions.svg"
 FRONT_DOOR = "https://learn.microsoft.com/azure/frontdoor/front-door-overview"
 APP_SERVICE = "https://learn.microsoft.com/azure/app-service/overview"
 KEY_VAULT = "https://learn.microsoft.com/azure/key-vault/general/overview"
-
 
 def main() -> str:
     with Diagram(
@@ -65,7 +59,6 @@ def main() -> str:
         api >> Private("The API reads secrets", 3) >> vault
         api >> Private("The API reports failures", 4) >> alerts
     return diagram.path
-
 
 if __name__ == "__main__":
     print(main())

@@ -1,15 +1,10 @@
-"""AKS with a registry, private data, and platform services beside the cluster.
-
-    python examples/azure_aks.py
-"""
-
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from infrasketch import Async, Diagram, Private  # noqa: E402
-from infrasketch.azure import (  # noqa: E402
+from infrasketch import Async, Diagram, Private
+from infrasketch.azure import (
     ACR,
     AKS,
     ApplicationGateway,
@@ -26,7 +21,6 @@ from infrasketch.azure import (  # noqa: E402
 )
 
 OUT = Path(__file__).resolve().parent / "out" / "azure-aks.svg"
-
 
 def main() -> str:
     with Diagram("AKS platform", OUT, subtitle="Cluster, registry, and private data") as diagram:
@@ -55,7 +49,6 @@ def main() -> str:
         cluster >> vault
         cluster >> insights
     return diagram.path
-
 
 if __name__ == "__main__":
     print(main())

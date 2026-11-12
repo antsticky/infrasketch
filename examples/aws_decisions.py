@@ -1,23 +1,17 @@
-"""A reviewed AWS design: SKU, exposure, notes, a date, and a folded group.
-
-    python examples/aws_decisions.py
-"""
-
 import sys
 from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from infrasketch import Diagram, Group, Https, Private  # noqa: E402
-from infrasketch.aws import APIGateway, CloudWatch, Lambda, SecretsManager, Users, VPC  # noqa: E402
+from infrasketch import Diagram, Group, Https, Private
+from infrasketch.aws import APIGateway, CloudWatch, Lambda, SecretsManager, Users, VPC
 
 OUT = Path(__file__).resolve().parent / "out" / "aws-decisions.svg"
 
 API = "https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html"
 LAMBDA = "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
 SECRETS = "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html"
-
 
 def main() -> str:
     with Diagram(
@@ -56,7 +50,6 @@ def main() -> str:
         checkout >> Private("Checkout reads the keys", 3) >> secrets
         checkout >> Private("Checkout emits metrics", 4) >> metrics
     return diagram.path
-
 
 if __name__ == "__main__":
     print(main())

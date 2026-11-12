@@ -6,7 +6,7 @@
   <title>Guide · infrasketch</title>
   <meta name="description" content="How to draw Azure and AWS architecture diagrams with infrasketch.">
   <link rel="icon" href="assets/favicon.svg">
-  <link rel="stylesheet" href="assets/site.css?v=4">
+  <link rel="stylesheet" href="assets/site.css?v=10">
 </head>
 <body>
   <header class="top">
@@ -118,13 +118,13 @@ edge = Cloudflare("Primary")</code></pre>
     note="Private endpoint only",
     href="https://learn.microsoft.com/azure/app-service/overview",
 )</code></pre>
-        <p>See <code>examples/azure_decisions.py</code> and <code>examples/aws_decisions.py</code>.</p>
+        <p>See <button type="button" class="file-ref" data-file="examples/azure_decisions.py">examples/azure_decisions.py</button> and <button type="button" class="file-ref" data-file="examples/aws_decisions.py">examples/aws_decisions.py</button>.</p>
         <p>A resource with no icon draws a neutral placeholder. Pass <code>icon</code> a picture file to draw that resource with your own artwork. SVG, PNG, JPEG, GIF, WebP, BMP, and ICO all work. The picture is fitted inside the icon square without cropping or stretching. The same argument replaces the icon of a named resource. Azure and AWS icons stay at their original colors and proportions when you do not pass <code>icon</code>.</p>
         <pre><code>from infrasketch import Node
 
 billing = Node("Billing", icon="billing.png", caption="Own service")
 api = AppService("Orders", icon="logo.ico")</code></pre>
-        <p>See <code>examples/custom_icon.py</code>. The <a href="icons.html">icon browser</a> shows the import line for every icon. From a terminal, <code>python -m infrasketch search cosmos</code> prints the same line. A diagram credits only the marks it actually draws.</p>
+        <p>See <button type="button" class="file-ref" data-file="examples/custom_icon.py">examples/custom_icon.py</button>. The <a href="icons.html">icon browser</a> shows the import line for every icon. From a terminal, <code>python -m infrasketch search cosmos</code> prints the same line. A diagram credits only the marks it actually draws.</p>
       </section>
 
       <section class="panel" id="edges" hidden>
@@ -191,7 +191,7 @@ with Diagram("Orders", "orders.svg"):
         alerts = Monitor("Alerts")
 
     api &gt;&gt; Private("The API reports failures") &gt;&gt; alerts</code></pre>
-        <p>See <code>examples/azure_folded.py</code>.</p>
+        <p>See <button type="button" class="file-ref" data-file="examples/azure_folded.py">examples/azure_folded.py</button>.</p>
         <p>Inside a boundary, connected resources flow in the diagram direction. Resources at the same step stack. <code>arrange="row"</code> forces a single row, <code>arrange="column"</code> a single column, and <code>arrange="grid"</code> with <code>columns=3</code> a grid. A short last row is centered under the rows above it. <code>direction</code> and <code>align</code> on a group override the diagram for that box.</p>
         <pre><code>with ResourceGroup("rg-shared", arrange="grid", columns=3):
     vault = KeyVault("Keys")
@@ -199,7 +199,7 @@ with Diagram("Orders", "orders.svg"):
     health = Monitor("Health")
     logs = LogAnalytics("Logs")
     traces = ApplicationInsights("Traces")</code></pre>
-        <p>Five resources fill two rows. Logs and Traces sit in the centered row. See <code>examples/azure_grid.py</code>.</p>
+        <p>Five resources fill two rows. Logs and Traces sit in the centered row. See <button type="button" class="file-ref" data-file="examples/azure_grid.py">examples/azure_grid.py</button>.</p>
       </section>
     </div>
   </main>
@@ -207,6 +207,16 @@ with Diagram("Orders", "orders.svg"):
   <footer class="site-footer wrap">
     Azure icons © Microsoft · AWS icons © Amazon Web Services · External marks © their owners.
   </footer>
+  <dialog class="code-pop" id="code-pop" aria-labelledby="code-pop-name">
+    <div class="code-pop-head">
+      <p class="code-pop-name" id="code-pop-name"></p>
+      <button type="button" class="code-copy" id="code-pop-copy" aria-label="Copy code" title="Copy code">
+        <svg class="icon-copy" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><rect x="5.25" y="3.25" width="8" height="10" rx="1.25" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10.75 3.25V2.5A1.25 1.25 0 0 0 9.5 1.25h-6A1.25 1.25 0 0 0 2.25 2.5v8A1.25 1.25 0 0 0 3.5 11.75H5.25" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <svg class="icon-check" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5 6.5 11.5 12.5 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <pre><code id="code-pop-code"></code></pre>
+  </dialog>
   <script>
     const buttons = [...document.querySelectorAll("#guide-nav .cat")];
     const panels = [...document.querySelectorAll(".guide .panel")];
@@ -237,6 +247,113 @@ with Diagram("Orders", "orders.svg"):
       button.addEventListener("click", () => show(button.dataset.section));
     }
     show(new URLSearchParams(location.search).get("section") || "installation");
+
+    const pop = document.querySelector("#code-pop");
+    const popName = document.querySelector("#code-pop-name");
+    const popCode = document.querySelector("#code-pop-code");
+    const popCopy = document.querySelector("#code-pop-copy");
+    const sources = new Map();
+    const keywords = new Set("False None True and as assert async await break class continue def del elif else except finally for from global if import in is lambda nonlocal not or pass raise return try while with yield".split(" "));
+
+    function escapeHtml(text) {
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function highlightPython(source) {
+      const stringPattern = /^(?:[rRuUbBfF]{1,2})?(?:'''[\s\S]*?'''|"""[\s\S]*?"""|'(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*")/;
+      let html = "";
+      let index = 0;
+      while (index < source.length) {
+        const rest = source.slice(index);
+        if (source[index] === "#") {
+          const end = source.indexOf("\n", index);
+          const stop = end === -1 ? source.length : end;
+          html += `<span class="py-comment">${escapeHtml(source.slice(index, stop))}</span>`;
+          index = stop;
+          continue;
+        }
+        const stringMatch = rest.match(stringPattern);
+        if (stringMatch) {
+          html += `<span class="py-string">${escapeHtml(stringMatch[0])}</span>`;
+          index += stringMatch[0].length;
+          continue;
+        }
+        const name = rest.match(/^[A-Za-z_][A-Za-z0-9_]*/);
+        if (name) {
+          const token = name[0];
+          const after = source.slice(index + token.length);
+          const kind = keywords.has(token) ? "keyword" : /^\s*\(/.test(after) ? "call" : "";
+          html += kind ? `<span class="py-${kind}">${escapeHtml(token)}</span>` : escapeHtml(token);
+          index += token.length;
+          continue;
+        }
+        const number = rest.match(/^\d+(?:\.\d+)?/);
+        if (number) {
+          html += `<span class="py-number">${number[0]}</span>`;
+          index += number[0].length;
+          continue;
+        }
+        html += escapeHtml(source[index]);
+        index += 1;
+      }
+      return html;
+    }
+
+    async function loadSource(path) {
+      if (sources.has(path)) return sources.get(path);
+      const urls = [new URL(path, location.href), new URL(`../${path}`, location.href)];
+      for (const url of urls) {
+        const response = await fetch(url);
+        if (!response.ok) continue;
+        const text = await response.text();
+        sources.set(path, text);
+        return text;
+      }
+      throw new Error(path);
+    }
+
+    function resetCopy() {
+      popCopy.classList.remove("is-copied");
+      popCopy.setAttribute("aria-label", "Copy code");
+      popCopy.title = "Copy code";
+    }
+
+    async function openSource(path) {
+      popName.textContent = path;
+      popCode.textContent = "Loading…";
+      popCopy.disabled = true;
+      resetCopy();
+      pop.dataset.source = "";
+      if (!pop.open) pop.showModal();
+      try {
+        const text = await loadSource(path);
+        pop.dataset.source = text;
+        popCode.innerHTML = highlightPython(text.replace(/\s+$/, ""));
+        popCopy.disabled = false;
+      } catch {
+        popCode.textContent = `Could not load ${path}.`;
+      }
+    }
+
+    for (const ref of document.querySelectorAll(".file-ref")) {
+      ref.addEventListener("click", () => openSource(ref.dataset.file));
+    }
+    pop.addEventListener("click", (event) => {
+      if (event.target === pop) pop.close();
+    });
+    pop.addEventListener("close", resetCopy);
+    popCopy.addEventListener("click", async () => {
+      const text = pop.dataset.source;
+      if (!text) return;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        return;
+      }
+      popCopy.classList.add("is-copied");
+      popCopy.setAttribute("aria-label", "Copied");
+      popCopy.title = "Copied";
+    });
   </script>
 </body>
 </html>

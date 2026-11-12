@@ -1,15 +1,10 @@
-"""A storefront, an API, and the data services behind them.
-
-    python examples/azure_web_api.py
-"""
-
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from infrasketch import Diagram, Https, Private  # noqa: E402
-from infrasketch.azure import (  # noqa: E402
+from infrasketch import Diagram, Https, Private
+from infrasketch.azure import (
     AppService,
     FrontDoor,
     KeyVault,
@@ -24,7 +19,6 @@ from infrasketch.azure import (  # noqa: E402
 )
 
 OUT = Path(__file__).resolve().parent / "out" / "azure-web-api.svg"
-
 
 def main() -> str:
     with Diagram("Web, API, and Redis", OUT, subtitle="Production · West Europe") as diagram:
@@ -49,7 +43,6 @@ def main() -> str:
         api >> database
         api >> Private("secrets") >> vault
     return diagram.path
-
 
 if __name__ == "__main__":
     print(main())

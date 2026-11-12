@@ -1,15 +1,10 @@
-"""An API that hands work to Lambda through a queue.
-
-    python examples/aws_events.py
-"""
-
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from infrasketch import Async, Diagram  # noqa: E402
-from infrasketch.aws import (  # noqa: E402
+from infrasketch import Async, Diagram
+from infrasketch.aws import (
     APIGateway,
     CloudWatch,
     DynamoDB,
@@ -20,7 +15,6 @@ from infrasketch.aws import (  # noqa: E402
 )
 
 OUT = Path(__file__).resolve().parent / "out" / "aws-events.svg"
-
 
 def main() -> str:
     with Diagram("Event-driven functions", OUT, subtitle="API, queue, and data") as diagram:
@@ -38,7 +32,6 @@ def main() -> str:
         orders >> catalog
         worker >> logs
     return diagram.path
-
 
 if __name__ == "__main__":
     print(main())

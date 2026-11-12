@@ -1,15 +1,10 @@
-"""Container Apps behind a private network, pulling images from ACR.
-
-    python examples/azure_container_apps.py
-"""
-
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from infrasketch import Async, Diagram, Private  # noqa: E402
-from infrasketch.azure import (  # noqa: E402
+from infrasketch import Async, Diagram, Private
+from infrasketch.azure import (
     ACR,
     ApplicationGateway,
     ContainerApp,
@@ -25,7 +20,6 @@ from infrasketch.azure import (  # noqa: E402
 )
 
 OUT = Path(__file__).resolve().parent / "out" / "azure-container-apps.svg"
-
 
 def main() -> str:
     with Diagram(
@@ -58,7 +52,6 @@ def main() -> str:
         backend >> Private() >> redis_pe >> cache
         backend >> Private() >> sql_pe >> database
     return diagram.path
-
 
 if __name__ == "__main__":
     print(main())

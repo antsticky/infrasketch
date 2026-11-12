@@ -1,15 +1,10 @@
-"""EKS with a registry, a cache, and a database.
-
-    python examples/aws_eks.py
-"""
-
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from infrasketch import Diagram  # noqa: E402
-from infrasketch.aws import (  # noqa: E402
+from infrasketch import Diagram
+from infrasketch.aws import (
     ECR,
     EKS,
     ELB,
@@ -22,7 +17,6 @@ from infrasketch.aws import (  # noqa: E402
 )
 
 OUT = Path(__file__).resolve().parent / "out" / "aws-eks.svg"
-
 
 def main() -> str:
     with Diagram("EKS platform", OUT, subtitle="Cluster, registry, and private data") as diagram:
@@ -41,7 +35,6 @@ def main() -> str:
         cluster >> cache
         cluster >> database
     return diagram.path
-
 
 if __name__ == "__main__":
     print(main())

@@ -1,15 +1,10 @@
-"""An HTTP API that hands work to functions through Service Bus.
-
-    python examples/azure_functions.py
-"""
-
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from infrasketch import Async, Diagram, Https  # noqa: E402
-from infrasketch.azure import (  # noqa: E402
+from infrasketch import Async, Diagram, Https
+from infrasketch.azure import (
     APIManagement,
     ApplicationInsights,
     BlobStorage,
@@ -26,7 +21,6 @@ from infrasketch.azure import (  # noqa: E402
 )
 
 OUT = Path(__file__).resolve().parent / "out" / "azure-functions.svg"
-
 
 def main() -> str:
     with Diagram("Event-driven functions", OUT, subtitle="API, queue, and data") as diagram:
@@ -62,7 +56,6 @@ def main() -> str:
         worker >> insights
         insights >> logs >> monitor
     return diagram.path
-
 
 if __name__ == "__main__":
     print(main())
