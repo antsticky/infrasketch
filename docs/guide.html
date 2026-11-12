@@ -6,7 +6,7 @@
   <title>Guide · infrasketch</title>
   <meta name="description" content="How to draw Azure and AWS architecture diagrams with infrasketch.">
   <link rel="icon" href="assets/favicon.svg">
-  <link rel="stylesheet" href="assets/site.css?v=10">
+  <link rel="stylesheet" href="assets/site.css?v=12">
 </head>
 <body>
   <header class="top">
@@ -333,6 +333,12 @@ with Diagram("Orders", "orders.svg"):
       } catch {
         popCode.textContent = `Could not load ${path}.`;
       }
+    }
+
+    for (const code of document.querySelectorAll(".guide pre code")) {
+      const text = code.textContent.replace(/^\n/, "").replace(/\s+$/, "");
+      if (text.startsWith("pip ")) continue;
+      code.innerHTML = highlightPython(text);
     }
 
     for (const ref of document.querySelectorAll(".file-ref")) {
