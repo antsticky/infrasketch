@@ -337,10 +337,12 @@ class Node(Endpoint):
 
 
 class Group(Endpoint):
-    """A rounded boundary. Prefer ``ResourceGroup``, ``VNet``, or ``Subnet``.
+    """A plain rounded boundary, with no eyebrow and no icon.
 
-    The title opens and closes the box. ``folded=True`` starts it closed.
-    ``foldable=False`` leaves the box fixed.
+    Prefer a named boundary when you have one, such as ``ResourceGroup``,
+    ``VNet``, ``OnPremises``, or ``Cluster``. The title opens and closes the
+    box. ``folded=True`` starts it closed. ``foldable=False`` leaves the box
+    fixed.
     """
 
     kind = "group"

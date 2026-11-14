@@ -21,20 +21,24 @@ icons are Amazon Web Services artwork. Neither set is covered by that license.
 See ``NOTICE``.
 """
 
+from infrasketch.groups import Cluster, DMZ, Namespace, Network, OnPremises, Zone
 from infrasketch.model import Async, Diagram, Edge, Group, Https, Node, Private
 from infrasketch.search import categories, search
-
-Cluster = Group
 
 __all__ = [
     "Async",
     "Cluster",
+    "DMZ",
     "Diagram",
     "Edge",
     "Group",
     "Https",
+    "Namespace",
+    "Network",
     "Node",
+    "OnPremises",
     "Private",
+    "Zone",
     "categories",
     "search",
 ]

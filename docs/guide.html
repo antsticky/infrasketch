@@ -157,7 +157,7 @@ api = AppService("Orders", icon="logo.ico")</code></pre>
 
       <section class="panel" id="boundaries" hidden>
         <h2>Boundaries &amp; Groups</h2>
-        <p>Import Azure boundaries from <code>infrasketch.azure</code> and AWS boundaries from <code>infrasketch.aws</code>. <code>Group</code> comes from <code>infrasketch</code> and draws a box that belongs to neither cloud. A group takes <code>sku</code>, <code>region</code>, <code>public</code>, and <code>note</code> on the title band. Groups do not take a link.</p>
+        <p>Import Azure boundaries from <code>infrasketch.azure</code> and AWS boundaries from <code>infrasketch.aws</code>. Boundaries that belong to neither cloud, and the plain <code>Group</code>, come from <code>infrasketch</code>. A group takes <code>sku</code>, <code>region</code>, <code>public</code>, and <code>note</code> on the title band. Groups do not take a link.</p>
         <h3>Azure</h3>
         <table>
           <thead><tr><th>Group</th><th>Use it for</th></tr></thead>
@@ -183,6 +183,39 @@ api = AppService("Orders", icon="logo.ico")</code></pre>
             <tr><td><code>AutoScaling("workers")</code></td><td>An Auto Scaling group</td></tr>
           </tbody>
         </table>
+        <h3>Neither cloud</h3>
+        <p><code>Group</code> draws a white box with no eyebrow and no icon. The named boundaries below add a title band. <code>Cluster</code> carries the Kubernetes mark.</p>
+        <table>
+          <thead><tr><th>Group</th><th>Use it for</th></tr></thead>
+          <tbody>
+            <tr><td><code>OnPremises("office")</code></td><td>A datacenter or office</td></tr>
+            <tr><td><code>Zone("dc1")</code></td><td>An availability zone</td></tr>
+            <tr><td><code>Network("lan")</code></td><td>A network that is neither a virtual network nor a VPC</td></tr>
+            <tr><td><code>DMZ("edge")</code></td><td>A public edge in front of a private network</td></tr>
+            <tr><td><code>Cluster("shop")</code></td><td>A Kubernetes cluster</td></tr>
+            <tr><td><code>Namespace("orders")</code></td><td>A namespace inside a cluster</td></tr>
+            <tr><td><code>Group("Observability")</code></td><td>Any other box</td></tr>
+          </tbody>
+        </table>
+        <pre><code>from infrasketch import Cluster, DMZ, Diagram, Https, Namespace, Network, OnPremises, Private, Zone
+from infrasketch.external import Cloudflare, Kubernetes, PostgreSQL, Prometheus
+
+with Diagram("Shop platform", "external-boundaries.svg", subtitle="A public edge, a cluster, and the office"):
+    with DMZ("Public edge"):
+        edge = Cloudflare("Storefront")
+    with OnPremises("Prague office"):
+        with Zone("dc1"):
+            with Network("lan", direction="TB"):
+                with Cluster("shop", direction="LR"):
+                    with Namespace("orders"):
+                        api = Kubernetes("API")
+                    with Namespace("data"):
+                        database = PostgreSQL("Orders")
+                metrics = Prometheus("Metrics")
+    edge &gt;&gt; Https("Customers reach the API", 1) &gt;&gt; api
+    api &gt;&gt; Private("The API reads orders", 2) &gt;&gt; database
+    api &gt;&gt; Private() &gt;&gt; metrics</code></pre>
+        <p>See <button type="button" class="file-ref" data-file="examples/external_boundaries.py">examples/external_boundaries.py</button>.</p>
         <p>Every boundary starts open, and its title is a button. Click the title, or focus it and press Enter or Space, to close the box, and do the same again to open it. A keyboard focus draws a ring on the box. This is the same for a resource group, a virtual network, a subnet, a VPC, and the other boundaries.</p>
         <p><code>folded=True</code> starts that box closed. The resources stay in the model, the box shows how many there are, and a connector from outside lands on the box. <code>foldable=False</code> leaves a boundary fixed. Open the SVG in a browser; an image preview does not run the click. Lines that start and end inside a closed box are not drawn. If a diagram has too many boundaries to open and close, set <code>foldable=False</code> on the ones that should stay fixed.</p>
         <pre><code>from infrasketch import Diagram, Private

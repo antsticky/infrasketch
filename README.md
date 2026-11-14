@@ -134,7 +134,20 @@ api = AppService(
 | `VNet("vnet-app")` | A virtual network |
 | `Subnet("snet-api")` | A subnet |
 | `PrivateNetwork("data")` | Private endpoints or Private Link |
-| `Group("Workers")` | Anything else |
+| `Group("Workers")` | A plain box, with no eyebrow and no icon |
+
+Boundaries that belong to neither cloud come from `infrasketch`:
+
+| Group | Use it for |
+| --- | --- |
+| `OnPremises("office")` | A datacenter or office |
+| `Zone("dc1")` | An availability zone |
+| `Network("lan")` | A network that is neither a virtual network nor a VPC |
+| `DMZ("edge")` | A public edge in front of a private network |
+| `Cluster("shop")` | A Kubernetes cluster |
+| `Namespace("orders")` | A namespace inside a cluster |
+
+See `examples/external_boundaries.py`.
 
 Inside a boundary, connected resources flow in the diagram direction.
 Resources at the same step stack, which is what you want for a cache beside
@@ -221,6 +234,7 @@ are never recoloured or stretched.
 | `examples/aws_decisions.py` | The same decisions on an AWS drawing |
 | `examples/external_github.py` | A GitHub repository deploying an App Service |
 | `examples/external_edge.py` | Cloudflare and Akamai in front of an App Service |
+| `examples/external_boundaries.py` | On-premises, a zone, a network, a DMZ, a cluster, and namespaces |
 
 ![Web, API, and Redis](examples/out/azure-web-api.svg)
 

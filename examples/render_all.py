@@ -18,6 +18,7 @@ from azure_grid import main as azure_grid
 from custom_icon import main as custom_icon
 from azure_network import main as azure_network
 from azure_web_api import main as azure_web_api
+from external_boundaries import main as external_boundaries
 from external_edge import main as external_edge
 from external_github import main as external_github
 
@@ -40,6 +41,7 @@ def main() -> None:
         aws_decisions,
         external_github,
         external_edge,
+        external_boundaries,
     ):
         print(render())
 
